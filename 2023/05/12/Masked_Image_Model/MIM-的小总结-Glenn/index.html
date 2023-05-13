@@ -17,13 +17,13 @@
   <meta http-equiv="window-target" content="_top" />
   
   
-  <title>MIM 的小总结 | Hexo</title>
-  <meta name="description" content="MIM 专栏：  距离放出的最新 Masked Image Model（MIM）文章（非特定领域）已经过去 8 天了。 趁这段时间，赶紧对 MIM 做下小总结。  MIM 作为上游任务，其目标应该是为下游任务（例如分类、分割、目标检测）提供一个有利的初始化。 直观上来看，当模型面临具有挑战性的重建任务时，它需要学会识别图像中更复杂、更抽象的特征，以便在缺失数据的情况下进行有效的预测。这意味着编码">
+  <title>MIM 的小总结（一） | Glenn&#39;s blog</title>
+  <meta name="description" content="距离放出的最新 Masked Image Model（MIM）文章（非特定领域）已经过去 8 天了。 趁这段时间，赶紧对 MIM 做下小总结。  MIM 作为上游任务，其目标应该是为下游任务（例如分类、分割、目标检测）提供一个有利的初始化。 直观上来看，当模型面临具有挑战性的重建任务时，它需要学会识别图像中更复杂、更抽象的特征，以便在缺失数据的情况下进行有效的预测。这意味着编码器需要捕捉更高层次的">
 <meta property="og:type" content="article">
-<meta property="og:title" content="MIM 的小总结">
+<meta property="og:title" content="MIM 的小总结（一）">
 <meta property="og:url" content="https://chenluda.github.io/2023/05/12/Masked_Image_Model/MIM-%E7%9A%84%E5%B0%8F%E6%80%BB%E7%BB%93-Glenn/index.html">
 <meta property="og:site_name" content="Glenn">
-<meta property="og:description" content="MIM 专栏：  距离放出的最新 Masked Image Model（MIM）文章（非特定领域）已经过去 8 天了。 趁这段时间，赶紧对 MIM 做下小总结。  MIM 作为上游任务，其目标应该是为下游任务（例如分类、分割、目标检测）提供一个有利的初始化。 直观上来看，当模型面临具有挑战性的重建任务时，它需要学会识别图像中更复杂、更抽象的特征，以便在缺失数据的情况下进行有效的预测。这意味着编码">
+<meta property="og:description" content="距离放出的最新 Masked Image Model（MIM）文章（非特定领域）已经过去 8 天了。 趁这段时间，赶紧对 MIM 做下小总结。  MIM 作为上游任务，其目标应该是为下游任务（例如分类、分割、目标检测）提供一个有利的初始化。 直观上来看，当模型面临具有挑战性的重建任务时，它需要学会识别图像中更复杂、更抽象的特征，以便在缺失数据的情况下进行有效的预测。这意味着编码器需要捕捉更高层次的">
 <meta property="og:locale" content="zh_CN">
 <meta property="og:image" content="https://chenluda.github.io/2023/05/12/Masked_Image_Model/MIM-%E7%9A%84%E5%B0%8F%E6%80%BB%E7%BB%93-Glenn/v2-574a30b52a04d88b780eab87b21be5ab_r.jpg">
 <meta property="og:image" content="https://chenluda.github.io/2023/05/12/Masked_Image_Model/MIM-%E7%9A%84%E5%B0%8F%E6%80%BB%E7%BB%93-Glenn/v2-77dca549bf63f1e0f9f80bca2ca4d42b_r.jpg">
@@ -33,7 +33,7 @@
 <meta property="og:image" content="https://chenluda.github.io/2023/05/12/Masked_Image_Model/MIM-%E7%9A%84%E5%B0%8F%E6%80%BB%E7%BB%93-Glenn/v2-d30d37fe2f0a478acec274149a179546_r.jpg">
 <meta property="og:image" content="https://chenluda.github.io/2023/05/12/Masked_Image_Model/MIM-%E7%9A%84%E5%B0%8F%E6%80%BB%E7%BB%93-Glenn/v2-a3dc5d996ced8d6e58351bb800f6624d_r.jpg">
 <meta property="article:published_time" content="2023-05-12T10:44:56.000Z">
-<meta property="article:modified_time" content="2023-05-13T04:04:15.706Z">
+<meta property="article:modified_time" content="2023-05-13T05:49:00.410Z">
 <meta property="article:author" content="Glenn">
 <meta property="article:tag" content="Masked Image Modeling">
 <meta name="twitter:card" content="summary">
@@ -44,7 +44,7 @@
     <link rel="alternate" href="/atom.xml" title="Glenn" type="application/atom+xml">
   
   
-    <link rel="icon" href="/favicon.png" type="image/x-icon">
+    <link rel="icon" href="/images/avatar.png" type="image/x-icon">
   
   
 <link rel="stylesheet" href="/css/style.css">
@@ -108,7 +108,7 @@
       </button>
     </div>
     <nav id="main-navbar" class="collapse navbar-collapse" itemscope itemtype="http://schema.org/SiteNavigationElement" role="navigation">
-      <ul class="nav navbar-nav main-nav ">
+      <ul class="nav navbar-nav main-nav menu-highlight">
         
         
         <li class="menu-item menu-item-home">
@@ -175,17 +175,7 @@
   <div class="widget">
     <h3 class="widget-title">分类</h3>
     <div class="widget-body">
-      <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/%E4%BB%A3%E7%A0%81/">代码</a><span class="category-list-count">4</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/%E8%AE%BA%E6%96%87%E9%80%9F%E8%A7%88/">论文速览</a><span class="category-list-count">13</span></li></ul>
-    </div>
-  </div>
-
-
-    
-      
-  <div class="widget">
-    <h3 class="widget-title">标签</h3>
-    <div class="widget-body">
-      <ul class="tag-list" itemprop="keywords"><li class="tag-list-item"><a class="tag-list-link" href="/tags/Masked-Image-Modeling/" rel="tag">Masked Image Modeling</a><span class="tag-list-count">13</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Research/" rel="tag">Research</a><span class="tag-list-count">4</span></li></ul>
+      <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/%E4%BB%A3%E7%A0%81/">代码</a><span class="category-list-count">4</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/%E8%AE%BA%E6%96%87/">论文</a><span class="category-list-count">13</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/%E9%80%9F%E8%A7%88/">速览</a><span class="category-list-count">2</span></li></ul>
     </div>
   </div>
 
@@ -195,7 +185,7 @@
   <div class="widget">
     <h3 class="widget-title">标签云</h3>
     <div class="widget-body tagcloud">
-      <a href="/tags/Masked-Image-Modeling/" style="font-size: 14px;">Masked Image Modeling</a> <a href="/tags/Research/" style="font-size: 13px;">Research</a>
+      <a href="/tags/Competition/" style="font-size: 13px;">Competition</a> <a href="/tags/Masked-Image-Modeling/" style="font-size: 14px;">Masked Image Modeling</a> <a href="/tags/Research/" style="font-size: 13.5px;">Research</a>
     </div>
   </div>
 
@@ -204,7 +194,7 @@
   <div class="widget">
     <h3 class="widget-title">归档</h3>
     <div class="widget-body">
-      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2023/05/">五月 2023</a><span class="archive-list-count">17</span></li></ul>
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2023/05/">五月 2023</a><span class="archive-list-count">19</span></li></ul>
     </div>
   </div>
 
@@ -216,6 +206,36 @@
     <div class="widget-body">
       <ul class="recent-post-list list-unstyled no-thumbnail">
         
+          <li>
+            
+            <div class="item-inner">
+              <p class="item-category">
+                <a class="category-link" href="/categories/%E9%80%9F%E8%A7%88/">速览</a>
+              </p>
+              <p class="item-title">
+                <a href="/2023/05/13/%E9%80%9F%E8%A7%88/MICCAI-2023-%E6%8C%91%E6%88%98%E8%B5%9B%E9%80%9F%E8%A7%88-Glenn/" class="title">MICCAI 2023 挑战赛速览</a>
+              </p>
+              <p class="item-date">
+                <time datetime="2023-05-13T05:01:44.000Z" itemprop="datePublished">2023-05-13</time>
+              </p>
+            </div>
+          </li>
+          
+          <li>
+            
+            <div class="item-inner">
+              <p class="item-category">
+                <a class="category-link" href="/categories/%E9%80%9F%E8%A7%88/">速览</a>
+              </p>
+              <p class="item-title">
+                <a href="/2023/05/13/%E9%80%9F%E8%A7%88/AI%E5%AD%A6%E6%9C%AF%E4%BA%A7%E5%93%81%E4%BA%A7%E5%93%81%E4%B8%80/" class="title">AI 学术产品速览（一）</a>
+              </p>
+              <p class="item-date">
+                <time datetime="2023-05-13T04:55:01.000Z" itemprop="datePublished">2023-05-13</time>
+              </p>
+            </div>
+          </li>
+          
           <li>
             
             <div class="item-inner">
@@ -261,36 +281,6 @@
             </div>
           </li>
           
-          <li>
-            
-            <div class="item-inner">
-              <p class="item-category">
-                <a class="category-link" href="/categories/%E4%BB%A3%E7%A0%81/">代码</a>
-              </p>
-              <p class="item-title">
-                <a href="/2023/05/12/%E4%BB%A3%E7%A0%81/%E4%BB%A3%E7%A0%81-%E4%BB%8E-OpenReview-%E8%8E%B7%E5%8F%96%E9%A1%B6-Glenn/" class="title">代码 | 从 OpenReview 获取顶会接收论文集并保存至本地数据库</a>
-              </p>
-              <p class="item-date">
-                <time datetime="2023-05-12T10:52:15.000Z" itemprop="datePublished">2023-05-12</time>
-              </p>
-            </div>
-          </li>
-          
-          <li>
-            
-            <div class="item-inner">
-              <p class="item-category">
-                <a class="category-link" href="/categories/%E8%AE%BA%E6%96%87%E9%80%9F%E8%A7%88/">论文速览</a>
-              </p>
-              <p class="item-title">
-                <a href="/2023/05/12/Masked_Image_Model/MIM-%E7%9A%84%E5%B0%8F%E6%80%BB%E7%BB%93-Glenn/" class="title">MIM 的小总结</a>
-              </p>
-              <p class="item-date">
-                <time datetime="2023-05-12T10:44:56.000Z" itemprop="datePublished">2023-05-12</time>
-              </p>
-            </div>
-          </li>
-          
       </ul>
     </div>
   </div>
@@ -311,7 +301,7 @@
         
   
     <h1 class="article-title" itemprop="name">
-      MIM 的小总结
+      MIM 的小总结（一）
     </h1>
   
 
@@ -326,7 +316,7 @@
         
   <span class="article-category">
     <i class="icon icon-folder"></i>
-    <a class="article-category-link" href="/categories/%E8%AE%BA%E6%96%87%E9%80%9F%E8%A7%88/">论文速览</a>
+    <a class="article-category-link" href="/categories/%E8%AE%BA%E6%96%87/">论文</a>
   </span>
 
         
@@ -338,16 +328,20 @@
 
         
 
+	<span class="article-read hidden-xs">
+    	<i class="icon icon-eye-fill" aria-hidden="true"></i>
+    	<span id="/2023/05/12/Masked_Image_Model/MIM-%E7%9A%84%E5%B0%8F%E6%80%BB%E7%BB%93-Glenn/" class="leancloud_visitors"  data-flag-title="MIM 的小总结（一）">
+			<span class="leancloud-visitors-count">0</span>
+		</span>
+    </span>
+
         <span class="post-comment"><i class="icon icon-comment"></i> <a href="/2023/05/12/Masked_Image_Model/MIM-%E7%9A%84%E5%B0%8F%E6%80%BB%E7%BB%93-Glenn/#comments" class="article-comment-link">评论</a></span>
         
       </div>
     </div>
     <div class="article-entry marked-body" itemprop="articleBody">
       
-        <blockquote>
-<p>MIM 专栏：</p>
-</blockquote>
-<p>距离放出的最新 Masked Image Model（MIM）文章（非特定领域）已经过去 8 天了。</p>
+        <p>距离放出的最新 Masked Image Model（MIM）文章（非特定领域）已经过去 8 天了。</p>
 <p>趁这段时间，赶紧对 MIM 做下小总结。</p>
 <hr>
 <p>MIM 作为上游任务，其目标应该是为下游任务（例如分类、分割、目标检测）提供一个有利的初始化。</p>
@@ -415,7 +409,7 @@
     
     <li class="post-copyright-link hidden-xs">
       <strong>本文链接：</strong>
-      <a href="https://chenluda.github.io/2023/05/12/Masked_Image_Model/MIM-%E7%9A%84%E5%B0%8F%E6%80%BB%E7%BB%93-Glenn/" title="MIM 的小总结" target="_blank" rel="external">https://chenluda.github.io/2023/05/12/Masked_Image_Model/MIM-的小总结-Glenn/</a>
+      <a href="https://chenluda.github.io/2023/05/12/Masked_Image_Model/MIM-%E7%9A%84%E5%B0%8F%E6%80%BB%E7%BB%93-Glenn/" title="MIM 的小总结（一）" target="_blank" rel="external">https://chenluda.github.io/2023/05/12/Masked_Image_Model/MIM-的小总结-Glenn/</a>
     </li>
     
     <li class="post-copyright-license">
@@ -559,13 +553,13 @@ window.jQuery || document.write('<script src="js/jquery.min.js"><\/script>')
     el: '#vcomments',
     verify: false,
     notify: false,
-    appId: '',
-    appKey: '',
-    placeholder: 'Just go go',
+    appId: 'Mr6aCGJuw2sme5obVyjdlAIp-gzGzoHsz',
+    appKey: 'fja89BU5rk64kGgsGqptQTUX',
+    placeholder: '请输入...',
     avatar: 'mm',
     meta: meta,
     pageSize: '10' || 10,
-    visitor: false
+    visitor: true
   });
   </script>
 

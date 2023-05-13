@@ -17,7 +17,7 @@
   <meta http-equiv="window-target" content="_top" />
   
   
-  <title>代码 | 获取 arXiv 论文作者单位 | Hexo</title>
+  <title>代码 | 获取 arXiv 论文作者单位 | Glenn&#39;s blog</title>
   <meta name="description" content="前几天写了些代码，实现了每天定点向微信推送 arXiv 的最新文章，推送内容包括论文标题、论文网址、首次发布时间、摘要。现在需要提供作者单位，代码已集成在上一篇文章的代码中。 论文标题、论文网址、首次发布时间、摘要等内容都可以通过 arXiv 的接口直接获取。但它没有提供作者单位。 作者单位在论文中的位置随期刊或会议格式而变动，但通常都在第一页。 所以我们需要先将论文 pdf 的第一页解析为可识别">
 <meta property="og:type" content="article">
 <meta property="og:title" content="代码 | 获取 arXiv 论文作者单位">
@@ -27,7 +27,7 @@
 <meta property="og:locale" content="zh_CN">
 <meta property="og:image" content="https://chenluda.github.io/2023/05/12/%E4%BB%A3%E7%A0%81/%E4%BB%A3%E7%A0%81-%E8%8E%B7%E5%8F%96-arXiv-%E8%AE%BA%E6%96%87%E4%BD%9C%E8%80%85%E5%8D%95%E4%BD%8D-Glenn/v2-9a0900099d877206d2438937313032b5_r.jpg">
 <meta property="article:published_time" content="2023-05-12T10:52:40.000Z">
-<meta property="article:modified_time" content="2023-05-13T04:33:57.272Z">
+<meta property="article:modified_time" content="2023-05-13T05:33:40.965Z">
 <meta property="article:author" content="Glenn">
 <meta property="article:tag" content="Research">
 <meta name="twitter:card" content="summary">
@@ -38,7 +38,7 @@
     <link rel="alternate" href="/atom.xml" title="Glenn" type="application/atom+xml">
   
   
-    <link rel="icon" href="/favicon.png" type="image/x-icon">
+    <link rel="icon" href="/images/avatar.png" type="image/x-icon">
   
   
 <link rel="stylesheet" href="/css/style.css">
@@ -102,7 +102,7 @@
       </button>
     </div>
     <nav id="main-navbar" class="collapse navbar-collapse" itemscope itemtype="http://schema.org/SiteNavigationElement" role="navigation">
-      <ul class="nav navbar-nav main-nav ">
+      <ul class="nav navbar-nav main-nav menu-highlight">
         
         
         <li class="menu-item menu-item-home">
@@ -169,17 +169,7 @@
   <div class="widget">
     <h3 class="widget-title">分类</h3>
     <div class="widget-body">
-      <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/%E4%BB%A3%E7%A0%81/">代码</a><span class="category-list-count">4</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/%E8%AE%BA%E6%96%87%E9%80%9F%E8%A7%88/">论文速览</a><span class="category-list-count">13</span></li></ul>
-    </div>
-  </div>
-
-
-    
-      
-  <div class="widget">
-    <h3 class="widget-title">标签</h3>
-    <div class="widget-body">
-      <ul class="tag-list" itemprop="keywords"><li class="tag-list-item"><a class="tag-list-link" href="/tags/Masked-Image-Modeling/" rel="tag">Masked Image Modeling</a><span class="tag-list-count">13</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Research/" rel="tag">Research</a><span class="tag-list-count">4</span></li></ul>
+      <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/%E4%BB%A3%E7%A0%81/">代码</a><span class="category-list-count">4</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/%E8%AE%BA%E6%96%87/">论文</a><span class="category-list-count">13</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/%E9%80%9F%E8%A7%88/">速览</a><span class="category-list-count">2</span></li></ul>
     </div>
   </div>
 
@@ -189,7 +179,7 @@
   <div class="widget">
     <h3 class="widget-title">标签云</h3>
     <div class="widget-body tagcloud">
-      <a href="/tags/Masked-Image-Modeling/" style="font-size: 14px;">Masked Image Modeling</a> <a href="/tags/Research/" style="font-size: 13px;">Research</a>
+      <a href="/tags/Competition/" style="font-size: 13px;">Competition</a> <a href="/tags/Masked-Image-Modeling/" style="font-size: 14px;">Masked Image Modeling</a> <a href="/tags/Research/" style="font-size: 13.5px;">Research</a>
     </div>
   </div>
 
@@ -198,7 +188,7 @@
   <div class="widget">
     <h3 class="widget-title">归档</h3>
     <div class="widget-body">
-      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2023/05/">五月 2023</a><span class="archive-list-count">17</span></li></ul>
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2023/05/">五月 2023</a><span class="archive-list-count">19</span></li></ul>
     </div>
   </div>
 
@@ -210,6 +200,36 @@
     <div class="widget-body">
       <ul class="recent-post-list list-unstyled no-thumbnail">
         
+          <li>
+            
+            <div class="item-inner">
+              <p class="item-category">
+                <a class="category-link" href="/categories/%E9%80%9F%E8%A7%88/">速览</a>
+              </p>
+              <p class="item-title">
+                <a href="/2023/05/13/%E9%80%9F%E8%A7%88/MICCAI-2023-%E6%8C%91%E6%88%98%E8%B5%9B%E9%80%9F%E8%A7%88-Glenn/" class="title">MICCAI 2023 挑战赛速览</a>
+              </p>
+              <p class="item-date">
+                <time datetime="2023-05-13T05:01:44.000Z" itemprop="datePublished">2023-05-13</time>
+              </p>
+            </div>
+          </li>
+          
+          <li>
+            
+            <div class="item-inner">
+              <p class="item-category">
+                <a class="category-link" href="/categories/%E9%80%9F%E8%A7%88/">速览</a>
+              </p>
+              <p class="item-title">
+                <a href="/2023/05/13/%E9%80%9F%E8%A7%88/AI%E5%AD%A6%E6%9C%AF%E4%BA%A7%E5%93%81%E4%BA%A7%E5%93%81%E4%B8%80/" class="title">AI 学术产品速览（一）</a>
+              </p>
+              <p class="item-date">
+                <time datetime="2023-05-13T04:55:01.000Z" itemprop="datePublished">2023-05-13</time>
+              </p>
+            </div>
+          </li>
+          
           <li>
             
             <div class="item-inner">
@@ -251,36 +271,6 @@
               </p>
               <p class="item-date">
                 <time datetime="2023-05-12T10:52:25.000Z" itemprop="datePublished">2023-05-12</time>
-              </p>
-            </div>
-          </li>
-          
-          <li>
-            
-            <div class="item-inner">
-              <p class="item-category">
-                <a class="category-link" href="/categories/%E4%BB%A3%E7%A0%81/">代码</a>
-              </p>
-              <p class="item-title">
-                <a href="/2023/05/12/%E4%BB%A3%E7%A0%81/%E4%BB%A3%E7%A0%81-%E4%BB%8E-OpenReview-%E8%8E%B7%E5%8F%96%E9%A1%B6-Glenn/" class="title">代码 | 从 OpenReview 获取顶会接收论文集并保存至本地数据库</a>
-              </p>
-              <p class="item-date">
-                <time datetime="2023-05-12T10:52:15.000Z" itemprop="datePublished">2023-05-12</time>
-              </p>
-            </div>
-          </li>
-          
-          <li>
-            
-            <div class="item-inner">
-              <p class="item-category">
-                <a class="category-link" href="/categories/%E8%AE%BA%E6%96%87%E9%80%9F%E8%A7%88/">论文速览</a>
-              </p>
-              <p class="item-title">
-                <a href="/2023/05/12/Masked_Image_Model/MIM-%E7%9A%84%E5%B0%8F%E6%80%BB%E7%BB%93-Glenn/" class="title">MIM 的小总结</a>
-              </p>
-              <p class="item-date">
-                <time datetime="2023-05-12T10:44:56.000Z" itemprop="datePublished">2023-05-12</time>
               </p>
             </div>
           </li>
@@ -331,6 +321,13 @@
 
 
         
+
+	<span class="article-read hidden-xs">
+    	<i class="icon icon-eye-fill" aria-hidden="true"></i>
+    	<span id="/2023/05/12/%E4%BB%A3%E7%A0%81/%E4%BB%A3%E7%A0%81-%E8%8E%B7%E5%8F%96-arXiv-%E8%AE%BA%E6%96%87%E4%BD%9C%E8%80%85%E5%8D%95%E4%BD%8D-Glenn/" class="leancloud_visitors"  data-flag-title="代码 | 获取 arXiv 论文作者单位">
+			<span class="leancloud-visitors-count">0</span>
+		</span>
+    </span>
 
         <span class="post-comment"><i class="icon icon-comment"></i> <a href="/2023/05/12/%E4%BB%A3%E7%A0%81/%E4%BB%A3%E7%A0%81-%E8%8E%B7%E5%8F%96-arXiv-%E8%AE%BA%E6%96%87%E4%BD%9C%E8%80%85%E5%8D%95%E4%BD%8D-Glenn/#comments" class="article-comment-link">评论</a></span>
         
@@ -435,6 +432,10 @@
   
   <ul class="pager pull-left">
     
+    <li class="prev">
+      <a href="/2023/05/13/%E9%80%9F%E8%A7%88/AI%E5%AD%A6%E6%9C%AF%E4%BA%A7%E5%93%81%E4%BA%A7%E5%93%81%E4%B8%80/" title="AI 学术产品速览（一）"><i class="icon icon-angle-left" aria-hidden="true"></i><span>&nbsp;&nbsp;上一篇</span></a>
+    </li>
+    
     
     <li class="next">
       <a href="/2023/05/12/%E4%BB%A3%E7%A0%81/%E4%BB%A3%E7%A0%81-%E6%AF%8F%E5%A4%A9%E5%AE%9A%E7%82%B9%E5%90%91%E5%BE%AE%E4%BF%A1%E6%8E%A8%E9%80%81-arXiv-Glenn/" title="代码 | 每天定点向微信推送 arXiv 最新文章"><span>下一篇&nbsp;&nbsp;</span><i class="icon icon-angle-right" aria-hidden="true"></i></a>
@@ -529,13 +530,13 @@ window.jQuery || document.write('<script src="js/jquery.min.js"><\/script>')
     el: '#vcomments',
     verify: false,
     notify: false,
-    appId: '',
-    appKey: '',
-    placeholder: 'Just go go',
+    appId: 'Mr6aCGJuw2sme5obVyjdlAIp-gzGzoHsz',
+    appKey: 'fja89BU5rk64kGgsGqptQTUX',
+    placeholder: '请输入...',
     avatar: 'mm',
     meta: meta,
     pageSize: '10' || 10,
-    visitor: false
+    visitor: true
   });
   </script>
 

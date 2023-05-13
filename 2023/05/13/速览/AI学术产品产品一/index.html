@@ -1,0 +1,620 @@
+<!DOCTYPE html>
+<html lang=zh>
+<head>
+  <meta charset="utf-8">
+  
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=no, minimal-ui">
+  <meta name="renderer" content="webkit">
+  <meta http-equiv="Cache-Control" content="no-transform" />
+  <meta http-equiv="Cache-Control" content="no-siteapp" />
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black">
+  <meta name="format-detection" content="telephone=no,email=no,adress=no">
+  <!-- Color theme for statusbar -->
+  <meta name="theme-color" content="#000000" />
+  <!-- 强制页面在当前窗口以独立页面显示,防止别人在框架里调用页面 -->
+  <meta http-equiv="window-target" content="_top" />
+  
+  
+  <title>AI 学术产品速览（一） | Glenn&#39;s blog</title>
+  <meta name="description" content="在大模型时代，人工智能学术产品已经成为科学研究领域的一大助力。这些产品通过提高科研人员的工作效率，实现了对科研过程的优化，从而推动科学进步和技术创新。随着不断更新的算法和技术，AI 学术产品已经逐渐渗透到各个学科领域，为科研人员在数据分析、文献检索、实验设计等方面提供了极大的便利。  开源产品学术优化：chatgpt_academic源代码：https:&#x2F;&#x2F;github.com&#x2F;binary-hu">
+<meta property="og:type" content="article">
+<meta property="og:title" content="AI 学术产品速览（一）">
+<meta property="og:url" content="https://chenluda.github.io/2023/05/13/%E9%80%9F%E8%A7%88/AI%E5%AD%A6%E6%9C%AF%E4%BA%A7%E5%93%81%E4%BA%A7%E5%93%81%E4%B8%80/index.html">
+<meta property="og:site_name" content="Glenn">
+<meta property="og:description" content="在大模型时代，人工智能学术产品已经成为科学研究领域的一大助力。这些产品通过提高科研人员的工作效率，实现了对科研过程的优化，从而推动科学进步和技术创新。随着不断更新的算法和技术，AI 学术产品已经逐渐渗透到各个学科领域，为科研人员在数据分析、文献检索、实验设计等方面提供了极大的便利。  开源产品学术优化：chatgpt_academic源代码：https:&#x2F;&#x2F;github.com&#x2F;binary-hu">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://chenluda.github.io/2023/05/13/%E9%80%9F%E8%A7%88/AI%E5%AD%A6%E6%9C%AF%E4%BA%A7%E5%93%81%E4%BA%A7%E5%93%81%E4%B8%80/v2-fc5395f1dc64d6098e09923be4172b66_r.jpg">
+<meta property="og:image" content="https://chenluda.github.io/2023/05/13/%E9%80%9F%E8%A7%88/AI%E5%AD%A6%E6%9C%AF%E4%BA%A7%E5%93%81%E4%BA%A7%E5%93%81%E4%B8%80/v2-5c5fb82ff31c74741335e6e548443f9d_r.jpg">
+<meta property="og:image" content="https://chenluda.github.io/2023/05/13/%E9%80%9F%E8%A7%88/AI%E5%AD%A6%E6%9C%AF%E4%BA%A7%E5%93%81%E4%BA%A7%E5%93%81%E4%B8%80/v2-3ffbc0a36f04f8702db20bf02e17735b_r.jpg">
+<meta property="og:image" content="https://chenluda.github.io/2023/05/13/%E9%80%9F%E8%A7%88/AI%E5%AD%A6%E6%9C%AF%E4%BA%A7%E5%93%81%E4%BA%A7%E5%93%81%E4%B8%80/v2-9c2cd3fafe55ed538d7eae294018ad31_r.jpg">
+<meta property="og:image" content="https://chenluda.github.io/2023/05/13/%E9%80%9F%E8%A7%88/AI%E5%AD%A6%E6%9C%AF%E4%BA%A7%E5%93%81%E4%BA%A7%E5%93%81%E4%B8%80/v2-04619b074e597b120b9eaece1aa0449b_r.jpg">
+<meta property="og:image" content="https://chenluda.github.io/2023/05/13/%E9%80%9F%E8%A7%88/AI%E5%AD%A6%E6%9C%AF%E4%BA%A7%E5%93%81%E4%BA%A7%E5%93%81%E4%B8%80/v2-6b1e8cb0394a6d1e88d8c0d15d61b7f9_r.jpg">
+<meta property="og:image" content="https://chenluda.github.io/2023/05/13/%E9%80%9F%E8%A7%88/AI%E5%AD%A6%E6%9C%AF%E4%BA%A7%E5%93%81%E4%BA%A7%E5%93%81%E4%B8%80/v2-f0ccbe69e611b0072672538e730d7eb2_r.jpg">
+<meta property="og:image" content="https://chenluda.github.io/2023/05/13/%E9%80%9F%E8%A7%88/AI%E5%AD%A6%E6%9C%AF%E4%BA%A7%E5%93%81%E4%BA%A7%E5%93%81%E4%B8%80/v2-697a5d295505d29fade7d46a305d4623_r.jpg">
+<meta property="og:image" content="https://chenluda.github.io/2023/05/13/%E9%80%9F%E8%A7%88/AI%E5%AD%A6%E6%9C%AF%E4%BA%A7%E5%93%81%E4%BA%A7%E5%93%81%E4%B8%80/v2-65962c83eebe61124bcec305bf5579f8_r.jpg">
+<meta property="og:image" content="https://chenluda.github.io/2023/05/13/%E9%80%9F%E8%A7%88/AI%E5%AD%A6%E6%9C%AF%E4%BA%A7%E5%93%81%E4%BA%A7%E5%93%81%E4%B8%80/v2-e2934cd3da7cd0d3761ed2171b87487b_r.jpg">
+<meta property="og:image" content="https://chenluda.github.io/2023/05/13/%E9%80%9F%E8%A7%88/AI%E5%AD%A6%E6%9C%AF%E4%BA%A7%E5%93%81%E4%BA%A7%E5%93%81%E4%B8%80/v2-b515bbaab162df3017940a374f88bf70_r.jpg">
+<meta property="og:image" content="https://chenluda.github.io/2023/05/13/%E9%80%9F%E8%A7%88/AI%E5%AD%A6%E6%9C%AF%E4%BA%A7%E5%93%81%E4%BA%A7%E5%93%81%E4%B8%80/v2-831a140893752c1c87dfb5d3684d5d19_r.jpg">
+<meta property="og:image" content="https://chenluda.github.io/2023/05/13/%E9%80%9F%E8%A7%88/AI%E5%AD%A6%E6%9C%AF%E4%BA%A7%E5%93%81%E4%BA%A7%E5%93%81%E4%B8%80/v2-24b4fb0bce5f2fbb505636d85d70a619_r.jpg">
+<meta property="og:image" content="https://chenluda.github.io/2023/05/13/%E9%80%9F%E8%A7%88/AI%E5%AD%A6%E6%9C%AF%E4%BA%A7%E5%93%81%E4%BA%A7%E5%93%81%E4%B8%80/v2-fae2eb8fb396d245f80a4f5336f6d7b6_r.jpg">
+<meta property="og:image" content="https://chenluda.github.io/2023/05/13/%E9%80%9F%E8%A7%88/AI%E5%AD%A6%E6%9C%AF%E4%BA%A7%E5%93%81%E4%BA%A7%E5%93%81%E4%B8%80/v2-fab3b957355fccaaafd9ca80fc09f8eb_r.jpg">
+<meta property="article:published_time" content="2023-05-13T04:55:01.000Z">
+<meta property="article:modified_time" content="2023-05-13T05:27:32.005Z">
+<meta property="article:author" content="Glenn">
+<meta property="article:tag" content="Research">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://chenluda.github.io/2023/05/13/%E9%80%9F%E8%A7%88/AI%E5%AD%A6%E6%9C%AF%E4%BA%A7%E5%93%81%E4%BA%A7%E5%93%81%E4%B8%80/v2-fc5395f1dc64d6098e09923be4172b66_r.jpg">
+  <!-- Canonical links -->
+  <link rel="canonical" href="https://chenluda.github.io/2023/05/13/%E9%80%9F%E8%A7%88/AI%E5%AD%A6%E6%9C%AF%E4%BA%A7%E5%93%81%E4%BA%A7%E5%93%81%E4%B8%80/index.html">
+  
+    <link rel="alternate" href="/atom.xml" title="Glenn" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="/images/avatar.png" type="image/x-icon">
+  
+  
+<link rel="stylesheet" href="/css/style.css">
+
+  
+  
+  
+  
+<!-- hexo injector head_end start -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/katex.min.css">
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/hexo-math@4.0.0/dist/style.css">
+<!-- hexo injector head_end end --><meta name="generator" content="Hexo 6.3.0"></head>
+
+
+<body class="main-center theme-black" itemscope itemtype="http://schema.org/WebPage">
+  <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+  <div class="slimContent">
+    <div class="navbar-header">
+      
+      
+      <div class="profile-block text-center">
+        <a id="avatar" href="https://github.com/chenluda" target="_blank">
+          <img class="img-circle img-rotate" src="/images/avatar.png" width="200" height="200">
+        </a>
+        <h2 id="name" class="hidden-xs hidden-sm">Glenn</h2>
+        <h3 id="title" class="hidden-xs hidden-sm hidden-md">Stay hungry, stay foolish.</h3>
+        <small id="location" class="text-muted hidden-xs hidden-sm"><i class="icon icon-map-marker"></i> Yunnan, China</small>
+      </div>
+      
+      <div class="search" id="search-form-wrap">
+
+    <form class="search-form sidebar-form">
+        <div class="input-group">
+            <input type="text" class="search-form-input form-control" placeholder="搜索" />
+            <span class="input-group-btn">
+                <button type="submit" class="search-form-submit btn btn-flat" onclick="return false;"><i class="icon icon-search"></i></button>
+            </span>
+        </div>
+    </form>
+    <div class="ins-search">
+  <div class="ins-search-mask"></div>
+  <div class="ins-search-container">
+    <div class="ins-input-wrapper">
+      <input type="text" class="ins-search-input" placeholder="想要查找什么..." x-webkit-speech />
+      <button type="button" class="close ins-close ins-selectable" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span></button>
+    </div>
+    <div class="ins-section-wrapper">
+      <div class="ins-section-container"></div>
+    </div>
+  </div>
+</div>
+
+
+</div>
+      <button class="navbar-toggle collapsed" type="button" data-toggle="collapse" data-target="#main-navbar" aria-controls="main-navbar" aria-expanded="false">
+        <span class="sr-only">Toggle navigation</span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+    </div>
+    <nav id="main-navbar" class="collapse navbar-collapse" itemscope itemtype="http://schema.org/SiteNavigationElement" role="navigation">
+      <ul class="nav navbar-nav main-nav menu-highlight">
+        
+        
+        <li class="menu-item menu-item-home">
+          <a href="/.">
+            
+            <i class="icon icon-home-fill"></i>
+            
+            <span class="menu-title">首页</span>
+          </a>
+        </li>
+        
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives">
+            
+            <i class="icon icon-archives-fill"></i>
+            
+            <span class="menu-title">归档</span>
+          </a>
+        </li>
+        
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories">
+            
+            <i class="icon icon-folder"></i>
+            
+            <span class="menu-title">分类</span>
+          </a>
+        </li>
+        
+      </ul>
+      
+	
+    <ul class="social-links">
+    	
+        <li><a href="https://github.com/chenluda" target="_blank" title="Github" data-toggle=tooltip data-placement=top><i class="icon icon-github"></i></a></li>
+        
+        <li><a href="https://www.zhihu.com/people/Glenn" target="_blank" title="Zhihu" data-toggle=tooltip data-placement=top><i class="icon icon-zhihu"></i></a></li>
+        
+    </ul>
+
+    </nav>
+  </div>
+</header>
+
+  
+    <aside class="sidebar" itemscope itemtype="http://schema.org/WPSideBar">
+  <div class="slimContent">
+    
+      <div class="widget">
+    <h3 class="widget-title">公告</h3>
+    <div class="widget-body">
+        <div id="board">
+            <div class="content">
+                <p>欢迎交流与分享经验!</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+    
+      
+  <div class="widget">
+    <h3 class="widget-title">分类</h3>
+    <div class="widget-body">
+      <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/%E4%BB%A3%E7%A0%81/">代码</a><span class="category-list-count">4</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/%E8%AE%BA%E6%96%87/">论文</a><span class="category-list-count">13</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/%E9%80%9F%E8%A7%88/">速览</a><span class="category-list-count">2</span></li></ul>
+    </div>
+  </div>
+
+
+    
+      
+  <div class="widget">
+    <h3 class="widget-title">标签云</h3>
+    <div class="widget-body tagcloud">
+      <a href="/tags/Competition/" style="font-size: 13px;">Competition</a> <a href="/tags/Masked-Image-Modeling/" style="font-size: 14px;">Masked Image Modeling</a> <a href="/tags/Research/" style="font-size: 13.5px;">Research</a>
+    </div>
+  </div>
+
+    
+      
+  <div class="widget">
+    <h3 class="widget-title">归档</h3>
+    <div class="widget-body">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2023/05/">五月 2023</a><span class="archive-list-count">19</span></li></ul>
+    </div>
+  </div>
+
+
+    
+      
+  <div class="widget">
+    <h3 class="widget-title">最新文章</h3>
+    <div class="widget-body">
+      <ul class="recent-post-list list-unstyled no-thumbnail">
+        
+          <li>
+            
+            <div class="item-inner">
+              <p class="item-category">
+                <a class="category-link" href="/categories/%E9%80%9F%E8%A7%88/">速览</a>
+              </p>
+              <p class="item-title">
+                <a href="/2023/05/13/%E9%80%9F%E8%A7%88/MICCAI-2023-%E6%8C%91%E6%88%98%E8%B5%9B%E9%80%9F%E8%A7%88-Glenn/" class="title">MICCAI 2023 挑战赛速览</a>
+              </p>
+              <p class="item-date">
+                <time datetime="2023-05-13T05:01:44.000Z" itemprop="datePublished">2023-05-13</time>
+              </p>
+            </div>
+          </li>
+          
+          <li>
+            
+            <div class="item-inner">
+              <p class="item-category">
+                <a class="category-link" href="/categories/%E9%80%9F%E8%A7%88/">速览</a>
+              </p>
+              <p class="item-title">
+                <a href="/2023/05/13/%E9%80%9F%E8%A7%88/AI%E5%AD%A6%E6%9C%AF%E4%BA%A7%E5%93%81%E4%BA%A7%E5%93%81%E4%B8%80/" class="title">AI 学术产品速览（一）</a>
+              </p>
+              <p class="item-date">
+                <time datetime="2023-05-13T04:55:01.000Z" itemprop="datePublished">2023-05-13</time>
+              </p>
+            </div>
+          </li>
+          
+          <li>
+            
+            <div class="item-inner">
+              <p class="item-category">
+                <a class="category-link" href="/categories/%E4%BB%A3%E7%A0%81/">代码</a>
+              </p>
+              <p class="item-title">
+                <a href="/2023/05/12/%E4%BB%A3%E7%A0%81/%E4%BB%A3%E7%A0%81-%E8%8E%B7%E5%8F%96-arXiv-%E8%AE%BA%E6%96%87%E4%BD%9C%E8%80%85%E5%8D%95%E4%BD%8D-Glenn/" class="title">代码 | 获取 arXiv 论文作者单位</a>
+              </p>
+              <p class="item-date">
+                <time datetime="2023-05-12T10:52:40.000Z" itemprop="datePublished">2023-05-12</time>
+              </p>
+            </div>
+          </li>
+          
+          <li>
+            
+            <div class="item-inner">
+              <p class="item-category">
+                <a class="category-link" href="/categories/%E4%BB%A3%E7%A0%81/">代码</a>
+              </p>
+              <p class="item-title">
+                <a href="/2023/05/12/%E4%BB%A3%E7%A0%81/%E4%BB%A3%E7%A0%81-%E6%AF%8F%E5%A4%A9%E5%AE%9A%E7%82%B9%E5%90%91%E5%BE%AE%E4%BF%A1%E6%8E%A8%E9%80%81-arXiv-Glenn/" class="title">代码 | 每天定点向微信推送 arXiv 最新文章</a>
+              </p>
+              <p class="item-date">
+                <time datetime="2023-05-12T10:52:34.000Z" itemprop="datePublished">2023-05-12</time>
+              </p>
+            </div>
+          </li>
+          
+          <li>
+            
+            <div class="item-inner">
+              <p class="item-category">
+                <a class="category-link" href="/categories/%E4%BB%A3%E7%A0%81/">代码</a>
+              </p>
+              <p class="item-title">
+                <a href="/2023/05/12/%E4%BB%A3%E7%A0%81/%E4%BB%A3%E7%A0%81-%E5%B0%86%E7%9F%A5%E4%B9%8E%E4%B8%93%E6%A0%8F%E6%96%87%E7%AB%A0%E8%BD%AC%E6%8D%A2%E4%B8%BA-Markd-Glenn/" class="title">代码 | 将知乎专栏文章转换为 Markdown 文件保存到本地</a>
+              </p>
+              <p class="item-date">
+                <time datetime="2023-05-12T10:52:25.000Z" itemprop="datePublished">2023-05-12</time>
+              </p>
+            </div>
+          </li>
+          
+      </ul>
+    </div>
+  </div>
+  
+
+    
+  </div>
+</aside>
+
+  
+  
+  <aside class="sidebar sidebar-toc collapse   in  " id="collapseToc" itemscope itemtype="http://schema.org/WPSideBar">
+  <div class="slimContent">
+    <nav id="toc" class="article-toc">
+      <h3 class="toc-title">文章目录</h3>
+      <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%BC%80%E6%BA%90%E4%BA%A7%E5%93%81"><span class="toc-number">1.</span> <span class="toc-text">开源产品</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%AD%A6%E6%9C%AF%E4%BC%98%E5%8C%96%EF%BC%9Achatgpt-academic"><span class="toc-number">1.1.</span> <span class="toc-text">学术优化：chatgpt_academic</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E8%AE%BA%E6%96%87%E6%80%BB%E7%BB%93-amp-%E8%BE%85%E5%8A%A9%E9%98%85%E8%AF%BB%EF%BC%9AChatPaper"><span class="toc-number">1.2.</span> <span class="toc-text">论文总结 &amp; 辅助阅读：ChatPaper</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E8%AE%BA%E6%96%87%E8%AF%84%E5%AE%A1-amp-%E8%AF%84%E5%AE%A1%E5%9B%9E%E5%A4%8D%EF%BC%9AChatReviewer-amp-ChatResponse"><span class="toc-number">1.3.</span> <span class="toc-text">论文评审 &amp; 评审回复：ChatReviewer &amp; ChatResponse</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E9%A2%98%E7%9B%AE%E7%94%9F%E6%88%90%EF%BC%9AChatGenTitle"><span class="toc-number">1.4.</span> <span class="toc-text">题目生成：ChatGenTitle</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%95%86%E4%B8%9A%E4%BA%A7%E5%93%81"><span class="toc-number">2.</span> <span class="toc-text">商业产品</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%AD%A6%E6%9C%AF%E5%86%99%E4%BD%9C%EF%BC%9Awritefull-X"><span class="toc-number">2.1.</span> <span class="toc-text">学术写作：writefull X</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E8%AE%BA%E6%96%87%E6%80%BB%E7%BB%93-amp-%E8%BE%85%E5%8A%A9%E9%98%85%E8%AF%BB%EF%BC%9ASCISPACE"><span class="toc-number">2.2.</span> <span class="toc-text">论文总结 &amp; 辅助阅读：SCISPACE</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E8%AE%BA%E6%96%87%E6%80%BB%E7%BB%93-amp-%E8%BE%85%E5%8A%A9%E9%98%85%E8%AF%BB%EF%BC%9APandaGPT"><span class="toc-number">2.3.</span> <span class="toc-text">论文总结 &amp; 辅助阅读：PandaGPT</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E8%AE%BA%E6%96%87%E6%80%BB%E7%BB%93%EF%BC%9Abriefgpt"><span class="toc-number">2.4.</span> <span class="toc-text">论文总结：briefgpt</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E8%AE%BA%E6%96%87%E6%80%BB%E7%BB%93-amp-%E8%BE%85%E5%8A%A9%E9%98%85%E8%AF%BB%EF%BC%9AAMiner"><span class="toc-number">2.5.</span> <span class="toc-text">论文总结 &amp; 辅助阅读：AMiner</span></a></li></ol></li></ol>
+    </nav>
+  </div>
+</aside>
+
+<main class="main" role="main">
+  <div class="content">
+  <article id="post-速览/AI学术产品产品一" class="article article-type-post" itemscope itemtype="http://schema.org/BlogPosting">
+    
+    <div class="article-header">
+      
+        
+  
+    <h1 class="article-title" itemprop="name">
+      AI 学术产品速览（一）
+    </h1>
+  
+
+      
+      <div class="article-meta">
+        <span class="article-date">
+    <i class="icon icon-calendar-check"></i>
+	<a href="/2023/05/13/%E9%80%9F%E8%A7%88/AI%E5%AD%A6%E6%9C%AF%E4%BA%A7%E5%93%81%E4%BA%A7%E5%93%81%E4%B8%80/" class="article-date">
+	  <time datetime="2023-05-13T04:55:01.000Z" itemprop="datePublished">2023-05-13</time>
+	</a>
+</span>
+        
+  <span class="article-category">
+    <i class="icon icon-folder"></i>
+    <a class="article-category-link" href="/categories/%E9%80%9F%E8%A7%88/">速览</a>
+  </span>
+
+        
+  <span class="article-tag">
+    <i class="icon icon-tags"></i>
+	<a class="article-tag-link-link" href="/tags/Research/" rel="tag">Research</a>
+  </span>
+
+
+        
+
+	<span class="article-read hidden-xs">
+    	<i class="icon icon-eye-fill" aria-hidden="true"></i>
+    	<span id="/2023/05/13/%E9%80%9F%E8%A7%88/AI%E5%AD%A6%E6%9C%AF%E4%BA%A7%E5%93%81%E4%BA%A7%E5%93%81%E4%B8%80/" class="leancloud_visitors"  data-flag-title="AI 学术产品速览（一）">
+			<span class="leancloud-visitors-count">0</span>
+		</span>
+    </span>
+
+        <span class="post-comment"><i class="icon icon-comment"></i> <a href="/2023/05/13/%E9%80%9F%E8%A7%88/AI%E5%AD%A6%E6%9C%AF%E4%BA%A7%E5%93%81%E4%BA%A7%E5%93%81%E4%B8%80/#comments" class="article-comment-link">评论</a></span>
+        
+      </div>
+    </div>
+    <div class="article-entry marked-body" itemprop="articleBody">
+      
+        <p>在大模型时代，人工智能学术产品已经成为科学研究领域的一大助力。这些产品通过提高科研人员的工作效率，实现了对科研过程的优化，从而推动科学进步和技术创新。随着不断更新的算法和技术，AI 学术产品已经逐渐渗透到各个学科领域，为科研人员在数据分析、文献检索、实验设计等方面提供了极大的便利。</p>
+<hr>
+<h2 id="开源产品"><a href="#开源产品" class="headerlink" title="开源产品"></a>开源产品</h2><h3 id="学术优化：chatgpt-academic"><a href="#学术优化：chatgpt-academic" class="headerlink" title="学术优化：chatgpt_academic"></a>学术优化：chatgpt_academic</h3><p><strong>源代码：</strong><a href="https://link.zhihu.com/?target=https://github.com/binary-husky/chatgpt_academic">https://github.com/binary-husky/chatgpt_academic</a></p>
+<p><strong>在线网址：</strong><a href="https://link.zhihu.com/?target=https://huggingface.co/spaces/qingxu98/gpt-academic">academic-chatgpt - a Hugging Face Space by qingxu98</a></p>
+<blockquote>
+<p>科研工作专用ChatGPT&#x2F;GLM拓展，特别优化学术Paper润色体验，模块化设计支持自定义快捷按钮&amp;函数插件，支持代码块表格显示，Tex公式双显示，新增Python和C++项目剖析&amp;自译解功能，PDF&#x2F;LaTex论文翻译&amp;总结功能，支持并行问询多种LLM模型，支持gpt-3.5&#x2F;gpt-4&#x2F;chatglm</p>
+</blockquote>
+<p><img src="/2023/05/13/%E9%80%9F%E8%A7%88/AI%E5%AD%A6%E6%9C%AF%E4%BA%A7%E5%93%81%E4%BA%A7%E5%93%81%E4%B8%80/v2-fc5395f1dc64d6098e09923be4172b66_r.jpg"><br>chatgpt_academic<br><strong>功能模块：</strong></p>
+<p><img src="/2023/05/13/%E9%80%9F%E8%A7%88/AI%E5%AD%A6%E6%9C%AF%E4%BA%A7%E5%93%81%E4%BA%A7%E5%93%81%E4%B8%80/v2-5c5fb82ff31c74741335e6e548443f9d_r.jpg"></p>
+<hr>
+<h3 id="论文总结-amp-辅助阅读：ChatPaper"><a href="#论文总结-amp-辅助阅读：ChatPaper" class="headerlink" title="论文总结 &amp; 辅助阅读：ChatPaper"></a>论文总结 &amp; 辅助阅读：ChatPaper</h3><p><strong>源代码：</strong><a href="https://link.zhihu.com/?target=https://github.com/kaixindelele/ChatPaper">GitHub - kaixindelele&#x2F;ChatPaper: Use ChatGPT to summarize the arXiv papers. 全流程加速科研，利用chatgpt进行论文总结+润色+审稿+审稿回复</a></p>
+<p><strong>在线网址：</strong><a href="https://link.zhihu.com/?target=https://chatpaper.org/">ChatPaper</a></p>
+<p>（润色，审稿，审稿回复和题目生成，应该是没上线网站，在源代码中可以找到源码）</p>
+<blockquote>
+<p>全流程加速科研，利用chatgpt进行论文总结+润色+审稿+审稿回复</p>
+</blockquote>
+<p><img src="/2023/05/13/%E9%80%9F%E8%A7%88/AI%E5%AD%A6%E6%9C%AF%E4%BA%A7%E5%93%81%E4%BA%A7%E5%93%81%E4%B8%80/v2-3ffbc0a36f04f8702db20bf02e17735b_r.jpg"><br>ChatPaper<br><strong>功能模块：</strong></p>
+<p><img src="/2023/05/13/%E9%80%9F%E8%A7%88/AI%E5%AD%A6%E6%9C%AF%E4%BA%A7%E5%93%81%E4%BA%A7%E5%93%81%E4%B8%80/v2-9c2cd3fafe55ed538d7eae294018ad31_r.jpg"></p>
+<hr>
+<h3 id="论文评审-amp-评审回复：ChatReviewer-amp-ChatResponse"><a href="#论文评审-amp-评审回复：ChatReviewer-amp-ChatResponse" class="headerlink" title="论文评审 &amp; 评审回复：ChatReviewer &amp; ChatResponse"></a>论文评审 &amp; 评审回复：ChatReviewer &amp; ChatResponse</h3><p><strong>源代码：</strong><a href="https://link.zhihu.com/?target=https://github.com/nishiwen1214/ChatReviewer">GitHub - nishiwen1214&#x2F;ChatReviewer: ChatReviewer: 使用ChatGPT分析论文优缺点，提出改进建议</a></p>
+<p><strong>在线网址：</strong><a href="https://link.zhihu.com/?target=https://huggingface.co/spaces/ShiwenNi/ChatReviewer">ChatReviewer - a Hugging Face Space by ShiwenNi</a><br><a href="https://link.zhihu.com/?target=https://huggingface.co/spaces/ShiwenNi/ChatResponse">ChatResponse - a Hugging Face Space by ShiwenNi</a></p>
+<blockquote>
+<p>ChatReviewer 是一款基于ChatGPT-3.5的API开发的智能论文分析与建议助手。其用途如下<br>1）对论文的优缺点进行快速总结和分析，提高科研人员的文献阅读和理解的效率，紧跟研究前沿；2）对自己的论文进行分析，根据ChatReviewer生成的改进建议进行查漏补缺，进一步提高自己的论文质量。<br>ChatResponse 是一款根据审稿人的评论自动生成作者回复的AI助手。其用途为：根据输入的审稿意见，ChatResponse会自动提取其中各个审稿人的问题和担忧，并生成点对点的回复。</p>
+</blockquote>
+<p><img src="/2023/05/13/%E9%80%9F%E8%A7%88/AI%E5%AD%A6%E6%9C%AF%E4%BA%A7%E5%93%81%E4%BA%A7%E5%93%81%E4%B8%80/v2-04619b074e597b120b9eaece1aa0449b_r.jpg"><br>ChatReviewer<br><img src="/2023/05/13/%E9%80%9F%E8%A7%88/AI%E5%AD%A6%E6%9C%AF%E4%BA%A7%E5%93%81%E4%BA%A7%E5%93%81%E4%B8%80/v2-6b1e8cb0394a6d1e88d8c0d15d61b7f9_r.jpg"><br>ChatResponse</p>
+<hr>
+<h3 id="题目生成：ChatGenTitle"><a href="#题目生成：ChatGenTitle" class="headerlink" title="题目生成：ChatGenTitle"></a>题目生成：ChatGenTitle</h3><p><strong>源代码：</strong><a href="https://link.zhihu.com/?target=https://github.com/WangRongsheng/ChatGenTitle">GitHub - WangRongsheng&#x2F;ChatGenTitle: ChatGenTitle：使用百万arXiv论文信息在LLaMA模型上进行微调的论文题目生成模型</a></p>
+<blockquote>
+<p>使用百万arXiv论文信息在LLaMA模型上进行微调的论文题目生成模型</p>
+</blockquote>
+<p><img src="/2023/05/13/%E9%80%9F%E8%A7%88/AI%E5%AD%A6%E6%9C%AF%E4%BA%A7%E5%93%81%E4%BA%A7%E5%93%81%E4%B8%80/v2-f0ccbe69e611b0072672538e730d7eb2_r.jpg"><br>ChatGenTitle</p>
+<hr>
+<h2 id="商业产品"><a href="#商业产品" class="headerlink" title="商业产品"></a>商业产品</h2><h3 id="学术写作：writefull-X"><a href="#学术写作：writefull-X" class="headerlink" title="学术写作：writefull X"></a>学术写作：writefull X</h3><p><strong>网址：</strong><a href="https://link.zhihu.com/?target=https://x.writefull.com/">AI Writing Tools for Students and Researchers</a></p>
+<blockquote>
+<p>使用人工智能来帮助学术写作</p>
+</blockquote>
+<p><img src="/2023/05/13/%E9%80%9F%E8%A7%88/AI%E5%AD%A6%E6%9C%AF%E4%BA%A7%E5%93%81%E4%BA%A7%E5%93%81%E4%B8%80/v2-697a5d295505d29fade7d46a305d4623_r.jpg"><br>writefull X<br>浅试了一下，质量挺高的 AI 学术产品，应该正在孵化，后续会更新评测。</p>
+<p>目前该网站有以下功能：</p>
+<ul>
+<li><strong>论文标题生成。</strong>根据摘要内容生成论文题目。</li>
+</ul>
+<p><img src="/2023/05/13/%E9%80%9F%E8%A7%88/AI%E5%AD%A6%E6%9C%AF%E4%BA%A7%E5%93%81%E4%BA%A7%E5%93%81%E4%B8%80/v2-65962c83eebe61124bcec305bf5579f8_r.jpg"><br>根据 Segment Anything 论文的摘要生成的标题</p>
+<ul>
+<li><strong>论文摘要生成。</strong>根据论文内容生成论文摘要。</li>
+</ul>
+<p><img src="/2023/05/13/%E9%80%9F%E8%A7%88/AI%E5%AD%A6%E6%9C%AF%E4%BA%A7%E5%93%81%E4%BA%A7%E5%93%81%E4%B8%80/v2-e2934cd3da7cd0d3761ed2171b87487b_r.jpg"><br>根据 Segment Anything 论文的 Introduction 生成的摘要</p>
+<ul>
+<li><strong>降重？</strong></li>
+</ul>
+<p><img src="/2023/05/13/%E9%80%9F%E8%A7%88/AI%E5%AD%A6%E6%9C%AF%E4%BA%A7%E5%93%81%E4%BA%A7%E5%93%81%E4%B8%80/v2-b515bbaab162df3017940a374f88bf70_r.jpg"><br>改写 Segment Anything 论文 Introduction 的第一句</p>
+<ul>
+<li><strong>普通语句学术化。</strong>将普通语句学术化。</li>
+<li><strong>GPT 检测。</strong>根据输入的文本，判断其是否为 GPT 生成。</li>
+</ul>
+<hr>
+<h3 id="论文总结-amp-辅助阅读：SCISPACE"><a href="#论文总结-amp-辅助阅读：SCISPACE" class="headerlink" title="论文总结 &amp; 辅助阅读：SCISPACE"></a>论文总结 &amp; 辅助阅读：SCISPACE</h3><p><strong>网址：</strong><a href="https://link.zhihu.com/?target=https://typeset.io/">https://typeset.io/</a></p>
+<blockquote>
+<p>你的 AI 研究助理<br>在几分钟内完成数小时的阅读和理解<br>突出显示令人困惑的文本、数学和表格，以获得简单的解释<br>提出后续问题并立即得到答案<br>一种无需指定关键字就能搜索和查找相关论文的新方法</p>
+</blockquote>
+<p><img src="/2023/05/13/%E9%80%9F%E8%A7%88/AI%E5%AD%A6%E6%9C%AF%E4%BA%A7%E5%93%81%E4%BA%A7%E5%93%81%E4%B8%80/v2-831a140893752c1c87dfb5d3684d5d19_r.jpg"></p>
+<hr>
+<h3 id="论文总结-amp-辅助阅读：PandaGPT"><a href="#论文总结-amp-辅助阅读：PandaGPT" class="headerlink" title="论文总结 &amp; 辅助阅读：PandaGPT"></a>论文总结 &amp; 辅助阅读：PandaGPT</h3><p><strong>网址：</strong><a href="https://link.zhihu.com/?target=https://www.pandagpt.io/">PandaGPT, file reading made easy</a></p>
+<blockquote>
+<p>厌倦了阅读？让PandaGPT为您处理所有这些！<br>上传一个文件，询问任何问题。</p>
+</blockquote>
+<p>和 SCISPACE 比，还有很长路要走…</p>
+<p><img src="/2023/05/13/%E9%80%9F%E8%A7%88/AI%E5%AD%A6%E6%9C%AF%E4%BA%A7%E5%93%81%E4%BA%A7%E5%93%81%E4%B8%80/v2-24b4fb0bce5f2fbb505636d85d70a619_r.jpg"><br>PandaGPT</p>
+<hr>
+<h3 id="论文总结：briefgpt"><a href="#论文总结：briefgpt" class="headerlink" title="论文总结：briefgpt"></a>论文总结：briefgpt</h3><p><strong>网址：</strong><a href="https://link.zhihu.com/?target=https://briefgpt.xyz/">BriefGPT</a></p>
+<blockquote>
+<p>AI 论文速递</p>
+</blockquote>
+<p><img src="/2023/05/13/%E9%80%9F%E8%A7%88/AI%E5%AD%A6%E6%9C%AF%E4%BA%A7%E5%93%81%E4%BA%A7%E5%93%81%E4%B8%80/v2-fae2eb8fb396d245f80a4f5336f6d7b6_r.jpg"><br>briefgpt</p>
+<hr>
+<h3 id="论文总结-amp-辅助阅读：AMiner"><a href="#论文总结-amp-辅助阅读：AMiner" class="headerlink" title="论文总结 &amp; 辅助阅读：AMiner"></a>论文总结 &amp; 辅助阅读：AMiner</h3><p><strong>网址：</strong><a href="https://link.zhihu.com/?target=https://www.aminer.cn/">AMiner - AI赋能科技情报挖掘-学术搜索-论文检索-论文专利-文献追踪-学者画像</a></p>
+<blockquote>
+<p>AI 帮你理解科学</p>
+</blockquote>
+<p><img src="/2023/05/13/%E9%80%9F%E8%A7%88/AI%E5%AD%A6%E6%9C%AF%E4%BA%A7%E5%93%81%E4%BA%A7%E5%93%81%E4%B8%80/v2-fab3b957355fccaaafd9ca80fc09f8eb_r.jpg"><br>AMiner</p>
+
+      
+    </div>
+    <div class="article-footer">
+      <blockquote class="mt-2x">
+  <ul class="post-copyright list-unstyled">
+    
+    <li class="post-copyright-link hidden-xs">
+      <strong>本文链接：</strong>
+      <a href="https://chenluda.github.io/2023/05/13/%E9%80%9F%E8%A7%88/AI%E5%AD%A6%E6%9C%AF%E4%BA%A7%E5%93%81%E4%BA%A7%E5%93%81%E4%B8%80/" title="AI 学术产品速览（一）" target="_blank" rel="external">https://chenluda.github.io/2023/05/13/速览/AI学术产品产品一/</a>
+    </li>
+    
+    <li class="post-copyright-license">
+      <strong>版权声明： </strong> 本博客所有文章除特别声明外，均采用 <a href="http://creativecommons.org/licenses/by/4.0/deed.zh" target="_blank" rel="external">CC BY 4.0 CN协议</a> 许可协议。转载请注明出处！
+    </li>
+  </ul>
+</blockquote>
+
+
+<div class="panel panel-default panel-badger">
+  <div class="panel-body">
+    <figure class="media">
+      <div class="media-left">
+        <a href="https://github.com/chenluda" target="_blank" class="img-burn thumb-sm visible-lg">
+          <img src="/images/avatar.png" class="img-rounded w-full" alt="">
+        </a>
+      </div>
+      <div class="media-body">
+        <h3 class="media-heading"><a href="https://github.com/chenluda" target="_blank"><span class="text-dark">Glenn</span><small class="ml-1x">Stay hungry, stay foolish.</small></a></h3>
+        <div>咖啡，健身，热爱生活。</div>
+      </div>
+    </figure>
+  </div>
+</div>
+
+
+    </div>
+  </article>
+  
+    
+  <section id="comments">
+  	
+      <div id="vcomments"></div>
+    
+  </section>
+
+
+  
+</div>
+
+  <nav class="bar bar-footer clearfix" data-stick-bottom>
+  <div class="bar-inner">
+  
+  <ul class="pager pull-left">
+    
+    <li class="prev">
+      <a href="/2023/05/13/%E9%80%9F%E8%A7%88/MICCAI-2023-%E6%8C%91%E6%88%98%E8%B5%9B%E9%80%9F%E8%A7%88-Glenn/" title="MICCAI 2023 挑战赛速览"><i class="icon icon-angle-left" aria-hidden="true"></i><span>&nbsp;&nbsp;上一篇</span></a>
+    </li>
+    
+    
+    <li class="next">
+      <a href="/2023/05/12/%E4%BB%A3%E7%A0%81/%E4%BB%A3%E7%A0%81-%E8%8E%B7%E5%8F%96-arXiv-%E8%AE%BA%E6%96%87%E4%BD%9C%E8%80%85%E5%8D%95%E4%BD%8D-Glenn/" title="代码 | 获取 arXiv 论文作者单位"><span>下一篇&nbsp;&nbsp;</span><i class="icon icon-angle-right" aria-hidden="true"></i></a>
+    </li>
+    
+    
+    <li class="toggle-toc">
+      <a class="toggle-btn " data-toggle="collapse" href="#collapseToc" aria-expanded="false" title="文章目录" role="button">    <span>[&nbsp;</span><span>文章目录</span>
+        <i class="text-collapsed icon icon-anchor"></i>
+        <i class="text-in icon icon-close"></i>
+        <span>]</span>
+      </a>
+    </li>
+    
+  </ul>
+  
+  
+  
+  <div class="bar-right">
+    
+    <div class="share-component" data-sites="weibo,qq,wechat,facebook,twitter" data-mobile-sites="weibo,qq,qzone"></div>
+    
+  </div>
+  </div>
+</nav>
+  
+
+
+</main>
+
+  <footer class="footer" itemscope itemtype="http://schema.org/WPFooter">
+	
+	
+    <ul class="social-links">
+    	
+        <li><a href="https://github.com/chenluda" target="_blank" title="Github" data-toggle=tooltip data-placement=top><i class="icon icon-github"></i></a></li>
+        
+        <li><a href="https://www.zhihu.com/people/Glenn" target="_blank" title="Zhihu" data-toggle=tooltip data-placement=top><i class="icon icon-zhihu"></i></a></li>
+        
+    </ul>
+
+    <div class="copyright">
+    	
+        <div class="publishby">
+        	Theme by <a href="https://github.com/cofess" target="_blank"> cofess </a>base on <a href="https://github.com/cofess/hexo-theme-pure" target="_blank">pure</a>.
+        </div>
+    </div>
+</footer>
+  <script src="//cdn.jsdelivr.net/npm/jquery@1.12.4/dist/jquery.min.js"></script>
+<script>
+window.jQuery || document.write('<script src="js/jquery.min.js"><\/script>')
+</script>
+
+<script src="/js/plugin.min.js"></script>
+
+
+<script src="/js/application.js"></script>
+
+
+    <script>
+(function (window) {
+    var INSIGHT_CONFIG = {
+        TRANSLATION: {
+            POSTS: '文章',
+            PAGES: '页面',
+            CATEGORIES: '分类',
+            TAGS: '标签',
+            UNTITLED: '(未命名)',
+        },
+        ROOT_URL: '/',
+        CONTENT_URL: '/content.json',
+    };
+    window.INSIGHT_CONFIG = INSIGHT_CONFIG;
+})(window);
+</script>
+
+<script src="/js/insight.js"></script>
+
+
+
+
+
+
+   
+
+
+
+
+   
+    
+  <script src="//cdn1.lncld.net/static/js/3.0.4/av-min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/valine"></script>
+  <script type="text/javascript">
+  var GUEST = ['nick', 'mail', 'link'];
+  var meta = 'nick,mail,link';
+  meta = meta.split(',').filter(function(item) {
+    return GUEST.indexOf(item) > -1;
+  });
+  new Valine({
+    el: '#vcomments',
+    verify: false,
+    notify: false,
+    appId: 'Mr6aCGJuw2sme5obVyjdlAIp-gzGzoHsz',
+    appKey: 'fja89BU5rk64kGgsGqptQTUX',
+    placeholder: '请输入...',
+    avatar: 'mm',
+    meta: meta,
+    pageSize: '10' || 10,
+    visitor: true
+  });
+  </script>
+
+     
+
+
+
+
+
+
+
+</body>
+</html>

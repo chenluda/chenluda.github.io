@@ -1,0 +1,992 @@
+<!DOCTYPE html>
+<html lang=zh>
+<head>
+  <meta charset="utf-8">
+  
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=no, minimal-ui">
+  <meta name="renderer" content="webkit">
+  <meta http-equiv="Cache-Control" content="no-transform" />
+  <meta http-equiv="Cache-Control" content="no-siteapp" />
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black">
+  <meta name="format-detection" content="telephone=no,email=no,adress=no">
+  <!-- Color theme for statusbar -->
+  <meta name="theme-color" content="#000000" />
+  <!-- 强制页面在当前窗口以独立页面显示,防止别人在框架里调用页面 -->
+  <meta http-equiv="window-target" content="_top" />
+  
+  
+  <title>MICCAI 2023 挑战赛速览 | Glenn&#39;s blog</title>
+  <meta name="description" content="前言MICCAI 是医学图像计算与计算机辅助干预国际会议（International Conference on Medical Image Computing and Computer Assisted Intervention）的缩写。该会议自 1998 年开始，每年举办一次，是医学图像处理领域中最具有权威性和影响力的会议之一，被广泛认为是医学图像处理领域内的顶级会议之一。 而 MICCAI">
+<meta property="og:type" content="article">
+<meta property="og:title" content="MICCAI 2023 挑战赛速览">
+<meta property="og:url" content="https://chenluda.github.io/2023/05/13/%E9%80%9F%E8%A7%88/MICCAI-2023-%E6%8C%91%E6%88%98%E8%B5%9B%E9%80%9F%E8%A7%88-Glenn/index.html">
+<meta property="og:site_name" content="Glenn">
+<meta property="og:description" content="前言MICCAI 是医学图像计算与计算机辅助干预国际会议（International Conference on Medical Image Computing and Computer Assisted Intervention）的缩写。该会议自 1998 年开始，每年举办一次，是医学图像处理领域中最具有权威性和影响力的会议之一，被广泛认为是医学图像处理领域内的顶级会议之一。 而 MICCAI">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://chenluda.github.io/2023/05/13/%E9%80%9F%E8%A7%88/MICCAI-2023-%E6%8C%91%E6%88%98%E8%B5%9B%E9%80%9F%E8%A7%88-Glenn/v2-fdb48b93b45891d1042f36f76242baf2_r.jpg">
+<meta property="og:image" content="https://chenluda.github.io/2023/05/13/%E9%80%9F%E8%A7%88/MICCAI-2023-%E6%8C%91%E6%88%98%E8%B5%9B%E9%80%9F%E8%A7%88-Glenn/v2-660783f00f6e77975e4bab7cf8331665_r.jpg">
+<meta property="og:image" content="https://chenluda.github.io/2023/05/13/%E9%80%9F%E8%A7%88/MICCAI-2023-%E6%8C%91%E6%88%98%E8%B5%9B%E9%80%9F%E8%A7%88-Glenn/v2-f1c37e81708a168245ab7f833d5bd696_r.jpg">
+<meta property="og:image" content="https://chenluda.github.io/2023/05/13/%E9%80%9F%E8%A7%88/MICCAI-2023-%E6%8C%91%E6%88%98%E8%B5%9B%E9%80%9F%E8%A7%88-Glenn/v2-13a2a9bc581d7d2faedd06836f1bcb66_r.jpg">
+<meta property="og:image" content="https://chenluda.github.io/2023/05/13/%E9%80%9F%E8%A7%88/MICCAI-2023-%E6%8C%91%E6%88%98%E8%B5%9B%E9%80%9F%E8%A7%88-Glenn/v2-5dee36a8fac1d11bf787d4678b6e4f99_r.jpg">
+<meta property="og:image" content="https://chenluda.github.io/2023/05/13/%E9%80%9F%E8%A7%88/MICCAI-2023-%E6%8C%91%E6%88%98%E8%B5%9B%E9%80%9F%E8%A7%88-Glenn/v2-c2ea1d623f43619231247b227b6f3d5e_r.jpg">
+<meta property="og:image" content="https://chenluda.github.io/2023/05/13/%E9%80%9F%E8%A7%88/MICCAI-2023-%E6%8C%91%E6%88%98%E8%B5%9B%E9%80%9F%E8%A7%88-Glenn/v2-68ff9bc6ea20e6e51d16a3f973e4987a_r.jpg">
+<meta property="og:image" content="https://chenluda.github.io/2023/05/13/%E9%80%9F%E8%A7%88/MICCAI-2023-%E6%8C%91%E6%88%98%E8%B5%9B%E9%80%9F%E8%A7%88-Glenn/v2-f074bc58b23731e8538283671543059c_r.jpg">
+<meta property="og:image" content="https://chenluda.github.io/2023/05/13/%E9%80%9F%E8%A7%88/MICCAI-2023-%E6%8C%91%E6%88%98%E8%B5%9B%E9%80%9F%E8%A7%88-Glenn/v2-32b71a67da0089b544ec8c1f2cdc5412_r.jpg">
+<meta property="og:image" content="https://chenluda.github.io/2023/05/13/%E9%80%9F%E8%A7%88/MICCAI-2023-%E6%8C%91%E6%88%98%E8%B5%9B%E9%80%9F%E8%A7%88-Glenn/v2-f6e74c8f898d4833b02d752bc16d5511_r.jpg">
+<meta property="og:image" content="https://chenluda.github.io/2023/05/13/%E9%80%9F%E8%A7%88/MICCAI-2023-%E6%8C%91%E6%88%98%E8%B5%9B%E9%80%9F%E8%A7%88-Glenn/v2-32a5cfe85900e46e1345d6deb93a3ffc_r.jpg">
+<meta property="article:published_time" content="2023-05-13T05:01:44.000Z">
+<meta property="article:modified_time" content="2023-05-13T05:32:44.928Z">
+<meta property="article:author" content="Glenn">
+<meta property="article:tag" content="Competition">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://chenluda.github.io/2023/05/13/%E9%80%9F%E8%A7%88/MICCAI-2023-%E6%8C%91%E6%88%98%E8%B5%9B%E9%80%9F%E8%A7%88-Glenn/v2-fdb48b93b45891d1042f36f76242baf2_r.jpg">
+  <!-- Canonical links -->
+  <link rel="canonical" href="https://chenluda.github.io/2023/05/13/%E9%80%9F%E8%A7%88/MICCAI-2023-%E6%8C%91%E6%88%98%E8%B5%9B%E9%80%9F%E8%A7%88-Glenn/index.html">
+  
+    <link rel="alternate" href="/atom.xml" title="Glenn" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="/images/avatar.png" type="image/x-icon">
+  
+  
+<link rel="stylesheet" href="/css/style.css">
+
+  
+  
+  
+  
+<!-- hexo injector head_end start -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/katex.min.css">
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/hexo-math@4.0.0/dist/style.css">
+<!-- hexo injector head_end end --><meta name="generator" content="Hexo 6.3.0"></head>
+
+
+<body class="main-center theme-black" itemscope itemtype="http://schema.org/WebPage">
+  <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+  <div class="slimContent">
+    <div class="navbar-header">
+      
+      
+      <div class="profile-block text-center">
+        <a id="avatar" href="https://github.com/chenluda" target="_blank">
+          <img class="img-circle img-rotate" src="/images/avatar.png" width="200" height="200">
+        </a>
+        <h2 id="name" class="hidden-xs hidden-sm">Glenn</h2>
+        <h3 id="title" class="hidden-xs hidden-sm hidden-md">Stay hungry, stay foolish.</h3>
+        <small id="location" class="text-muted hidden-xs hidden-sm"><i class="icon icon-map-marker"></i> Yunnan, China</small>
+      </div>
+      
+      <div class="search" id="search-form-wrap">
+
+    <form class="search-form sidebar-form">
+        <div class="input-group">
+            <input type="text" class="search-form-input form-control" placeholder="搜索" />
+            <span class="input-group-btn">
+                <button type="submit" class="search-form-submit btn btn-flat" onclick="return false;"><i class="icon icon-search"></i></button>
+            </span>
+        </div>
+    </form>
+    <div class="ins-search">
+  <div class="ins-search-mask"></div>
+  <div class="ins-search-container">
+    <div class="ins-input-wrapper">
+      <input type="text" class="ins-search-input" placeholder="想要查找什么..." x-webkit-speech />
+      <button type="button" class="close ins-close ins-selectable" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span></button>
+    </div>
+    <div class="ins-section-wrapper">
+      <div class="ins-section-container"></div>
+    </div>
+  </div>
+</div>
+
+
+</div>
+      <button class="navbar-toggle collapsed" type="button" data-toggle="collapse" data-target="#main-navbar" aria-controls="main-navbar" aria-expanded="false">
+        <span class="sr-only">Toggle navigation</span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+    </div>
+    <nav id="main-navbar" class="collapse navbar-collapse" itemscope itemtype="http://schema.org/SiteNavigationElement" role="navigation">
+      <ul class="nav navbar-nav main-nav menu-highlight">
+        
+        
+        <li class="menu-item menu-item-home">
+          <a href="/.">
+            
+            <i class="icon icon-home-fill"></i>
+            
+            <span class="menu-title">首页</span>
+          </a>
+        </li>
+        
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives">
+            
+            <i class="icon icon-archives-fill"></i>
+            
+            <span class="menu-title">归档</span>
+          </a>
+        </li>
+        
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories">
+            
+            <i class="icon icon-folder"></i>
+            
+            <span class="menu-title">分类</span>
+          </a>
+        </li>
+        
+      </ul>
+      
+	
+    <ul class="social-links">
+    	
+        <li><a href="https://github.com/chenluda" target="_blank" title="Github" data-toggle=tooltip data-placement=top><i class="icon icon-github"></i></a></li>
+        
+        <li><a href="https://www.zhihu.com/people/Glenn" target="_blank" title="Zhihu" data-toggle=tooltip data-placement=top><i class="icon icon-zhihu"></i></a></li>
+        
+    </ul>
+
+    </nav>
+  </div>
+</header>
+
+  
+    <aside class="sidebar" itemscope itemtype="http://schema.org/WPSideBar">
+  <div class="slimContent">
+    
+      <div class="widget">
+    <h3 class="widget-title">公告</h3>
+    <div class="widget-body">
+        <div id="board">
+            <div class="content">
+                <p>欢迎交流与分享经验!</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+    
+      
+  <div class="widget">
+    <h3 class="widget-title">分类</h3>
+    <div class="widget-body">
+      <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/%E4%BB%A3%E7%A0%81/">代码</a><span class="category-list-count">4</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/%E8%AE%BA%E6%96%87/">论文</a><span class="category-list-count">13</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/%E9%80%9F%E8%A7%88/">速览</a><span class="category-list-count">2</span></li></ul>
+    </div>
+  </div>
+
+
+    
+      
+  <div class="widget">
+    <h3 class="widget-title">标签云</h3>
+    <div class="widget-body tagcloud">
+      <a href="/tags/Competition/" style="font-size: 13px;">Competition</a> <a href="/tags/Masked-Image-Modeling/" style="font-size: 14px;">Masked Image Modeling</a> <a href="/tags/Research/" style="font-size: 13.5px;">Research</a>
+    </div>
+  </div>
+
+    
+      
+  <div class="widget">
+    <h3 class="widget-title">归档</h3>
+    <div class="widget-body">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2023/05/">五月 2023</a><span class="archive-list-count">19</span></li></ul>
+    </div>
+  </div>
+
+
+    
+      
+  <div class="widget">
+    <h3 class="widget-title">最新文章</h3>
+    <div class="widget-body">
+      <ul class="recent-post-list list-unstyled no-thumbnail">
+        
+          <li>
+            
+            <div class="item-inner">
+              <p class="item-category">
+                <a class="category-link" href="/categories/%E9%80%9F%E8%A7%88/">速览</a>
+              </p>
+              <p class="item-title">
+                <a href="/2023/05/13/%E9%80%9F%E8%A7%88/MICCAI-2023-%E6%8C%91%E6%88%98%E8%B5%9B%E9%80%9F%E8%A7%88-Glenn/" class="title">MICCAI 2023 挑战赛速览</a>
+              </p>
+              <p class="item-date">
+                <time datetime="2023-05-13T05:01:44.000Z" itemprop="datePublished">2023-05-13</time>
+              </p>
+            </div>
+          </li>
+          
+          <li>
+            
+            <div class="item-inner">
+              <p class="item-category">
+                <a class="category-link" href="/categories/%E9%80%9F%E8%A7%88/">速览</a>
+              </p>
+              <p class="item-title">
+                <a href="/2023/05/13/%E9%80%9F%E8%A7%88/AI%E5%AD%A6%E6%9C%AF%E4%BA%A7%E5%93%81%E4%BA%A7%E5%93%81%E4%B8%80/" class="title">AI 学术产品速览（一）</a>
+              </p>
+              <p class="item-date">
+                <time datetime="2023-05-13T04:55:01.000Z" itemprop="datePublished">2023-05-13</time>
+              </p>
+            </div>
+          </li>
+          
+          <li>
+            
+            <div class="item-inner">
+              <p class="item-category">
+                <a class="category-link" href="/categories/%E4%BB%A3%E7%A0%81/">代码</a>
+              </p>
+              <p class="item-title">
+                <a href="/2023/05/12/%E4%BB%A3%E7%A0%81/%E4%BB%A3%E7%A0%81-%E8%8E%B7%E5%8F%96-arXiv-%E8%AE%BA%E6%96%87%E4%BD%9C%E8%80%85%E5%8D%95%E4%BD%8D-Glenn/" class="title">代码 | 获取 arXiv 论文作者单位</a>
+              </p>
+              <p class="item-date">
+                <time datetime="2023-05-12T10:52:40.000Z" itemprop="datePublished">2023-05-12</time>
+              </p>
+            </div>
+          </li>
+          
+          <li>
+            
+            <div class="item-inner">
+              <p class="item-category">
+                <a class="category-link" href="/categories/%E4%BB%A3%E7%A0%81/">代码</a>
+              </p>
+              <p class="item-title">
+                <a href="/2023/05/12/%E4%BB%A3%E7%A0%81/%E4%BB%A3%E7%A0%81-%E6%AF%8F%E5%A4%A9%E5%AE%9A%E7%82%B9%E5%90%91%E5%BE%AE%E4%BF%A1%E6%8E%A8%E9%80%81-arXiv-Glenn/" class="title">代码 | 每天定点向微信推送 arXiv 最新文章</a>
+              </p>
+              <p class="item-date">
+                <time datetime="2023-05-12T10:52:34.000Z" itemprop="datePublished">2023-05-12</time>
+              </p>
+            </div>
+          </li>
+          
+          <li>
+            
+            <div class="item-inner">
+              <p class="item-category">
+                <a class="category-link" href="/categories/%E4%BB%A3%E7%A0%81/">代码</a>
+              </p>
+              <p class="item-title">
+                <a href="/2023/05/12/%E4%BB%A3%E7%A0%81/%E4%BB%A3%E7%A0%81-%E5%B0%86%E7%9F%A5%E4%B9%8E%E4%B8%93%E6%A0%8F%E6%96%87%E7%AB%A0%E8%BD%AC%E6%8D%A2%E4%B8%BA-Markd-Glenn/" class="title">代码 | 将知乎专栏文章转换为 Markdown 文件保存到本地</a>
+              </p>
+              <p class="item-date">
+                <time datetime="2023-05-12T10:52:25.000Z" itemprop="datePublished">2023-05-12</time>
+              </p>
+            </div>
+          </li>
+          
+      </ul>
+    </div>
+  </div>
+  
+
+    
+  </div>
+</aside>
+
+  
+  
+  <aside class="sidebar sidebar-toc collapse   in  " id="collapseToc" itemscope itemtype="http://schema.org/WPSideBar">
+  <div class="slimContent">
+    <nav id="toc" class="article-toc">
+      <h3 class="toc-title">文章目录</h3>
+      <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%89%8D%E8%A8%80"><span class="toc-number">1.</span> <span class="toc-text">前言</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%9B%BE%E5%83%8F%E5%88%86%E5%89%B2-%E8%82%BE%E8%84%8F%EF%BC%88KiTS2023%EF%BC%89"><span class="toc-number">2.</span> <span class="toc-text">图像分割-肾脏（KiTS2023）</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%9B%BE%E5%83%8F%E5%90%88%E6%88%90-MRI-to-sCT-amp-CBCT-to-sCT%EF%BC%88SynthRAD2023%EF%BC%89"><span class="toc-number">3.</span> <span class="toc-text">图像合成-MRI to sCT &amp; CBCT to sCT（SynthRAD2023）</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%9B%BE%E5%83%8F%E9%85%8D%E5%87%86-%E4%B9%B3%E8%85%BA%E7%99%8C%E7%97%85%E7%90%86-WSI-%E7%9A%84-IHC-to-H-amp-E%EF%BC%88ACROBAT2023%EF%BC%89"><span class="toc-number">4.</span> <span class="toc-text">图像配准-乳腺癌病理 WSI 的 IHC to H&amp;E（ACROBAT2023）</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%9B%BE%E5%83%8F%E5%88%86%E5%89%B2-%E9%81%93%E5%86%85%E5%92%8C%E9%81%93%E5%A4%96%E5%89%8D%E5%BA%AD%E7%A5%9E%E7%BB%8F%E9%9E%98%E7%98%A4%E4%B8%8E%E8%80%B3%E8%9C%97%EF%BC%88crossMoDA2023%EF%BC%89"><span class="toc-number">5.</span> <span class="toc-text">图像分割-道内和道外前庭神经鞘瘤与耳蜗（crossMoDA2023）</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%9B%BE%E5%83%8F%E5%88%86%E5%89%B2-%E8%85%B9%E9%83%A8-CT-%E5%99%A8%E5%AE%98%E4%B8%8E%E8%82%BF%E7%98%A4%EF%BC%88FLARPEACT2023%EF%BC%89"><span class="toc-number">6.</span> <span class="toc-text">图像分割-腹部 CT 器官与肿瘤（FLARPEACT2023）</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E8%B7%A8%E9%A2%86%E5%9F%9F%E5%B0%91%E6%A0%B7%E6%9C%AC%E5%AD%A6%E4%B9%A0%EF%BC%88L2L2023%EF%BC%89"><span class="toc-number">7.</span> <span class="toc-text">跨领域少样本学习（L2L2023）</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%BC%82%E5%B8%B8%E6%A3%80%E6%B5%8B-%E8%84%91%E9%83%A8-amp-%E8%85%B9%E9%83%A8%EF%BC%88MOOD2023%EF%BC%89"><span class="toc-number">8.</span> <span class="toc-text">异常检测-脑部 &amp; 腹部（MOOD2023）</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%9B%BE%E5%83%8F%E5%88%86%E5%89%B2-%E5%A4%9A%E5%8F%91%E6%80%A7%E7%A5%9E%E7%BB%8F%E7%BA%A4%E7%BB%B4%E7%98%A4%EF%BC%88WBMRI-NF2023%EF%BC%89"><span class="toc-number">9.</span> <span class="toc-text">图像分割-多发性神经纤维瘤（WBMRI-NF2023）</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%9B%BE%E5%83%8F%E5%88%86%E5%89%B2-%E7%A5%9E%E7%BB%8F%E6%AF%8D%E7%BB%86%E8%83%9E%E7%98%A4%EF%BC%88SPPIN2023%EF%BC%89"><span class="toc-number">10.</span> <span class="toc-text">图像分割-神经母细胞瘤（SPPIN2023）</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%9B%BE%E5%83%8F%E5%88%86%E5%89%B2%E3%80%81%E5%9B%BE%E5%83%8F%E5%88%86%E7%B1%BB%E3%80%81%E7%9B%AE%E6%A0%87%E6%A3%80%E6%B5%8B-%E4%B9%B3%E8%85%BA%E8%82%BF%E7%98%A4%EF%BC%88TSCD-ABUS2023%EF%BC%89"><span class="toc-number">11.</span> <span class="toc-text">图像分割、图像分类、目标检测-乳腺肿瘤（TSCD-ABUS2023）</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%9B%BE%E5%83%8F%E9%87%8D%E5%BB%BA-%E5%A4%9A%E5%99%A8%E5%AE%98%E8%B6%85%E5%A3%B0%E5%BD%B1%E5%83%8F%EF%BC%88Ultrasound-Image-Enhancement-Challenge-2023%EF%BC%89"><span class="toc-number">12.</span> <span class="toc-text">图像重建-多器官超声影像（Ultrasound Image Enhancement Challenge 2023）</span></a></li></ol>
+    </nav>
+  </div>
+</aside>
+
+<main class="main" role="main">
+  <div class="content">
+  <article id="post-速览/MICCAI-2023-挑战赛速览-Glenn" class="article article-type-post" itemscope itemtype="http://schema.org/BlogPosting">
+    
+    <div class="article-header">
+      
+        
+  
+    <h1 class="article-title" itemprop="name">
+      MICCAI 2023 挑战赛速览
+    </h1>
+  
+
+      
+      <div class="article-meta">
+        <span class="article-date">
+    <i class="icon icon-calendar-check"></i>
+	<a href="/2023/05/13/%E9%80%9F%E8%A7%88/MICCAI-2023-%E6%8C%91%E6%88%98%E8%B5%9B%E9%80%9F%E8%A7%88-Glenn/" class="article-date">
+	  <time datetime="2023-05-13T05:01:44.000Z" itemprop="datePublished">2023-05-13</time>
+	</a>
+</span>
+        
+  <span class="article-category">
+    <i class="icon icon-folder"></i>
+    <a class="article-category-link" href="/categories/%E9%80%9F%E8%A7%88/">速览</a>
+  </span>
+
+        
+  <span class="article-tag">
+    <i class="icon icon-tags"></i>
+	<a class="article-tag-link-link" href="/tags/Competition/" rel="tag">Competition</a>
+  </span>
+
+
+        
+
+	<span class="article-read hidden-xs">
+    	<i class="icon icon-eye-fill" aria-hidden="true"></i>
+    	<span id="/2023/05/13/%E9%80%9F%E8%A7%88/MICCAI-2023-%E6%8C%91%E6%88%98%E8%B5%9B%E9%80%9F%E8%A7%88-Glenn/" class="leancloud_visitors"  data-flag-title="MICCAI 2023 挑战赛速览">
+			<span class="leancloud-visitors-count">0</span>
+		</span>
+    </span>
+
+        <span class="post-comment"><i class="icon icon-comment"></i> <a href="/2023/05/13/%E9%80%9F%E8%A7%88/MICCAI-2023-%E6%8C%91%E6%88%98%E8%B5%9B%E9%80%9F%E8%A7%88-Glenn/#comments" class="article-comment-link">评论</a></span>
+        
+      </div>
+    </div>
+    <div class="article-entry marked-body" itemprop="articleBody">
+      
+        <h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>MICCAI 是医学图像计算与计算机辅助干预国际会议（International Conference on Medical Image Computing and Computer Assisted Intervention）的缩写。该会议自 1998 年开始，每年举办一次，是医学图像处理领域中最具有权威性和影响力的会议之一，被广泛认为是医学图像处理领域内的顶级会议之一。</p>
+<p>而 MICCAI CHALLENGES 是 MICCAI 的一个重要组成部分。它是一个国际性的竞赛平台，面向医学图像计算和计算机辅助干预领域的研究人员和开发者，旨在鼓励和推动该领域的技术发展和应用。</p>
+<p>对于我们来说，这是个提升自己（获取数据集）的机会。今年的 MICCAI 将会在 10 月 8 日到 12 日在加拿大的温哥华举办，每年这个时候都是各种竞赛云集的时刻。</p>
+<p>截止 2023-05-09 16:45:17，部分在 MICCAI 2023 上注册的挑战赛还没有发布任务和介绍，持续更新。</p>
+<hr>
+<h2 id="图像分割-肾脏（KiTS2023）"><a href="#图像分割-肾脏（KiTS2023）" class="headerlink" title="图像分割-肾脏（KiTS2023）"></a>图像分割-肾脏（KiTS2023）</h2><blockquote>
+<p><em><strong>主页：</strong></em><a href="https://link.zhihu.com/?target=https://kits-challenge.org/kits23/">The 2023 Kidney Tumor Segmentation Challenge</a><br><em><strong>任务：</strong></em><em>图像分割</em><br><em><strong>目标：</strong></em><em>腹部 CT 中肾脏、肾脏肿瘤、肾脏囊肿（如图 1 所示）分割</em></p>
+</blockquote>
+<p><img src="/2023/05/13/%E9%80%9F%E8%A7%88/MICCAI-2023-%E6%8C%91%E6%88%98%E8%B5%9B%E9%80%9F%E8%A7%88-Glenn/v2-fdb48b93b45891d1042f36f76242baf2_r.jpg"><br>图1. 紫色为肾脏，绿色为肾脏肿瘤，蓝色为肾脏囊肿。</p>
+<blockquote>
+<p><em><strong>数据集：</strong></em><em>共 599 例，489 例训练集，110 例测试集。</em><br><em><strong>时间线：</strong></em><em>如下表所示</em></p>
+</blockquote>
+<table>
+<thead>
+<tr>
+<th></th>
+<th></th>
+</tr>
+</thead>
+<tbody><tr>
+<td>4 月 14 日</td>
+<td>训练数据集发布</td>
+</tr>
+<tr>
+<td>7 月 14 日</td>
+<td>论文提交截止时间</td>
+</tr>
+<tr>
+<td>7 月 21 日 - 7 月 28 日</td>
+<td>结果提交</td>
+</tr>
+<tr>
+<td>7 月 31 日</td>
+<td>公布结果</td>
+</tr>
+<tr>
+<td>10 月 8 日 - 10 月 12 日</td>
+<td>参加 MICCAI 2023 会议</td>
+</tr>
+</tbody></table>
+<blockquote>
+<p><em><strong>主办单位：</strong></em><em>明尼苏达大学、德国癌症研究中心、克利夫兰诊所</em></p>
+</blockquote>
+<hr>
+<h2 id="图像合成-MRI-to-sCT-amp-CBCT-to-sCT（SynthRAD2023）"><a href="#图像合成-MRI-to-sCT-amp-CBCT-to-sCT（SynthRAD2023）" class="headerlink" title="图像合成-MRI to sCT &amp; CBCT to sCT（SynthRAD2023）"></a>图像合成-MRI to sCT &amp; CBCT to sCT（SynthRAD2023）</h2><blockquote>
+<p><em><strong>主页：</strong></em><a href="https://link.zhihu.com/?target=https://synthrad2023.grand-challenge.org/">SynthRAD2023 - Grand Challenge</a><br><em><strong>任务：</strong></em><em>图像合成</em><br><em><strong>目标：</strong></em><em>1）使用磁共振影像（MRI）生成伪计算机断层成像（sCT）；</em><br> <em>2）锥形束计算机断层扫描（CBCT）生成伪计算机断层成像（sCT）。</em></p>
+</blockquote>
+<p><img src="/2023/05/13/%E9%80%9F%E8%A7%88/MICCAI-2023-%E6%8C%91%E6%88%98%E8%B5%9B%E9%80%9F%E8%A7%88-Glenn/v2-660783f00f6e77975e4bab7cf8331665_r.jpg"><br>图2. </p>
+<blockquote>
+<p><em><strong>数据集：</strong></em><em>540 例配对的 MRI-CT；540 例配对的 CBCT-CT 。</em><br><em><strong>时间线：</strong></em><em>如下表所示</em></p>
+</blockquote>
+<table>
+<thead>
+<tr>
+<th></th>
+<th></th>
+</tr>
+</thead>
+<tbody><tr>
+<td>4 月 1 日</td>
+<td>发布训练数据</td>
+</tr>
+<tr>
+<td>4 月 1 日 - 5 月 31 日</td>
+<td>训练阶段</td>
+</tr>
+<tr>
+<td>5 月 1 日 - 8 月 15 日</td>
+<td>初步测试阶段</td>
+</tr>
+<tr>
+<td>5 月 13 日</td>
+<td>在 ESTRO23 上介绍挑战赛</td>
+</tr>
+<tr>
+<td>6 月 1 日 - 7 月 15 日</td>
+<td>验证阶段</td>
+</tr>
+<tr>
+<td>7 月 16 日 - 8 月 15 日</td>
+<td>测试阶段</td>
+</tr>
+<tr>
+<td>8 月 15 日</td>
+<td>提交方法论论文的截止日期</td>
+</tr>
+<tr>
+<td>9 月 20 日</td>
+<td>公告和邀请介绍</td>
+</tr>
+<tr>
+<td>10 月 8 日 - 10 月 12 日</td>
+<td>在 MICCAI 大会上介绍挑战赛结果的第一部分</td>
+</tr>
+<tr>
+<td>4 月 &#x2F; 5 月</td>
+<td>在 ESTRO 大会上介绍挑战赛结果的第二部分</td>
+</tr>
+</tbody></table>
+<blockquote>
+<p><em><strong>主办单位：</strong></em><em>如下图所示</em></p>
+</blockquote>
+<p><img src="/2023/05/13/%E9%80%9F%E8%A7%88/MICCAI-2023-%E6%8C%91%E6%88%98%E8%B5%9B%E9%80%9F%E8%A7%88-Glenn/v2-f1c37e81708a168245ab7f833d5bd696_r.jpg"><br>图3. SynthRAD2023 主办单位和成员</p>
+<hr>
+<h2 id="图像配准-乳腺癌病理-WSI-的-IHC-to-H-amp-E（ACROBAT2023）"><a href="#图像配准-乳腺癌病理-WSI-的-IHC-to-H-amp-E（ACROBAT2023）" class="headerlink" title="图像配准-乳腺癌病理 WSI 的 IHC to H&amp;E（ACROBAT2023）"></a>图像配准-乳腺癌病理 WSI 的 IHC to H&amp;E（ACROBAT2023）</h2><blockquote>
+<p><em><strong>主页：</strong></em><a href="https://link.zhihu.com/?target=https://acrobat.grand-challenge.org/">ACROBAT 2023 - Grand Challenge</a><br><em><strong>任务：</strong></em><em>图像配准</em><br><em><strong>目标：</strong></em><em>将使用常规 IHC 染色剂（ER, PGR, HER2, KI67 四种之一）的乳腺癌组织切片的 WSI，配准到用 H&amp;E 染色的对应 WSI 上。</em><br><em><strong>数据集：</strong></em><em>共 750 例，每例包含 1 组 H&amp;E 染色的组织切片的 WSI 和 1-4 组对应的常规 IHC（ER、PGR、HER2、KI67）WSI。100 例验证集，200 例测试集。</em><br><em><strong>时间线：</strong></em><em>如下表所示</em></p>
+</blockquote>
+<table>
+<thead>
+<tr>
+<th></th>
+<th></th>
+</tr>
+</thead>
+<tbody><tr>
+<td>6 月 1 日</td>
+<td>数据集发布</td>
+</tr>
+<tr>
+<td>8 月 19 日</td>
+<td>结果提交</td>
+</tr>
+<tr>
+<td>8 月 26 日</td>
+<td>获奖者代码提交</td>
+</tr>
+</tbody></table>
+<blockquote>
+<p><em><strong>主办单位：</strong></em><em>卡罗林斯卡学院、图尔库大学、坦佩雷大学</em></p>
+</blockquote>
+<hr>
+<h2 id="图像分割-道内和道外前庭神经鞘瘤与耳蜗（crossMoDA2023）"><a href="#图像分割-道内和道外前庭神经鞘瘤与耳蜗（crossMoDA2023）" class="headerlink" title="图像分割-道内和道外前庭神经鞘瘤与耳蜗（crossMoDA2023）"></a>图像分割-道内和道外前庭神经鞘瘤与耳蜗（crossMoDA2023）</h2><blockquote>
+<p><em><strong>主页：</strong></em><a href="https://link.zhihu.com/?target=https://crossmoda-challenge.ml/">crossMoDA</a><br><em><strong>任务：</strong></em><em>跨模态图像分割</em><br><em><strong>目标：</strong></em><em>道内和道外前庭神经鞘瘤与耳蜗跨模态分割（从 ceT1 到 hrT2，如图 4 所示）</em></p>
+</blockquote>
+<p><img src="/2023/05/13/%E9%80%9F%E8%A7%88/MICCAI-2023-%E6%8C%91%E6%88%98%E8%B5%9B%E9%80%9F%E8%A7%88-Glenn/v2-13a2a9bc581d7d2faedd06836f1bcb66_r.jpg"><br>图4. 跨模态分割</p>
+<blockquote>
+<p><em><strong>数据集：</strong></em><em>训练集是 227 例 contrast-enhanced T1 和 295 例 high resolution T2 头部影像，验证集是 96 例 high resolution T2 头部影像，测试集是 365 例 high resolution T2 头部影像。如图 5 所示，所有数据都是多机构、异构扫描的。</em></p>
+</blockquote>
+<p><img src="/2023/05/13/%E9%80%9F%E8%A7%88/MICCAI-2023-%E6%8C%91%E6%88%98%E8%B5%9B%E9%80%9F%E8%A7%88-Glenn/v2-5dee36a8fac1d11bf787d4678b6e4f99_r.jpg"><br>图5. 数据集构成</p>
+<blockquote>
+<p><em><strong>时间线：</strong></em><em>如下表所示</em></p>
+</blockquote>
+<table>
+<thead>
+<tr>
+<th></th>
+<th></th>
+</tr>
+</thead>
+<tbody><tr>
+<td>4 月 15 日</td>
+<td>训练和验证数据发布</td>
+</tr>
+<tr>
+<td>4 月 27 日</td>
+<td>验证阶段开始</td>
+</tr>
+<tr>
+<td>7 月 1 日</td>
+<td>评估阶段开始</td>
+</tr>
+<tr>
+<td>7 月 10 日</td>
+<td>评估阶段结束</td>
+</tr>
+<tr>
+<td>10 月 8 日</td>
+<td>挑战结果将在 MICCAI 2023 上公布</td>
+</tr>
+<tr>
+<td>11 月 30 日</td>
+<td>在 MICCAI 2023 BrainLes 研讨会上介绍方法</td>
+</tr>
+<tr>
+<td>12 月</td>
+<td>向该领域的高影响力期刊提交合作论文，总结挑战赛的结果</td>
+</tr>
+</tbody></table>
+<blockquote>
+<p><em><strong>主办单位：</strong></em><em>如下图所示</em></p>
+</blockquote>
+<p><img src="/2023/05/13/%E9%80%9F%E8%A7%88/MICCAI-2023-%E6%8C%91%E6%88%98%E8%B5%9B%E9%80%9F%E8%A7%88-Glenn/v2-c2ea1d623f43619231247b227b6f3d5e_r.jpg"><br>图6. crossMoDA 主办单位和成员</p>
+<hr>
+<h2 id="图像分割-腹部-CT-器官与肿瘤（FLARPEACT2023）"><a href="#图像分割-腹部-CT-器官与肿瘤（FLARPEACT2023）" class="headerlink" title="图像分割-腹部 CT 器官与肿瘤（FLARPEACT2023）"></a>图像分割-腹部 CT 器官与肿瘤（FLARPEACT2023）</h2><blockquote>
+<p><em><strong>主页：</strong></em><a href="https://link.zhihu.com/?target=https://codalab.lisn.upsaclay.fr/competitions/12239">CodaLab - Competition</a><br><em><strong>任务：</strong></em><em>图像分割</em><br><em><strong>目标：</strong></em><em>在腹部 CT 扫描中分割 13 个器官（肝、脾、胰腺、右肾、左肾、胃、胆囊、食道、主动脉、下腔静脉、右肾上腺、左肾上腺和十二指肠）和一个包括各种癌症类型的肿瘤（如癌症、肾癌、胃癌、胰腺癌症、结肠癌），如图 7 所示。</em></p>
+</blockquote>
+<p><img src="/2023/05/13/%E9%80%9F%E8%A7%88/MICCAI-2023-%E6%8C%91%E6%88%98%E8%B5%9B%E9%80%9F%E8%A7%88-Glenn/v2-68ff9bc6ea20e6e51d16a3f973e4987a_r.jpg"><br>图7. 分割目标总览</p>
+<blockquote>
+<p><em><strong>数据集：</strong></em><em>共 4000 例，2200 例有部分标签，1800 例没有标签。</em><br><em><strong>时间线：</strong></em><em>如下表所示</em></p>
+</blockquote>
+<table>
+<thead>
+<tr>
+<th></th>
+<th></th>
+</tr>
+</thead>
+<tbody><tr>
+<td>4 月 1 日 - 7 月 31 日</td>
+<td>加入挑战赛并下载数据</td>
+</tr>
+<tr>
+<td>4 月 15 日 - 7 月 31 日</td>
+<td>结果提交</td>
+</tr>
+<tr>
+<td>8 月 1 日 - 8 月 15 日</td>
+<td>测试结果</td>
+</tr>
+</tbody></table>
+<blockquote>
+<p><em><strong>主办单位：</strong></em><em>多伦多大学</em></p>
+</blockquote>
+<hr>
+<h2 id="跨领域少样本学习（L2L2023）"><a href="#跨领域少样本学习（L2L2023）" class="headerlink" title="跨领域少样本学习（L2L2023）"></a>跨领域少样本学习（L2L2023）</h2><blockquote>
+<p><em><strong>主页：</strong></em><a href="https://link.zhihu.com/?target=https://www.l2l-challenge.org/">Learn2Learn Challenge MICCAI</a><br><em><strong>任务：</strong></em><em>跨领域少样本学习（Cross-Domain Few-shot Learning, CD-FSL）</em><br><em><strong>目标：</strong></em><em>在提供的 MIMeta 数据集上做 CD-FSL，如图 8 所示。</em></p>
+</blockquote>
+<p><img src="/2023/05/13/%E9%80%9F%E8%A7%88/MICCAI-2023-%E6%8C%91%E6%88%98%E8%B5%9B%E9%80%9F%E8%A7%88-Glenn/v2-f074bc58b23731e8538283671543059c_r.jpg"><br>图8. L2L2023 流程介绍</p>
+<blockquote>
+<p><em><strong>数据集：</strong></em><em>17 个公开数据集，共包含 28 个任务。</em><br><em><strong>时间线：</strong></em><em>如下表所示</em></p>
+</blockquote>
+<table>
+<thead>
+<tr>
+<th></th>
+<th></th>
+</tr>
+</thead>
+<tbody><tr>
+<td>5 月 2 日</td>
+<td>数据集发布</td>
+</tr>
+<tr>
+<td>5 月 25 日</td>
+<td>提交入口打开</td>
+</tr>
+<tr>
+<td>6 月 29 日</td>
+<td>报名截止日期</td>
+</tr>
+<tr>
+<td>8 月 10 日</td>
+<td>提交截止日期</td>
+</tr>
+<tr>
+<td>8 月 31 日</td>
+<td>Top 团队联系</td>
+</tr>
+<tr>
+<td>10 月 8 日 - 10 月 12 日</td>
+<td>MICCAI 2023 公布结果</td>
+</tr>
+</tbody></table>
+<blockquote>
+<p><em><strong>主办单位：</strong></em><em>麻省理工学院、MEVIS、吕贝克大学</em></p>
+</blockquote>
+<hr>
+<h2 id="异常检测-脑部-amp-腹部（MOOD2023）"><a href="#异常检测-脑部-amp-腹部（MOOD2023）" class="headerlink" title="异常检测-脑部 &amp; 腹部（MOOD2023）"></a>异常检测-脑部 &amp; 腹部（MOOD2023）</h2><blockquote>
+<p><em><strong>主页：</strong></em><a href="https://link.zhihu.com/?target=http://medicalood.dkfz.de/web/">Medical Out-of-Distribution Analysis Challenge</a><br><em><strong>任务：</strong></em><em>异常检测</em><br><em><strong>目标：</strong></em><em>1）分析每个病例是否存在异常，并给出异常概率。分数必须在 [0-1] 中，其中 0 表示没有异常，1表示最异常的输入；</em><br> <em>2）分析每个病例中每个体素是否存在异常，并给出异常概率。分数必须在 [0-1] 中，其中 0 表示没有异常，1 表示最异常的输入。</em><br><em><strong>数据集：</strong></em><em>脑部MRI 数据集，共 800 例；腹部 CT 数据集，共 550 例。</em><br><em><strong>时间线：</strong></em><em>如下表所示</em></p>
+</blockquote>
+<table>
+<thead>
+<tr>
+<th></th>
+<th></th>
+</tr>
+</thead>
+<tbody><tr>
+<td>4 月 1 日</td>
+<td>数据集发布</td>
+</tr>
+<tr>
+<td>8 月 30 日</td>
+<td>注册截止日期</td>
+</tr>
+<tr>
+<td>9 月 1 日</td>
+<td>结果提交截止日期</td>
+</tr>
+<tr>
+<td>9 月 7 日</td>
+<td>摘要提交截止日期</td>
+</tr>
+<tr>
+<td>10 月 8 日 - 10 月 12 日</td>
+<td>结果公布</td>
+</tr>
+</tbody></table>
+<blockquote>
+<p><em><strong>主办单位：</strong></em><em>德国癌症研究中心</em></p>
+</blockquote>
+<hr>
+<h2 id="图像分割-多发性神经纤维瘤（WBMRI-NF2023）"><a href="#图像分割-多发性神经纤维瘤（WBMRI-NF2023）" class="headerlink" title="图像分割-多发性神经纤维瘤（WBMRI-NF2023）"></a>图像分割-多发性神经纤维瘤（WBMRI-NF2023）</h2><blockquote>
+<p><em><strong>主页：</strong></em><a href="https://link.zhihu.com/?target=https://mgh-3dqi.github.io/">WBMRI-NF 2023: Neurofibromatosis Tumor Segmentation on Whole-body MRI Challenge</a><br><em><strong>任务：</strong></em><em>图像分割</em><br><em><strong>目标：</strong></em><em>在全身 MRI（Whole-Body MRI, WB-MRI）上分割多发性神经纤维瘤（Neurofibromatosis, NF）肿瘤。</em><br><em><strong>数据集：</strong></em><em>共 400 例全身 MRI，200 例训练集，50 例验证集，150 例不可见测试集。</em></p>
+</blockquote>
+<p><img src="/2023/05/13/%E9%80%9F%E8%A7%88/MICCAI-2023-%E6%8C%91%E6%88%98%E8%B5%9B%E9%80%9F%E8%A7%88-Glenn/v2-32b71a67da0089b544ec8c1f2cdc5412_r.jpg"><br>图9. 全身肿瘤分布</p>
+<blockquote>
+<p><em><strong>时间线：</strong></em><em>如下表所示</em></p>
+</blockquote>
+<table>
+<thead>
+<tr>
+<th></th>
+<th></th>
+</tr>
+</thead>
+<tbody><tr>
+<td>3 月 28 日</td>
+<td>挑战赛页面开放</td>
+</tr>
+<tr>
+<td>4 月 1 日</td>
+<td>训练数据发布</td>
+</tr>
+<tr>
+<td>5 月 14 日</td>
+<td>验证数据发布及结果提交</td>
+</tr>
+<tr>
+<td>7 月 22 日</td>
+<td>开放验证阶段截止日期</td>
+</tr>
+<tr>
+<td>8 月 1 日</td>
+<td>论文提交截止日期</td>
+</tr>
+<tr>
+<td>8 月 15 日</td>
+<td>代码提交截止日期</td>
+</tr>
+<tr>
+<td>9 月 1 日</td>
+<td>结果公布日期</td>
+</tr>
+</tbody></table>
+<blockquote>
+<p><em><strong>主办单位：</strong></em><em>麻省总医院、美国国家癌症研究所、Sage Bionetworks、威斯康星大学麦迪逊分校、英特尔</em></p>
+</blockquote>
+<hr>
+<h2 id="图像分割-神经母细胞瘤（SPPIN2023）"><a href="#图像分割-神经母细胞瘤（SPPIN2023）" class="headerlink" title="图像分割-神经母细胞瘤（SPPIN2023）"></a>图像分割-神经母细胞瘤（SPPIN2023）</h2><blockquote>
+<p><em><strong>主页：</strong></em><a href="https://link.zhihu.com/?target=https://sppin.grand-challenge.org/sppin/">Surgical Planning in Pediatric Neuroblastoma - Grand Challenge</a><br><em><strong>任务：</strong></em><em>图像分割</em><br><em><strong>目标：</strong></em><em>1）神经母细胞瘤的全监督分割；</em><br> <em>2）肿瘤相关腹部器官和血管的半监督分割。</em></p>
+</blockquote>
+<p><img src="/2023/05/13/%E9%80%9F%E8%A7%88/MICCAI-2023-%E6%8C%91%E6%88%98%E8%B5%9B%E9%80%9F%E8%A7%88-Glenn/v2-f6e74c8f898d4833b02d752bc16d5511_r.jpg"><br>图10. 神经母细胞瘤及其相关腹部器官和血管的分割</p>
+<blockquote>
+<p><em><strong>数据集：</strong></em><em>共 39 例 MRI。</em><br><em><strong>时间线：</strong></em><em>如下表所示</em></p>
+</blockquote>
+<table>
+<thead>
+<tr>
+<th></th>
+<th></th>
+</tr>
+</thead>
+<tbody><tr>
+<td>4 月 14 日</td>
+<td>训练数据发布</td>
+</tr>
+<tr>
+<td>5 月 1 日</td>
+<td>示例数据发布</td>
+</tr>
+<tr>
+<td>5 月 22 日</td>
+<td>初步测试阶段开始</td>
+</tr>
+<tr>
+<td>7 月 15 日</td>
+<td>提交入口开启</td>
+</tr>
+<tr>
+<td>8 月 15 日</td>
+<td>提交入口关闭</td>
+</tr>
+<tr>
+<td>10 月 8 日 - 10 月 12 日</td>
+<td>结果公布</td>
+</tr>
+</tbody></table>
+<blockquote>
+<p><em><strong>主办单位：</strong></em><em>Princess Máxima 儿童肿瘤医院、乌得勒支大学</em></p>
+</blockquote>
+<hr>
+<h2 id="图像分割、图像分类、目标检测-乳腺肿瘤（TSCD-ABUS2023）"><a href="#图像分割、图像分类、目标检测-乳腺肿瘤（TSCD-ABUS2023）" class="headerlink" title="图像分割、图像分类、目标检测-乳腺肿瘤（TSCD-ABUS2023）"></a>图像分割、图像分类、目标检测-乳腺肿瘤（TSCD-ABUS2023）</h2><blockquote>
+<p><em><strong>主页：</strong></em><a href="https://link.zhihu.com/?target=https://tdsc-abus2023.grand-challenge.org/">TDSC-ABUS2023 - Grand Challenge</a><br><em><strong>任务：</strong></em><em>图像分割、图像分类、目标检测</em><br><em><strong>目标：</strong></em><em>在三维乳腺超声影像中检测、分割和分类（良恶性）肿瘤。</em></p>
+</blockquote>
+<p><img src="/2023/05/13/%E9%80%9F%E8%A7%88/MICCAI-2023-%E6%8C%91%E6%88%98%E8%B5%9B%E9%80%9F%E8%A7%88-Glenn/v2-32a5cfe85900e46e1345d6deb93a3ffc_r.jpg"><br>图11. 三维乳腺肿瘤</p>
+<blockquote>
+<p><em><strong>数据集：</strong></em><em>共 200 例超声影像，100 例训练集，30 例验证集，70例测试集</em><br><em><strong>时间线：</strong></em><em>如下表所示</em></p>
+</blockquote>
+<table>
+<thead>
+<tr>
+<th></th>
+<th></th>
+</tr>
+</thead>
+<tbody><tr>
+<td>3 月 28 日</td>
+<td>注册</td>
+</tr>
+<tr>
+<td>4 月 6 日</td>
+<td>训练数据发布</td>
+</tr>
+<tr>
+<td>7 月 15 日</td>
+<td>验证数据发布，结果提交入口开放</td>
+</tr>
+<tr>
+<td>7 月 20 日</td>
+<td>结果提交截止时间</td>
+</tr>
+<tr>
+<td>7 月 20 日</td>
+<td>测试数据发布，论文提交入口开放</td>
+</tr>
+<tr>
+<td>7 月 30 日</td>
+<td>论文提交截止时间</td>
+</tr>
+<tr>
+<td>9 月 18 日</td>
+<td>结果公布</td>
+</tr>
+</tbody></table>
+<blockquote>
+<p><em><strong>主办单位：</strong></em><em>哈尔滨工业大学、哈尔滨医科大学</em></p>
+</blockquote>
+<hr>
+<h2 id="图像重建-多器官超声影像（Ultrasound-Image-Enhancement-Challenge-2023）"><a href="#图像重建-多器官超声影像（Ultrasound-Image-Enhancement-Challenge-2023）" class="headerlink" title="图像重建-多器官超声影像（Ultrasound Image Enhancement Challenge 2023）"></a>图像重建-多器官超声影像（Ultrasound Image Enhancement Challenge 2023）</h2><blockquote>
+<p><em><strong>主页：</strong></em><a href="https://link.zhihu.com/?target=https://ultrasoundenhance2023.grand-challenge.org/">Ultrasound Image Enhancement challenge 2023 - Grand Challenge</a><br><em><strong>任务：</strong></em><em>图像重建</em><br><em><strong>目标：</strong></em><em>从低质量的超声图像中重建出高质量的超声图像。</em><br><em><strong>数据集：</strong></em><em>来自 109 名患者的 3000 张超声图像（1500 对低质量和高质量图像），包括甲状腺、颈动脉、肝脏、乳房和肾脏五个器官。</em><br><em><strong>时间线：</strong></em><em>如下表所示</em></p>
+</blockquote>
+<table>
+<thead>
+<tr>
+<th></th>
+<th></th>
+</tr>
+</thead>
+<tbody><tr>
+<td>5 月 10 日</td>
+<td>训练数据发布</td>
+</tr>
+<tr>
+<td>6 月 20 日 - 7 月 30 日</td>
+<td>验证阶段</td>
+</tr>
+<tr>
+<td>7 月 20 日 - 8 月 20 日</td>
+<td>测试阶段</td>
+</tr>
+<tr>
+<td>9 月 10 日</td>
+<td>结果公布</td>
+</tr>
+</tbody></table>
+<blockquote>
+<p><em><strong>主办单位：</strong></em><em>复旦大学、上海大学、复旦大学附属肿瘤医院、斯坦福</em></p>
+</blockquote>
+
+      
+    </div>
+    <div class="article-footer">
+      <blockquote class="mt-2x">
+  <ul class="post-copyright list-unstyled">
+    
+    <li class="post-copyright-link hidden-xs">
+      <strong>本文链接：</strong>
+      <a href="https://chenluda.github.io/2023/05/13/%E9%80%9F%E8%A7%88/MICCAI-2023-%E6%8C%91%E6%88%98%E8%B5%9B%E9%80%9F%E8%A7%88-Glenn/" title="MICCAI 2023 挑战赛速览" target="_blank" rel="external">https://chenluda.github.io/2023/05/13/速览/MICCAI-2023-挑战赛速览-Glenn/</a>
+    </li>
+    
+    <li class="post-copyright-license">
+      <strong>版权声明： </strong> 本博客所有文章除特别声明外，均采用 <a href="http://creativecommons.org/licenses/by/4.0/deed.zh" target="_blank" rel="external">CC BY 4.0 CN协议</a> 许可协议。转载请注明出处！
+    </li>
+  </ul>
+</blockquote>
+
+
+<div class="panel panel-default panel-badger">
+  <div class="panel-body">
+    <figure class="media">
+      <div class="media-left">
+        <a href="https://github.com/chenluda" target="_blank" class="img-burn thumb-sm visible-lg">
+          <img src="/images/avatar.png" class="img-rounded w-full" alt="">
+        </a>
+      </div>
+      <div class="media-body">
+        <h3 class="media-heading"><a href="https://github.com/chenluda" target="_blank"><span class="text-dark">Glenn</span><small class="ml-1x">Stay hungry, stay foolish.</small></a></h3>
+        <div>咖啡，健身，热爱生活。</div>
+      </div>
+    </figure>
+  </div>
+</div>
+
+
+    </div>
+  </article>
+  
+    
+  <section id="comments">
+  	
+      <div id="vcomments"></div>
+    
+  </section>
+
+
+  
+</div>
+
+  <nav class="bar bar-footer clearfix" data-stick-bottom>
+  <div class="bar-inner">
+  
+  <ul class="pager pull-left">
+    
+    
+    <li class="next">
+      <a href="/2023/05/13/%E9%80%9F%E8%A7%88/AI%E5%AD%A6%E6%9C%AF%E4%BA%A7%E5%93%81%E4%BA%A7%E5%93%81%E4%B8%80/" title="AI 学术产品速览（一）"><span>下一篇&nbsp;&nbsp;</span><i class="icon icon-angle-right" aria-hidden="true"></i></a>
+    </li>
+    
+    
+    <li class="toggle-toc">
+      <a class="toggle-btn " data-toggle="collapse" href="#collapseToc" aria-expanded="false" title="文章目录" role="button">    <span>[&nbsp;</span><span>文章目录</span>
+        <i class="text-collapsed icon icon-anchor"></i>
+        <i class="text-in icon icon-close"></i>
+        <span>]</span>
+      </a>
+    </li>
+    
+  </ul>
+  
+  
+  
+  <div class="bar-right">
+    
+    <div class="share-component" data-sites="weibo,qq,wechat,facebook,twitter" data-mobile-sites="weibo,qq,qzone"></div>
+    
+  </div>
+  </div>
+</nav>
+  
+
+
+</main>
+
+  <footer class="footer" itemscope itemtype="http://schema.org/WPFooter">
+	
+	
+    <ul class="social-links">
+    	
+        <li><a href="https://github.com/chenluda" target="_blank" title="Github" data-toggle=tooltip data-placement=top><i class="icon icon-github"></i></a></li>
+        
+        <li><a href="https://www.zhihu.com/people/Glenn" target="_blank" title="Zhihu" data-toggle=tooltip data-placement=top><i class="icon icon-zhihu"></i></a></li>
+        
+    </ul>
+
+    <div class="copyright">
+    	
+        <div class="publishby">
+        	Theme by <a href="https://github.com/cofess" target="_blank"> cofess </a>base on <a href="https://github.com/cofess/hexo-theme-pure" target="_blank">pure</a>.
+        </div>
+    </div>
+</footer>
+  <script src="//cdn.jsdelivr.net/npm/jquery@1.12.4/dist/jquery.min.js"></script>
+<script>
+window.jQuery || document.write('<script src="js/jquery.min.js"><\/script>')
+</script>
+
+<script src="/js/plugin.min.js"></script>
+
+
+<script src="/js/application.js"></script>
+
+
+    <script>
+(function (window) {
+    var INSIGHT_CONFIG = {
+        TRANSLATION: {
+            POSTS: '文章',
+            PAGES: '页面',
+            CATEGORIES: '分类',
+            TAGS: '标签',
+            UNTITLED: '(未命名)',
+        },
+        ROOT_URL: '/',
+        CONTENT_URL: '/content.json',
+    };
+    window.INSIGHT_CONFIG = INSIGHT_CONFIG;
+})(window);
+</script>
+
+<script src="/js/insight.js"></script>
+
+
+
+
+
+
+   
+
+
+
+
+   
+    
+  <script src="//cdn1.lncld.net/static/js/3.0.4/av-min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/valine"></script>
+  <script type="text/javascript">
+  var GUEST = ['nick', 'mail', 'link'];
+  var meta = 'nick,mail,link';
+  meta = meta.split(',').filter(function(item) {
+    return GUEST.indexOf(item) > -1;
+  });
+  new Valine({
+    el: '#vcomments',
+    verify: false,
+    notify: false,
+    appId: 'Mr6aCGJuw2sme5obVyjdlAIp-gzGzoHsz',
+    appKey: 'fja89BU5rk64kGgsGqptQTUX',
+    placeholder: '请输入...',
+    avatar: 'mm',
+    meta: meta,
+    pageSize: '10' || 10,
+    visitor: true
+  });
+  </script>
+
+     
+
+
+
+
+
+
+
+</body>
+</html>

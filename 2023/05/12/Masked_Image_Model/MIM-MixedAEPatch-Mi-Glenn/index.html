@@ -17,7 +17,7 @@
   <meta http-equiv="window-target" content="_top" />
   
   
-  <title>MIM | MixedAE：Patch Mix 的调教手册 | Hexo</title>
+  <title>MIM | MixedAE：Patch Mix 的调教手册 | Glenn&#39;s blog</title>
   <meta name="description" content="题目：Mixed Autoencoder for Self-supervised Visual Representation Learning单位：香港科技大学、华为诺亚方舟实验室论文网址：https:&#x2F;&#x2F;arxiv.org&#x2F;abs&#x2F;2303.17152论文代码：未公开首次发布时间：2023 年 3 月 30 日（收录于 CVPR 2023）  123456@article&amp;#123;chen">
 <meta property="og:type" content="article">
 <meta property="og:title" content="MIM | MixedAE：Patch Mix 的调教手册">
@@ -35,7 +35,7 @@
 <meta property="og:image" content="https://chenluda.github.io/2023/05/12/Masked_Image_Model/MIM-MixedAEPatch-Mi-Glenn/v2-755b5781fb1478ccb335ccab332f755f_r.jpg">
 <meta property="og:image" content="https://chenluda.github.io/2023/05/12/Masked_Image_Model/MIM-MixedAEPatch-Mi-Glenn/v2-357a4f6f052edb0b4b762fc50d3c98ce_r.jpg">
 <meta property="article:published_time" content="2023-05-12T10:44:26.000Z">
-<meta property="article:modified_time" content="2023-05-12T12:17:11.165Z">
+<meta property="article:modified_time" content="2023-05-13T05:47:52.787Z">
 <meta property="article:author" content="Glenn">
 <meta property="article:tag" content="Masked Image Modeling">
 <meta name="twitter:card" content="summary">
@@ -46,7 +46,7 @@
     <link rel="alternate" href="/atom.xml" title="Glenn" type="application/atom+xml">
   
   
-    <link rel="icon" href="/favicon.png" type="image/x-icon">
+    <link rel="icon" href="/images/avatar.png" type="image/x-icon">
   
   
 <link rel="stylesheet" href="/css/style.css">
@@ -110,7 +110,7 @@
       </button>
     </div>
     <nav id="main-navbar" class="collapse navbar-collapse" itemscope itemtype="http://schema.org/SiteNavigationElement" role="navigation">
-      <ul class="nav navbar-nav main-nav ">
+      <ul class="nav navbar-nav main-nav menu-highlight">
         
         
         <li class="menu-item menu-item-home">
@@ -177,17 +177,7 @@
   <div class="widget">
     <h3 class="widget-title">分类</h3>
     <div class="widget-body">
-      <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/%E4%BB%A3%E7%A0%81/">代码</a><span class="category-list-count">4</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/%E8%AE%BA%E6%96%87%E9%80%9F%E8%A7%88/">论文速览</a><span class="category-list-count">13</span></li></ul>
-    </div>
-  </div>
-
-
-    
-      
-  <div class="widget">
-    <h3 class="widget-title">标签</h3>
-    <div class="widget-body">
-      <ul class="tag-list" itemprop="keywords"><li class="tag-list-item"><a class="tag-list-link" href="/tags/Masked-Image-Modeling/" rel="tag">Masked Image Modeling</a><span class="tag-list-count">13</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Research/" rel="tag">Research</a><span class="tag-list-count">4</span></li></ul>
+      <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/%E4%BB%A3%E7%A0%81/">代码</a><span class="category-list-count">4</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/%E8%AE%BA%E6%96%87/">论文</a><span class="category-list-count">13</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/%E9%80%9F%E8%A7%88/">速览</a><span class="category-list-count">2</span></li></ul>
     </div>
   </div>
 
@@ -197,7 +187,7 @@
   <div class="widget">
     <h3 class="widget-title">标签云</h3>
     <div class="widget-body tagcloud">
-      <a href="/tags/Masked-Image-Modeling/" style="font-size: 14px;">Masked Image Modeling</a> <a href="/tags/Research/" style="font-size: 13px;">Research</a>
+      <a href="/tags/Competition/" style="font-size: 13px;">Competition</a> <a href="/tags/Masked-Image-Modeling/" style="font-size: 14px;">Masked Image Modeling</a> <a href="/tags/Research/" style="font-size: 13.5px;">Research</a>
     </div>
   </div>
 
@@ -206,7 +196,7 @@
   <div class="widget">
     <h3 class="widget-title">归档</h3>
     <div class="widget-body">
-      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2023/05/">五月 2023</a><span class="archive-list-count">17</span></li></ul>
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2023/05/">五月 2023</a><span class="archive-list-count">19</span></li></ul>
     </div>
   </div>
 
@@ -218,6 +208,36 @@
     <div class="widget-body">
       <ul class="recent-post-list list-unstyled no-thumbnail">
         
+          <li>
+            
+            <div class="item-inner">
+              <p class="item-category">
+                <a class="category-link" href="/categories/%E9%80%9F%E8%A7%88/">速览</a>
+              </p>
+              <p class="item-title">
+                <a href="/2023/05/13/%E9%80%9F%E8%A7%88/MICCAI-2023-%E6%8C%91%E6%88%98%E8%B5%9B%E9%80%9F%E8%A7%88-Glenn/" class="title">MICCAI 2023 挑战赛速览</a>
+              </p>
+              <p class="item-date">
+                <time datetime="2023-05-13T05:01:44.000Z" itemprop="datePublished">2023-05-13</time>
+              </p>
+            </div>
+          </li>
+          
+          <li>
+            
+            <div class="item-inner">
+              <p class="item-category">
+                <a class="category-link" href="/categories/%E9%80%9F%E8%A7%88/">速览</a>
+              </p>
+              <p class="item-title">
+                <a href="/2023/05/13/%E9%80%9F%E8%A7%88/AI%E5%AD%A6%E6%9C%AF%E4%BA%A7%E5%93%81%E4%BA%A7%E5%93%81%E4%B8%80/" class="title">AI 学术产品速览（一）</a>
+              </p>
+              <p class="item-date">
+                <time datetime="2023-05-13T04:55:01.000Z" itemprop="datePublished">2023-05-13</time>
+              </p>
+            </div>
+          </li>
+          
           <li>
             
             <div class="item-inner">
@@ -263,36 +283,6 @@
             </div>
           </li>
           
-          <li>
-            
-            <div class="item-inner">
-              <p class="item-category">
-                <a class="category-link" href="/categories/%E4%BB%A3%E7%A0%81/">代码</a>
-              </p>
-              <p class="item-title">
-                <a href="/2023/05/12/%E4%BB%A3%E7%A0%81/%E4%BB%A3%E7%A0%81-%E4%BB%8E-OpenReview-%E8%8E%B7%E5%8F%96%E9%A1%B6-Glenn/" class="title">代码 | 从 OpenReview 获取顶会接收论文集并保存至本地数据库</a>
-              </p>
-              <p class="item-date">
-                <time datetime="2023-05-12T10:52:15.000Z" itemprop="datePublished">2023-05-12</time>
-              </p>
-            </div>
-          </li>
-          
-          <li>
-            
-            <div class="item-inner">
-              <p class="item-category">
-                <a class="category-link" href="/categories/%E8%AE%BA%E6%96%87%E9%80%9F%E8%A7%88/">论文速览</a>
-              </p>
-              <p class="item-title">
-                <a href="/2023/05/12/Masked_Image_Model/MIM-%E7%9A%84%E5%B0%8F%E6%80%BB%E7%BB%93-Glenn/" class="title">MIM 的小总结</a>
-              </p>
-              <p class="item-date">
-                <time datetime="2023-05-12T10:44:56.000Z" itemprop="datePublished">2023-05-12</time>
-              </p>
-            </div>
-          </li>
-          
       </ul>
     </div>
   </div>
@@ -304,6 +294,15 @@
 
   
   
+  <aside class="sidebar sidebar-toc collapse   in  " id="collapseToc" itemscope itemtype="http://schema.org/WPSideBar">
+  <div class="slimContent">
+    <nav id="toc" class="article-toc">
+      <h3 class="toc-title">文章目录</h3>
+      <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%89%8D%E8%A8%80"><span class="toc-number">1.</span> <span class="toc-text">前言</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%B8%BB%E8%A6%81%E5%86%85%E5%AE%B9"><span class="toc-number">2.</span> <span class="toc-text">主要内容</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%88%86%E6%9E%90"><span class="toc-number">3.</span> <span class="toc-text">分析</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%9E%84%E5%BB%BA%E4%B8%80%E4%B8%AA-mix-baseline"><span class="toc-number">3.1.</span> <span class="toc-text">构建一个 mix baseline</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%AE%9E%E9%AA%8C"><span class="toc-number">3.2.</span> <span class="toc-text">实验</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%88%86%E6%9E%90%E5%8E%9F%E5%9B%A0"><span class="toc-number">3.3.</span> <span class="toc-text">分析原因</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%96%B9%E6%B3%95"><span class="toc-number">4.</span> <span class="toc-text">方法</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E7%BB%93%E6%9E%9C"><span class="toc-number">5.</span> <span class="toc-text">结果</span></a></li></ol>
+    </nav>
+  </div>
+</aside>
+
 <main class="main" role="main">
   <div class="content">
   <article id="post-Masked_Image_Model/MIM-MixedAEPatch-Mi-Glenn" class="article article-type-post" itemscope itemtype="http://schema.org/BlogPosting">
@@ -328,7 +327,7 @@
         
   <span class="article-category">
     <i class="icon icon-folder"></i>
-    <a class="article-category-link" href="/categories/%E8%AE%BA%E6%96%87%E9%80%9F%E8%A7%88/">论文速览</a>
+    <a class="article-category-link" href="/categories/%E8%AE%BA%E6%96%87/">论文</a>
   </span>
 
         
@@ -339,6 +338,13 @@
 
 
         
+
+	<span class="article-read hidden-xs">
+    	<i class="icon icon-eye-fill" aria-hidden="true"></i>
+    	<span id="/2023/05/12/Masked_Image_Model/MIM-MixedAEPatch-Mi-Glenn/" class="leancloud_visitors"  data-flag-title="MIM | MixedAE：Patch Mix 的调教手册">
+			<span class="leancloud-visitors-count">0</span>
+		</span>
+    </span>
 
         <span class="post-comment"><i class="icon icon-comment"></i> <a href="/2023/05/12/Masked_Image_Model/MIM-MixedAEPatch-Mi-Glenn/#comments" class="article-comment-link">评论</a></span>
         
@@ -360,28 +366,14 @@
 <p>（PS：我认为 Input augmentation 与 Masking strategy 的区别在于前者是针对 patch masking&#x2F;zero 这种方法的，而后者是针对如何进行或者对哪个部分使用 patch masking&#x2F;zero 的）</p>
 <p>然而 MixedAE 证明了如果直接在 MIM 框架中引入 patch mix，会导致模型性能下降，因此提出了 homologous recognition（同源识别） 的辅助代理任务。图 1 展示了 MixedAE 的有效性。</p>
 <p><img src="/2023/05/12/Masked_Image_Model/MIM-MixedAEPatch-Mi-Glenn/v2-0f3c850735a56b35c52463d2792b9254_r.jpg"><br>图1. 在 ImageNet-1K 上的微调精度。ID 表示 instance discrimination。</p>
-<blockquote>
-<p> Understanding Masked Image Modeling via Learning Occlusion Invariant Feature 介绍看这里：</p>
-</blockquote>
-<blockquote>
-<p> MixMIM 介绍看这里：</p>
-</blockquote>
 <hr>
-<ol>
-<li>主要内容</li>
-</ol>
-<hr>
-<ul>
+<h2 id="主要内容"><a href="#主要内容" class="headerlink" title="主要内容"></a>主要内容</h2><ul>
 <li>使用 patch mix 替换 MAE 中的 patch masking&#x2F;zero，构建了一个简单的 baseline 结构。</li>
 <li>利用该 baseline 分析了直接引入 patch mix 会导致 MIM 模型性能下降的原因：<strong>互信息的增加。</strong></li>
 <li>为了解决这个问题，作者提出了 homologous recognition（同源识别） 的辅助代理任务，不仅通过明确要求每个 patch 识别同源 patches 来缓解互信息的增加，而且还可以执行 object-aware 的自监督预训练，以获得更好的下游密集感知性能。</li>
 </ul>
 <hr>
-<ol start="2">
-<li>分析</li>
-</ol>
-<hr>
-<h3 id="2-1-构建一个-mix-baseline"><a href="#2-1-构建一个-mix-baseline" class="headerlink" title="2.1 构建一个 mix baseline"></a>2.1 构建一个 mix baseline</h3><p>使用 patch mix 替换 MAE 中的 patch masking&#x2F;zero，我们可以构建一个简单的 baseline 结构。</p>
+<h2 id="分析"><a href="#分析" class="headerlink" title="分析"></a>分析</h2><h3 id="构建一个-mix-baseline"><a href="#构建一个-mix-baseline" class="headerlink" title="构建一个 mix baseline"></a>构建一个 mix baseline</h3><p>使用 patch mix 替换 MAE 中的 patch masking&#x2F;zero，我们可以构建一个简单的 baseline 结构。</p>
 <p>给定 Batch size 为 B ，则输入图像可以表示为 \left{x_i\right}^B_{i&#x3D;1} 。</p>
 <p>将输入图像分为 B×r 个组，每个组会生成一张混合图像，其中 r\in (0, 0.5] 是混合比。</p>
 <p>每组将会不重叠、顺序地从 Batch 中取 1&#x2F;r 张图像，按下面方式进行 patch 混合：</p>
@@ -393,7 +385,7 @@
 <p>再将 unmix 后的 \left{z^j_i\right}^{1&#x2F;r}_{i&#x3D;1} 送入 decoder 中，得到 y^j_i 。</p>
 <p>重建损失函数可以写为：</p>
 <p>$$ \mathcal L_{recon}&#x3D;\sum^{1&#x2F;r}_{i&#x3D;1}[1-\mathbb I(M^j&#x3D;i)(y_i^j-x_i^j)^2 $$ </p>
-<h3 id="2-2-实验"><a href="#2-2-实验" class="headerlink" title="2.2 实验"></a>2.2 实验</h3><table>
+<h3 id="实验"><a href="#实验" class="headerlink" title="实验"></a>实验</h3><table>
 <thead>
 <tr>
 <th></th>
@@ -418,7 +410,7 @@
 </tr>
 </tbody></table>
 <p>由表格可以看出，我们构建的 mix baseline 性能甚至比 MAE 更差。</p>
-<h3 id="2-3-分析原因"><a href="#2-3-分析原因" class="headerlink" title="2.3 分析原因"></a>2.3 分析原因</h3><p>以 r&#x3D;0.5 为例， X_1 ， X_2 表示为两个输入图像， M 表示为随机掩模。则混合输入可以表示为：</p>
+<h3 id="分析原因"><a href="#分析原因" class="headerlink" title="分析原因"></a>分析原因</h3><p>以 r&#x3D;0.5 为例， X_1 ， X_2 表示为两个输入图像， M 表示为随机掩模。则混合输入可以表示为：</p>
 <p>$$ \sigma_{mix}(\left{X_1,X_2\right},M)&#x3D;\mathbb{I}(M&#x3D;1)X_1+\mathbb{I}(M&#x3D;2)X_2 $$ </p>
 <p>而 MAE 输入可以表示为：</p>
 <p>$$ \sigma_{mix}(X_1,M)&#x3D;\mathbb{I}(M&#x3D;1)X_1+\mathbb{I}(M&#x3D;2)\vec 0 $$ </p>
@@ -429,11 +421,7 @@
 <p>因此，与减少 MI 的 patch mask&#x2F;zero 不同，直接混合反而会增加模型输入和重建目标之间的 MI，从而简化重建任务。</p>
 <p>混合带来的 MI 增加是 target-invariant 的，这表明当目标是有监督学习的标签或对比学习的正样本时，上述结论也成立。这可能解释了为什么直接混合有利于有监督学习和对比学习，而不利于 MIM。</p>
 <hr>
-<ol start="3">
-<li>方法</li>
-</ol>
-<hr>
-<p>导致 MI 增加的一个因素是，MAE 在 ViT 中使用了 global self-attention，通过这种方式，每个查询 patches 将不可避免地关注来自其他图像的异源 patches。由于生成式建模的不确定性，异源 patches 可能提供了完成重建的捷径。如图 2 所示，黄瓜的绿色是重建图中狐狸身后森林的“有价值”线索。</p>
+<h2 id="方法"><a href="#方法" class="headerlink" title="方法"></a>方法</h2><p>导致 MI 增加的一个因素是，MAE 在 ViT 中使用了 global self-attention，通过这种方式，每个查询 patches 将不可避免地关注来自其他图像的异源 patches。由于生成式建模的不确定性，异源 patches 可能提供了完成重建的捷径。如图 2 所示，黄瓜的绿色是重建图中狐狸身后森林的“有价值”线索。</p>
 <p><img src="/2023/05/12/Masked_Image_Model/MIM-MixedAEPatch-Mi-Glenn/v2-b39c6398fa1b6a4ac60aa8d4b15b0641_r.jpg"><br>图2. 生成式建模的不确定性<br>为了解决这个问题，作者提出了一种新的代理任务，称为同源识别，以强制每个查询明确识别并只关注同源 patch。</p>
 <p><img src="/2023/05/12/Masked_Image_Model/MIM-MixedAEPatch-Mi-Glenn/v2-c76ccdd664896dbe3b1935c26e5b8a32_r.jpg"><br>图3. Mixed Autoencoder（MixedAE）的网络结构<br><strong>1）同源 attention：</strong>通过使用 TopK(\cdot) 的采样操作，强制每个查询 patches 只关注注意分数最高的关键 patches，从而动态识别同源 patches。具体来说，同源 attention 可以表述为：</p>
 <p>$$ A_{HomoAtt}&#x3D;softmax(TopK(qk^T&#x2F;\sqrt D_h)) $$ </p>
@@ -452,11 +440,7 @@
 <p>$$ \mathcal L_{MixedAE}&#x3D;\mathcal L_{recon}+\lambda \mathcal L_{HomoCon} $$ </p>
 <p>其中平衡权重 λ 默认设置为 0.1。</p>
 <hr>
-<ol start="4">
-<li>结果</li>
-</ol>
-<hr>
-<p>图 6 可以看出，MAE 关注更具鉴别性的 patches ，如边界，而 MixedAE 更关注前景 patches。因此，作者在前面强调 MixedAE 具有 object-aware。</p>
+<h2 id="结果"><a href="#结果" class="headerlink" title="结果"></a>结果</h2><p>图 6 可以看出，MAE 关注更具鉴别性的 patches ，如边界，而 MixedAE 更关注前景 patches。因此，作者在前面强调 MixedAE 具有 object-aware。</p>
 <p><img src="/2023/05/12/Masked_Image_Model/MIM-MixedAEPatch-Mi-Glenn/v2-146b69aa7f5cdf5fc521dfd675aa21e4_r.jpg"><br>图6. 从 ImageNet-1K（第 1-3 列）、COCO（第 4-6 列）和 ADE20K（第 7-9 列）的图像的注意力热图可视化。 MAE 和 MixedAE 都在 ImageNet-1K 上进行了 300 个 epoch 的预训练。<br>由表 1 可以得出：</p>
 <ul>
 <li>有效性： MixedAE 在不同的预训练时间和额外开销下取得了最先进的性能。</li>
@@ -530,6 +514,14 @@
       <a href="/2023/05/12/Masked_Image_Model/MIM-Img2Vec%E5%9F%BA%E4%BA%8E-token-Glenn/" title="MIM | Img2Vec：基于 token 多样性原则选择教师模型"><span>下一篇&nbsp;&nbsp;</span><i class="icon icon-angle-right" aria-hidden="true"></i></a>
     </li>
     
+    
+    <li class="toggle-toc">
+      <a class="toggle-btn " data-toggle="collapse" href="#collapseToc" aria-expanded="false" title="文章目录" role="button">    <span>[&nbsp;</span><span>文章目录</span>
+        <i class="text-collapsed icon icon-anchor"></i>
+        <i class="text-in icon icon-close"></i>
+        <span>]</span>
+      </a>
+    </li>
     
   </ul>
   
@@ -619,13 +611,13 @@ window.jQuery || document.write('<script src="js/jquery.min.js"><\/script>')
     el: '#vcomments',
     verify: false,
     notify: false,
-    appId: '',
-    appKey: '',
-    placeholder: 'Just go go',
+    appId: 'Mr6aCGJuw2sme5obVyjdlAIp-gzGzoHsz',
+    appKey: 'fja89BU5rk64kGgsGqptQTUX',
+    placeholder: '请输入...',
     avatar: 'mm',
     meta: meta,
     pageSize: '10' || 10,
-    visitor: false
+    visitor: true
   });
   </script>
 
