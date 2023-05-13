@@ -21,23 +21,23 @@
   <meta name="description" content="题目：Understanding Masked Image Modeling via Learning Occlusion Invariant Feature单位：旷视论文网址：https:&#x2F;&#x2F;arxiv.org&#x2F;abs&#x2F;2208.04164论文代码：未公开首次发布时间：2022 年 8 月 8 日  123456@article&amp;#123;kong2022understanding, tit">
 <meta property="og:type" content="article">
 <meta property="og:title" content="MIM | 理论：掩蔽图像建模本质上在学习遮挡不变特征">
-<meta property="og:url" content="http://glennchen.cn/2023/05/12/Masked_Image_Model/MIM-%E7%90%86%E8%AE%BA%E6%8E%A9%E8%94%BD%E5%9B%BE%E5%83%8F%E5%BB%BA%E6%A8%A1%E6%9C%AC%E8%B4%A8%E4%B8%8A%E5%9C%A8%E5%AD%A6%E4%B9%A0%E9%81%AE-Glenn/index.html">
+<meta property="og:url" content="https://chenluda.github.io/2023/05/12/Masked_Image_Model/MIM-%E7%90%86%E8%AE%BA%E6%8E%A9%E8%94%BD%E5%9B%BE%E5%83%8F%E5%BB%BA%E6%A8%A1%E6%9C%AC%E8%B4%A8%E4%B8%8A%E5%9C%A8%E5%AD%A6%E4%B9%A0%E9%81%AE-Glenn/index.html">
 <meta property="og:site_name" content="Glenn">
 <meta property="og:description" content="题目：Understanding Masked Image Modeling via Learning Occlusion Invariant Feature单位：旷视论文网址：https:&#x2F;&#x2F;arxiv.org&#x2F;abs&#x2F;2208.04164论文代码：未公开首次发布时间：2022 年 8 月 8 日  123456@article&amp;#123;kong2022understanding, tit">
 <meta property="og:locale" content="zh_CN">
-<meta property="og:image" content="http://glennchen.cn/2023/05/12/Masked_Image_Model/MIM-%E7%90%86%E8%AE%BA%E6%8E%A9%E8%94%BD%E5%9B%BE%E5%83%8F%E5%BB%BA%E6%A8%A1%E6%9C%AC%E8%B4%A8%E4%B8%8A%E5%9C%A8%E5%AD%A6%E4%B9%A0%E9%81%AE-Glenn/v2-73781123cb3cb0487c50b4e13c32d52c_r.jpg">
-<meta property="og:image" content="http://glennchen.cn/2023/05/12/Masked_Image_Model/MIM-%E7%90%86%E8%AE%BA%E6%8E%A9%E8%94%BD%E5%9B%BE%E5%83%8F%E5%BB%BA%E6%A8%A1%E6%9C%AC%E8%B4%A8%E4%B8%8A%E5%9C%A8%E5%AD%A6%E4%B9%A0%E9%81%AE-Glenn/v2-444fc033921de19e3c5a69cad06f28e3_r.jpg">
-<meta property="og:image" content="http://glennchen.cn/2023/05/12/Masked_Image_Model/MIM-%E7%90%86%E8%AE%BA%E6%8E%A9%E8%94%BD%E5%9B%BE%E5%83%8F%E5%BB%BA%E6%A8%A1%E6%9C%AC%E8%B4%A8%E4%B8%8A%E5%9C%A8%E5%AD%A6%E4%B9%A0%E9%81%AE-Glenn/v2-19d9ba34b1ee820fc47e5a15e9262d21_r.jpg">
-<meta property="og:image" content="http://glennchen.cn/2023/05/12/Masked_Image_Model/MIM-%E7%90%86%E8%AE%BA%E6%8E%A9%E8%94%BD%E5%9B%BE%E5%83%8F%E5%BB%BA%E6%A8%A1%E6%9C%AC%E8%B4%A8%E4%B8%8A%E5%9C%A8%E5%AD%A6%E4%B9%A0%E9%81%AE-Glenn/v2-2d2ab13dc71671b57ddcc7ffc26872d3_r.jpg">
-<meta property="og:image" content="http://glennchen.cn/2023/05/12/Masked_Image_Model/MIM-%E7%90%86%E8%AE%BA%E6%8E%A9%E8%94%BD%E5%9B%BE%E5%83%8F%E5%BB%BA%E6%A8%A1%E6%9C%AC%E8%B4%A8%E4%B8%8A%E5%9C%A8%E5%AD%A6%E4%B9%A0%E9%81%AE-Glenn/v2-8e3ac2441d81b98d66a474faf0ad317e_r.jpg">
+<meta property="og:image" content="https://chenluda.github.io/2023/05/12/Masked_Image_Model/MIM-%E7%90%86%E8%AE%BA%E6%8E%A9%E8%94%BD%E5%9B%BE%E5%83%8F%E5%BB%BA%E6%A8%A1%E6%9C%AC%E8%B4%A8%E4%B8%8A%E5%9C%A8%E5%AD%A6%E4%B9%A0%E9%81%AE-Glenn/v2-73781123cb3cb0487c50b4e13c32d52c_r.jpg">
+<meta property="og:image" content="https://chenluda.github.io/2023/05/12/Masked_Image_Model/MIM-%E7%90%86%E8%AE%BA%E6%8E%A9%E8%94%BD%E5%9B%BE%E5%83%8F%E5%BB%BA%E6%A8%A1%E6%9C%AC%E8%B4%A8%E4%B8%8A%E5%9C%A8%E5%AD%A6%E4%B9%A0%E9%81%AE-Glenn/v2-444fc033921de19e3c5a69cad06f28e3_r.jpg">
+<meta property="og:image" content="https://chenluda.github.io/2023/05/12/Masked_Image_Model/MIM-%E7%90%86%E8%AE%BA%E6%8E%A9%E8%94%BD%E5%9B%BE%E5%83%8F%E5%BB%BA%E6%A8%A1%E6%9C%AC%E8%B4%A8%E4%B8%8A%E5%9C%A8%E5%AD%A6%E4%B9%A0%E9%81%AE-Glenn/v2-19d9ba34b1ee820fc47e5a15e9262d21_r.jpg">
+<meta property="og:image" content="https://chenluda.github.io/2023/05/12/Masked_Image_Model/MIM-%E7%90%86%E8%AE%BA%E6%8E%A9%E8%94%BD%E5%9B%BE%E5%83%8F%E5%BB%BA%E6%A8%A1%E6%9C%AC%E8%B4%A8%E4%B8%8A%E5%9C%A8%E5%AD%A6%E4%B9%A0%E9%81%AE-Glenn/v2-2d2ab13dc71671b57ddcc7ffc26872d3_r.jpg">
+<meta property="og:image" content="https://chenluda.github.io/2023/05/12/Masked_Image_Model/MIM-%E7%90%86%E8%AE%BA%E6%8E%A9%E8%94%BD%E5%9B%BE%E5%83%8F%E5%BB%BA%E6%A8%A1%E6%9C%AC%E8%B4%A8%E4%B8%8A%E5%9C%A8%E5%AD%A6%E4%B9%A0%E9%81%AE-Glenn/v2-8e3ac2441d81b98d66a474faf0ad317e_r.jpg">
 <meta property="article:published_time" content="2023-05-12T10:44:48.000Z">
 <meta property="article:modified_time" content="2023-05-12T12:17:22.278Z">
 <meta property="article:author" content="Glenn">
 <meta property="article:tag" content="Masked Image Modeling">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:image" content="http://glennchen.cn/2023/05/12/Masked_Image_Model/MIM-%E7%90%86%E8%AE%BA%E6%8E%A9%E8%94%BD%E5%9B%BE%E5%83%8F%E5%BB%BA%E6%A8%A1%E6%9C%AC%E8%B4%A8%E4%B8%8A%E5%9C%A8%E5%AD%A6%E4%B9%A0%E9%81%AE-Glenn/v2-73781123cb3cb0487c50b4e13c32d52c_r.jpg">
+<meta name="twitter:image" content="https://chenluda.github.io/2023/05/12/Masked_Image_Model/MIM-%E7%90%86%E8%AE%BA%E6%8E%A9%E8%94%BD%E5%9B%BE%E5%83%8F%E5%BB%BA%E6%A8%A1%E6%9C%AC%E8%B4%A8%E4%B8%8A%E5%9C%A8%E5%AD%A6%E4%B9%A0%E9%81%AE-Glenn/v2-73781123cb3cb0487c50b4e13c32d52c_r.jpg">
   <!-- Canonical links -->
-  <link rel="canonical" href="http://glennchen.cn/2023/05/12/Masked_Image_Model/MIM-%E7%90%86%E8%AE%BA%E6%8E%A9%E8%94%BD%E5%9B%BE%E5%83%8F%E5%BB%BA%E6%A8%A1%E6%9C%AC%E8%B4%A8%E4%B8%8A%E5%9C%A8%E5%AD%A6%E4%B9%A0%E9%81%AE-Glenn/index.html">
+  <link rel="canonical" href="https://chenluda.github.io/2023/05/12/Masked_Image_Model/MIM-%E7%90%86%E8%AE%BA%E6%8E%A9%E8%94%BD%E5%9B%BE%E5%83%8F%E5%BB%BA%E6%A8%A1%E6%9C%AC%E8%B4%A8%E4%B8%8A%E5%9C%A8%E5%AD%A6%E4%B9%A0%E9%81%AE-Glenn/index.html">
   
     <link rel="alternate" href="/atom.xml" title="Glenn" type="application/atom+xml">
   
@@ -440,7 +440,7 @@
     
     <li class="post-copyright-link hidden-xs">
       <strong>本文链接：</strong>
-      <a href="http://glennchen.cn/2023/05/12/Masked_Image_Model/MIM-%E7%90%86%E8%AE%BA%E6%8E%A9%E8%94%BD%E5%9B%BE%E5%83%8F%E5%BB%BA%E6%A8%A1%E6%9C%AC%E8%B4%A8%E4%B8%8A%E5%9C%A8%E5%AD%A6%E4%B9%A0%E9%81%AE-Glenn/" title="MIM | 理论：掩蔽图像建模本质上在学习遮挡不变特征" target="_blank" rel="external">http://glennchen.cn/2023/05/12/Masked_Image_Model/MIM-理论掩蔽图像建模本质上在学习遮-Glenn/</a>
+      <a href="https://chenluda.github.io/2023/05/12/Masked_Image_Model/MIM-%E7%90%86%E8%AE%BA%E6%8E%A9%E8%94%BD%E5%9B%BE%E5%83%8F%E5%BB%BA%E6%A8%A1%E6%9C%AC%E8%B4%A8%E4%B8%8A%E5%9C%A8%E5%AD%A6%E4%B9%A0%E9%81%AE-Glenn/" title="MIM | 理论：掩蔽图像建模本质上在学习遮挡不变特征" target="_blank" rel="external">https://chenluda.github.io/2023/05/12/Masked_Image_Model/MIM-理论掩蔽图像建模本质上在学习遮-Glenn/</a>
     </li>
     
     <li class="post-copyright-license">

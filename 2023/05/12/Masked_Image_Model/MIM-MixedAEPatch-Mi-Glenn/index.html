@@ -21,27 +21,27 @@
   <meta name="description" content="题目：Mixed Autoencoder for Self-supervised Visual Representation Learning单位：香港科技大学、华为诺亚方舟实验室论文网址：https:&#x2F;&#x2F;arxiv.org&#x2F;abs&#x2F;2303.17152论文代码：未公开首次发布时间：2023 年 3 月 30 日（收录于 CVPR 2023）  123456@article&amp;#123;chen">
 <meta property="og:type" content="article">
 <meta property="og:title" content="MIM | MixedAE：Patch Mix 的调教手册">
-<meta property="og:url" content="http://glennchen.cn/2023/05/12/Masked_Image_Model/MIM-MixedAEPatch-Mi-Glenn/index.html">
+<meta property="og:url" content="https://chenluda.github.io/2023/05/12/Masked_Image_Model/MIM-MixedAEPatch-Mi-Glenn/index.html">
 <meta property="og:site_name" content="Glenn">
 <meta property="og:description" content="题目：Mixed Autoencoder for Self-supervised Visual Representation Learning单位：香港科技大学、华为诺亚方舟实验室论文网址：https:&#x2F;&#x2F;arxiv.org&#x2F;abs&#x2F;2303.17152论文代码：未公开首次发布时间：2023 年 3 月 30 日（收录于 CVPR 2023）  123456@article&amp;#123;chen">
 <meta property="og:locale" content="zh_CN">
-<meta property="og:image" content="http://glennchen.cn/2023/05/12/Masked_Image_Model/MIM-MixedAEPatch-Mi-Glenn/v2-bb6fde0cf8c24ec309d54f8d7998a0e9_r.jpg">
-<meta property="og:image" content="http://glennchen.cn/2023/05/12/Masked_Image_Model/MIM-MixedAEPatch-Mi-Glenn/v2-0f3c850735a56b35c52463d2792b9254_r.jpg">
-<meta property="og:image" content="http://glennchen.cn/2023/05/12/Masked_Image_Model/MIM-MixedAEPatch-Mi-Glenn/v2-b39c6398fa1b6a4ac60aa8d4b15b0641_r.jpg">
-<meta property="og:image" content="http://glennchen.cn/2023/05/12/Masked_Image_Model/MIM-MixedAEPatch-Mi-Glenn/v2-c76ccdd664896dbe3b1935c26e5b8a32_r.jpg">
-<meta property="og:image" content="http://glennchen.cn/2023/05/12/Masked_Image_Model/MIM-MixedAEPatch-Mi-Glenn/v2-a1280bb5785c1e713960f0d33db448e2_r.jpg">
-<meta property="og:image" content="http://glennchen.cn/2023/05/12/Masked_Image_Model/MIM-MixedAEPatch-Mi-Glenn/v2-df62715306376a33955d8b1173c52f4e_r.jpg">
-<meta property="og:image" content="http://glennchen.cn/2023/05/12/Masked_Image_Model/MIM-MixedAEPatch-Mi-Glenn/v2-146b69aa7f5cdf5fc521dfd675aa21e4_r.jpg">
-<meta property="og:image" content="http://glennchen.cn/2023/05/12/Masked_Image_Model/MIM-MixedAEPatch-Mi-Glenn/v2-755b5781fb1478ccb335ccab332f755f_r.jpg">
-<meta property="og:image" content="http://glennchen.cn/2023/05/12/Masked_Image_Model/MIM-MixedAEPatch-Mi-Glenn/v2-357a4f6f052edb0b4b762fc50d3c98ce_r.jpg">
+<meta property="og:image" content="https://chenluda.github.io/2023/05/12/Masked_Image_Model/MIM-MixedAEPatch-Mi-Glenn/v2-bb6fde0cf8c24ec309d54f8d7998a0e9_r.jpg">
+<meta property="og:image" content="https://chenluda.github.io/2023/05/12/Masked_Image_Model/MIM-MixedAEPatch-Mi-Glenn/v2-0f3c850735a56b35c52463d2792b9254_r.jpg">
+<meta property="og:image" content="https://chenluda.github.io/2023/05/12/Masked_Image_Model/MIM-MixedAEPatch-Mi-Glenn/v2-b39c6398fa1b6a4ac60aa8d4b15b0641_r.jpg">
+<meta property="og:image" content="https://chenluda.github.io/2023/05/12/Masked_Image_Model/MIM-MixedAEPatch-Mi-Glenn/v2-c76ccdd664896dbe3b1935c26e5b8a32_r.jpg">
+<meta property="og:image" content="https://chenluda.github.io/2023/05/12/Masked_Image_Model/MIM-MixedAEPatch-Mi-Glenn/v2-a1280bb5785c1e713960f0d33db448e2_r.jpg">
+<meta property="og:image" content="https://chenluda.github.io/2023/05/12/Masked_Image_Model/MIM-MixedAEPatch-Mi-Glenn/v2-df62715306376a33955d8b1173c52f4e_r.jpg">
+<meta property="og:image" content="https://chenluda.github.io/2023/05/12/Masked_Image_Model/MIM-MixedAEPatch-Mi-Glenn/v2-146b69aa7f5cdf5fc521dfd675aa21e4_r.jpg">
+<meta property="og:image" content="https://chenluda.github.io/2023/05/12/Masked_Image_Model/MIM-MixedAEPatch-Mi-Glenn/v2-755b5781fb1478ccb335ccab332f755f_r.jpg">
+<meta property="og:image" content="https://chenluda.github.io/2023/05/12/Masked_Image_Model/MIM-MixedAEPatch-Mi-Glenn/v2-357a4f6f052edb0b4b762fc50d3c98ce_r.jpg">
 <meta property="article:published_time" content="2023-05-12T10:44:26.000Z">
 <meta property="article:modified_time" content="2023-05-12T12:17:11.165Z">
 <meta property="article:author" content="Glenn">
 <meta property="article:tag" content="Masked Image Modeling">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:image" content="http://glennchen.cn/2023/05/12/Masked_Image_Model/MIM-MixedAEPatch-Mi-Glenn/v2-bb6fde0cf8c24ec309d54f8d7998a0e9_r.jpg">
+<meta name="twitter:image" content="https://chenluda.github.io/2023/05/12/Masked_Image_Model/MIM-MixedAEPatch-Mi-Glenn/v2-bb6fde0cf8c24ec309d54f8d7998a0e9_r.jpg">
   <!-- Canonical links -->
-  <link rel="canonical" href="http://glennchen.cn/2023/05/12/Masked_Image_Model/MIM-MixedAEPatch-Mi-Glenn/index.html">
+  <link rel="canonical" href="https://chenluda.github.io/2023/05/12/Masked_Image_Model/MIM-MixedAEPatch-Mi-Glenn/index.html">
   
     <link rel="alternate" href="/atom.xml" title="Glenn" type="application/atom+xml">
   
@@ -475,7 +475,7 @@
     
     <li class="post-copyright-link hidden-xs">
       <strong>本文链接：</strong>
-      <a href="http://glennchen.cn/2023/05/12/Masked_Image_Model/MIM-MixedAEPatch-Mi-Glenn/" title="MIM | MixedAE：Patch Mix 的调教手册" target="_blank" rel="external">http://glennchen.cn/2023/05/12/Masked_Image_Model/MIM-MixedAEPatch-Mi-Glenn/</a>
+      <a href="https://chenluda.github.io/2023/05/12/Masked_Image_Model/MIM-MixedAEPatch-Mi-Glenn/" title="MIM | MixedAE：Patch Mix 的调教手册" target="_blank" rel="external">https://chenluda.github.io/2023/05/12/Masked_Image_Model/MIM-MixedAEPatch-Mi-Glenn/</a>
     </li>
     
     <li class="post-copyright-license">

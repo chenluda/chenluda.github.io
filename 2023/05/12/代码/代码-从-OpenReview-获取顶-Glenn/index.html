@@ -21,24 +21,24 @@
   <meta name="description" content="最近在调整自己的论文追踪网站，发现从 arXiv 的 Comments 扒论文的中稿会议或期刊效率太低，且准确率也不高，想着还不如直接爬取会议接受的论文。 AI 论文追踪 by GlennOpenReview 是一个旨在促进同行评审过程中透明度的平台。通常，OpenReview 公布接收结果的时间比会议官方网站要早。实际上，大部分论文推送网站也是从 OpenReview 上获取会议论文信息的。 O">
 <meta property="og:type" content="article">
 <meta property="og:title" content="代码 | 从 OpenReview 获取顶会接收论文集并保存至本地数据库">
-<meta property="og:url" content="http://glennchen.cn/2023/05/12/%E4%BB%A3%E7%A0%81/%E4%BB%A3%E7%A0%81-%E4%BB%8E-OpenReview-%E8%8E%B7%E5%8F%96%E9%A1%B6-Glenn/index.html">
+<meta property="og:url" content="https://chenluda.github.io/2023/05/12/%E4%BB%A3%E7%A0%81/%E4%BB%A3%E7%A0%81-%E4%BB%8E-OpenReview-%E8%8E%B7%E5%8F%96%E9%A1%B6-Glenn/index.html">
 <meta property="og:site_name" content="Glenn">
 <meta property="og:description" content="最近在调整自己的论文追踪网站，发现从 arXiv 的 Comments 扒论文的中稿会议或期刊效率太低，且准确率也不高，想着还不如直接爬取会议接受的论文。 AI 论文追踪 by GlennOpenReview 是一个旨在促进同行评审过程中透明度的平台。通常，OpenReview 公布接收结果的时间比会议官方网站要早。实际上，大部分论文推送网站也是从 OpenReview 上获取会议论文信息的。 O">
 <meta property="og:locale" content="zh_CN">
-<meta property="og:image" content="http://glennchen.cn/2023/05/12/%E4%BB%A3%E7%A0%81/%E4%BB%A3%E7%A0%81-%E4%BB%8E-OpenReview-%E8%8E%B7%E5%8F%96%E9%A1%B6-Glenn/v2-79172cd2b65b7c7e52236e7226993f93_r.jpg">
-<meta property="og:image" content="http://glennchen.cn/2023/05/12/%E4%BB%A3%E7%A0%81/%E4%BB%A3%E7%A0%81-%E4%BB%8E-OpenReview-%E8%8E%B7%E5%8F%96%E9%A1%B6-Glenn/v2-995212751371361c27d6d8b7a9d80799_r.jpg">
-<meta property="og:image" content="http://glennchen.cn/2023/05/12/%E4%BB%A3%E7%A0%81/%E4%BB%A3%E7%A0%81-%E4%BB%8E-OpenReview-%E8%8E%B7%E5%8F%96%E9%A1%B6-Glenn/v2-952bd6b8a2bd042164e4a587d7a2d13b_r.jpg">
-<meta property="og:image" content="http://glennchen.cn/2023/05/12/%E4%BB%A3%E7%A0%81/%E4%BB%A3%E7%A0%81-%E4%BB%8E-OpenReview-%E8%8E%B7%E5%8F%96%E9%A1%B6-Glenn/v2-723ebcd7ba1d18ba998b603d546bf409_r.jpg">
+<meta property="og:image" content="https://chenluda.github.io/2023/05/12/%E4%BB%A3%E7%A0%81/%E4%BB%A3%E7%A0%81-%E4%BB%8E-OpenReview-%E8%8E%B7%E5%8F%96%E9%A1%B6-Glenn/v2-79172cd2b65b7c7e52236e7226993f93_r.jpg">
+<meta property="og:image" content="https://chenluda.github.io/2023/05/12/%E4%BB%A3%E7%A0%81/%E4%BB%A3%E7%A0%81-%E4%BB%8E-OpenReview-%E8%8E%B7%E5%8F%96%E9%A1%B6-Glenn/v2-995212751371361c27d6d8b7a9d80799_r.jpg">
+<meta property="og:image" content="https://chenluda.github.io/2023/05/12/%E4%BB%A3%E7%A0%81/%E4%BB%A3%E7%A0%81-%E4%BB%8E-OpenReview-%E8%8E%B7%E5%8F%96%E9%A1%B6-Glenn/v2-952bd6b8a2bd042164e4a587d7a2d13b_r.jpg">
+<meta property="og:image" content="https://chenluda.github.io/2023/05/12/%E4%BB%A3%E7%A0%81/%E4%BB%A3%E7%A0%81-%E4%BB%8E-OpenReview-%E8%8E%B7%E5%8F%96%E9%A1%B6-Glenn/v2-723ebcd7ba1d18ba998b603d546bf409_r.jpg">
 <meta property="article:published_time" content="2023-05-12T10:52:15.000Z">
 <meta property="article:modified_time" content="2023-05-12T12:19:21.076Z">
 <meta property="article:author" content="Glenn">
+<meta property="article:tag" content="DataBase">
 <meta property="article:tag" content="Conference paper">
 <meta property="article:tag" content="OpenReview">
-<meta property="article:tag" content="DataBase">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:image" content="http://glennchen.cn/2023/05/12/%E4%BB%A3%E7%A0%81/%E4%BB%A3%E7%A0%81-%E4%BB%8E-OpenReview-%E8%8E%B7%E5%8F%96%E9%A1%B6-Glenn/v2-79172cd2b65b7c7e52236e7226993f93_r.jpg">
+<meta name="twitter:image" content="https://chenluda.github.io/2023/05/12/%E4%BB%A3%E7%A0%81/%E4%BB%A3%E7%A0%81-%E4%BB%8E-OpenReview-%E8%8E%B7%E5%8F%96%E9%A1%B6-Glenn/v2-79172cd2b65b7c7e52236e7226993f93_r.jpg">
   <!-- Canonical links -->
-  <link rel="canonical" href="http://glennchen.cn/2023/05/12/%E4%BB%A3%E7%A0%81/%E4%BB%A3%E7%A0%81-%E4%BB%8E-OpenReview-%E8%8E%B7%E5%8F%96%E9%A1%B6-Glenn/index.html">
+  <link rel="canonical" href="https://chenluda.github.io/2023/05/12/%E4%BB%A3%E7%A0%81/%E4%BB%A3%E7%A0%81-%E4%BB%8E-OpenReview-%E8%8E%B7%E5%8F%96%E9%A1%B6-Glenn/index.html">
   
     <link rel="alternate" href="/atom.xml" title="Glenn" type="application/atom+xml">
   
@@ -362,7 +362,7 @@
     
     <li class="post-copyright-link hidden-xs">
       <strong>本文链接：</strong>
-      <a href="http://glennchen.cn/2023/05/12/%E4%BB%A3%E7%A0%81/%E4%BB%A3%E7%A0%81-%E4%BB%8E-OpenReview-%E8%8E%B7%E5%8F%96%E9%A1%B6-Glenn/" title="代码 | 从 OpenReview 获取顶会接收论文集并保存至本地数据库" target="_blank" rel="external">http://glennchen.cn/2023/05/12/代码/代码-从-OpenReview-获取顶-Glenn/</a>
+      <a href="https://chenluda.github.io/2023/05/12/%E4%BB%A3%E7%A0%81/%E4%BB%A3%E7%A0%81-%E4%BB%8E-OpenReview-%E8%8E%B7%E5%8F%96%E9%A1%B6-Glenn/" title="代码 | 从 OpenReview 获取顶会接收论文集并保存至本地数据库" target="_blank" rel="external">https://chenluda.github.io/2023/05/12/代码/代码-从-OpenReview-获取顶-Glenn/</a>
     </li>
     
     <li class="post-copyright-license">

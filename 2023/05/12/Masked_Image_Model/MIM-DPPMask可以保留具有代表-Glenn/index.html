@@ -21,30 +21,30 @@
   <meta name="description" content="题目：DPPMask: Masked Image Modeling with Determinantal Point Processes单位：中国科学院深圳先进技术研究院、中国科学院大学、之江实验室、香港中文大学论文网址：https:&#x2F;&#x2F;arxiv.org&#x2F;abs&#x2F;2303.12736论文代码：未公开首次发布时间：2023 年 3 月 13 日（2023 年 3 月 25 日 v2 版本上传）">
 <meta property="og:type" content="article">
 <meta property="og:title" content="MIM | DPPMask：可以保留具有代表性 patches 的掩蔽策略">
-<meta property="og:url" content="http://glennchen.cn/2023/05/12/Masked_Image_Model/MIM-DPPMask%E5%8F%AF%E4%BB%A5%E4%BF%9D%E7%95%99%E5%85%B7%E6%9C%89%E4%BB%A3%E8%A1%A8-Glenn/index.html">
+<meta property="og:url" content="https://chenluda.github.io/2023/05/12/Masked_Image_Model/MIM-DPPMask%E5%8F%AF%E4%BB%A5%E4%BF%9D%E7%95%99%E5%85%B7%E6%9C%89%E4%BB%A3%E8%A1%A8-Glenn/index.html">
 <meta property="og:site_name" content="Glenn">
 <meta property="og:description" content="题目：DPPMask: Masked Image Modeling with Determinantal Point Processes单位：中国科学院深圳先进技术研究院、中国科学院大学、之江实验室、香港中文大学论文网址：https:&#x2F;&#x2F;arxiv.org&#x2F;abs&#x2F;2303.12736论文代码：未公开首次发布时间：2023 年 3 月 13 日（2023 年 3 月 25 日 v2 版本上传）">
 <meta property="og:locale" content="zh_CN">
-<meta property="og:image" content="http://glennchen.cn/2023/05/12/Masked_Image_Model/MIM-DPPMask%E5%8F%AF%E4%BB%A5%E4%BF%9D%E7%95%99%E5%85%B7%E6%9C%89%E4%BB%A3%E8%A1%A8-Glenn/v2-9dd9cfdc375cabbb5b05c0b791eedea8_r.jpg">
-<meta property="og:image" content="http://glennchen.cn/2023/05/12/Masked_Image_Model/MIM-DPPMask%E5%8F%AF%E4%BB%A5%E4%BF%9D%E7%95%99%E5%85%B7%E6%9C%89%E4%BB%A3%E8%A1%A8-Glenn/v2-f26c9dd6f4a0a0342a38a82a8c8d6371_r.jpg">
-<meta property="og:image" content="http://glennchen.cn/2023/05/12/Masked_Image_Model/MIM-DPPMask%E5%8F%AF%E4%BB%A5%E4%BF%9D%E7%95%99%E5%85%B7%E6%9C%89%E4%BB%A3%E8%A1%A8-Glenn/v2-d0fe5f16f8c8060353680b3063137f46_r.jpg">
-<meta property="og:image" content="http://glennchen.cn/2023/05/12/Masked_Image_Model/MIM-DPPMask%E5%8F%AF%E4%BB%A5%E4%BF%9D%E7%95%99%E5%85%B7%E6%9C%89%E4%BB%A3%E8%A1%A8-Glenn/v2-2295d39f5ecdcf7a7fd224e873f290f3_r.jpg">
-<meta property="og:image" content="http://glennchen.cn/2023/05/12/Masked_Image_Model/MIM-DPPMask%E5%8F%AF%E4%BB%A5%E4%BF%9D%E7%95%99%E5%85%B7%E6%9C%89%E4%BB%A3%E8%A1%A8-Glenn/v2-8915d3afaeeb55cd53e593260664b609_r.jpg">
-<meta property="og:image" content="http://glennchen.cn/2023/05/12/Masked_Image_Model/MIM-DPPMask%E5%8F%AF%E4%BB%A5%E4%BF%9D%E7%95%99%E5%85%B7%E6%9C%89%E4%BB%A3%E8%A1%A8-Glenn/v2-6e60a502568aaa2b4304208689ece1d3_r.jpg">
-<meta property="og:image" content="http://glennchen.cn/2023/05/12/Masked_Image_Model/MIM-DPPMask%E5%8F%AF%E4%BB%A5%E4%BF%9D%E7%95%99%E5%85%B7%E6%9C%89%E4%BB%A3%E8%A1%A8-Glenn/v2-88d7fd12b0d7a6c31045dd9eafd932d2_r.jpg">
-<meta property="og:image" content="http://glennchen.cn/2023/05/12/Masked_Image_Model/MIM-DPPMask%E5%8F%AF%E4%BB%A5%E4%BF%9D%E7%95%99%E5%85%B7%E6%9C%89%E4%BB%A3%E8%A1%A8-Glenn/v2-d56a8279915bab70cc0003787dff8f5c_r.jpg">
-<meta property="og:image" content="http://glennchen.cn/2023/05/12/Masked_Image_Model/MIM-DPPMask%E5%8F%AF%E4%BB%A5%E4%BF%9D%E7%95%99%E5%85%B7%E6%9C%89%E4%BB%A3%E8%A1%A8-Glenn/v2-921f57b26338f3dccd8724420d858494_r.jpg">
-<meta property="og:image" content="http://glennchen.cn/2023/05/12/Masked_Image_Model/MIM-DPPMask%E5%8F%AF%E4%BB%A5%E4%BF%9D%E7%95%99%E5%85%B7%E6%9C%89%E4%BB%A3%E8%A1%A8-Glenn/v2-2fee8ddf57e1c532c13b9142d9ac341a_r.jpg">
-<meta property="og:image" content="http://glennchen.cn/2023/05/12/Masked_Image_Model/MIM-DPPMask%E5%8F%AF%E4%BB%A5%E4%BF%9D%E7%95%99%E5%85%B7%E6%9C%89%E4%BB%A3%E8%A1%A8-Glenn/v2-f5e09cc37e1ffaead7e8d37a0e6378ed_r.jpg">
-<meta property="og:image" content="http://glennchen.cn/2023/05/12/Masked_Image_Model/MIM-DPPMask%E5%8F%AF%E4%BB%A5%E4%BF%9D%E7%95%99%E5%85%B7%E6%9C%89%E4%BB%A3%E8%A1%A8-Glenn/v2-2cdb40ac22914e7aba3726a8e9dd8224_r.jpg">
+<meta property="og:image" content="https://chenluda.github.io/2023/05/12/Masked_Image_Model/MIM-DPPMask%E5%8F%AF%E4%BB%A5%E4%BF%9D%E7%95%99%E5%85%B7%E6%9C%89%E4%BB%A3%E8%A1%A8-Glenn/v2-9dd9cfdc375cabbb5b05c0b791eedea8_r.jpg">
+<meta property="og:image" content="https://chenluda.github.io/2023/05/12/Masked_Image_Model/MIM-DPPMask%E5%8F%AF%E4%BB%A5%E4%BF%9D%E7%95%99%E5%85%B7%E6%9C%89%E4%BB%A3%E8%A1%A8-Glenn/v2-f26c9dd6f4a0a0342a38a82a8c8d6371_r.jpg">
+<meta property="og:image" content="https://chenluda.github.io/2023/05/12/Masked_Image_Model/MIM-DPPMask%E5%8F%AF%E4%BB%A5%E4%BF%9D%E7%95%99%E5%85%B7%E6%9C%89%E4%BB%A3%E8%A1%A8-Glenn/v2-d0fe5f16f8c8060353680b3063137f46_r.jpg">
+<meta property="og:image" content="https://chenluda.github.io/2023/05/12/Masked_Image_Model/MIM-DPPMask%E5%8F%AF%E4%BB%A5%E4%BF%9D%E7%95%99%E5%85%B7%E6%9C%89%E4%BB%A3%E8%A1%A8-Glenn/v2-2295d39f5ecdcf7a7fd224e873f290f3_r.jpg">
+<meta property="og:image" content="https://chenluda.github.io/2023/05/12/Masked_Image_Model/MIM-DPPMask%E5%8F%AF%E4%BB%A5%E4%BF%9D%E7%95%99%E5%85%B7%E6%9C%89%E4%BB%A3%E8%A1%A8-Glenn/v2-8915d3afaeeb55cd53e593260664b609_r.jpg">
+<meta property="og:image" content="https://chenluda.github.io/2023/05/12/Masked_Image_Model/MIM-DPPMask%E5%8F%AF%E4%BB%A5%E4%BF%9D%E7%95%99%E5%85%B7%E6%9C%89%E4%BB%A3%E8%A1%A8-Glenn/v2-6e60a502568aaa2b4304208689ece1d3_r.jpg">
+<meta property="og:image" content="https://chenluda.github.io/2023/05/12/Masked_Image_Model/MIM-DPPMask%E5%8F%AF%E4%BB%A5%E4%BF%9D%E7%95%99%E5%85%B7%E6%9C%89%E4%BB%A3%E8%A1%A8-Glenn/v2-88d7fd12b0d7a6c31045dd9eafd932d2_r.jpg">
+<meta property="og:image" content="https://chenluda.github.io/2023/05/12/Masked_Image_Model/MIM-DPPMask%E5%8F%AF%E4%BB%A5%E4%BF%9D%E7%95%99%E5%85%B7%E6%9C%89%E4%BB%A3%E8%A1%A8-Glenn/v2-d56a8279915bab70cc0003787dff8f5c_r.jpg">
+<meta property="og:image" content="https://chenluda.github.io/2023/05/12/Masked_Image_Model/MIM-DPPMask%E5%8F%AF%E4%BB%A5%E4%BF%9D%E7%95%99%E5%85%B7%E6%9C%89%E4%BB%A3%E8%A1%A8-Glenn/v2-921f57b26338f3dccd8724420d858494_r.jpg">
+<meta property="og:image" content="https://chenluda.github.io/2023/05/12/Masked_Image_Model/MIM-DPPMask%E5%8F%AF%E4%BB%A5%E4%BF%9D%E7%95%99%E5%85%B7%E6%9C%89%E4%BB%A3%E8%A1%A8-Glenn/v2-2fee8ddf57e1c532c13b9142d9ac341a_r.jpg">
+<meta property="og:image" content="https://chenluda.github.io/2023/05/12/Masked_Image_Model/MIM-DPPMask%E5%8F%AF%E4%BB%A5%E4%BF%9D%E7%95%99%E5%85%B7%E6%9C%89%E4%BB%A3%E8%A1%A8-Glenn/v2-f5e09cc37e1ffaead7e8d37a0e6378ed_r.jpg">
+<meta property="og:image" content="https://chenluda.github.io/2023/05/12/Masked_Image_Model/MIM-DPPMask%E5%8F%AF%E4%BB%A5%E4%BF%9D%E7%95%99%E5%85%B7%E6%9C%89%E4%BB%A3%E8%A1%A8-Glenn/v2-2cdb40ac22914e7aba3726a8e9dd8224_r.jpg">
 <meta property="article:published_time" content="2023-05-12T10:43:54.000Z">
 <meta property="article:modified_time" content="2023-05-12T12:16:50.365Z">
 <meta property="article:author" content="Glenn">
 <meta property="article:tag" content="Masked Image Modeling">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:image" content="http://glennchen.cn/2023/05/12/Masked_Image_Model/MIM-DPPMask%E5%8F%AF%E4%BB%A5%E4%BF%9D%E7%95%99%E5%85%B7%E6%9C%89%E4%BB%A3%E8%A1%A8-Glenn/v2-9dd9cfdc375cabbb5b05c0b791eedea8_r.jpg">
+<meta name="twitter:image" content="https://chenluda.github.io/2023/05/12/Masked_Image_Model/MIM-DPPMask%E5%8F%AF%E4%BB%A5%E4%BF%9D%E7%95%99%E5%85%B7%E6%9C%89%E4%BB%A3%E8%A1%A8-Glenn/v2-9dd9cfdc375cabbb5b05c0b791eedea8_r.jpg">
   <!-- Canonical links -->
-  <link rel="canonical" href="http://glennchen.cn/2023/05/12/Masked_Image_Model/MIM-DPPMask%E5%8F%AF%E4%BB%A5%E4%BF%9D%E7%95%99%E5%85%B7%E6%9C%89%E4%BB%A3%E8%A1%A8-Glenn/index.html">
+  <link rel="canonical" href="https://chenluda.github.io/2023/05/12/Masked_Image_Model/MIM-DPPMask%E5%8F%AF%E4%BB%A5%E4%BF%9D%E7%95%99%E5%85%B7%E6%9C%89%E4%BB%A3%E8%A1%A8-Glenn/index.html">
   
     <link rel="alternate" href="/atom.xml" title="Glenn" type="application/atom+xml">
   
@@ -445,7 +445,7 @@
     
     <li class="post-copyright-link hidden-xs">
       <strong>本文链接：</strong>
-      <a href="http://glennchen.cn/2023/05/12/Masked_Image_Model/MIM-DPPMask%E5%8F%AF%E4%BB%A5%E4%BF%9D%E7%95%99%E5%85%B7%E6%9C%89%E4%BB%A3%E8%A1%A8-Glenn/" title="MIM | DPPMask：可以保留具有代表性 patches 的掩蔽策略" target="_blank" rel="external">http://glennchen.cn/2023/05/12/Masked_Image_Model/MIM-DPPMask可以保留具有代表-Glenn/</a>
+      <a href="https://chenluda.github.io/2023/05/12/Masked_Image_Model/MIM-DPPMask%E5%8F%AF%E4%BB%A5%E4%BF%9D%E7%95%99%E5%85%B7%E6%9C%89%E4%BB%A3%E8%A1%A8-Glenn/" title="MIM | DPPMask：可以保留具有代表性 patches 的掩蔽策略" target="_blank" rel="external">https://chenluda.github.io/2023/05/12/Masked_Image_Model/MIM-DPPMask可以保留具有代表-Glenn/</a>
     </li>
     
     <li class="post-copyright-license">

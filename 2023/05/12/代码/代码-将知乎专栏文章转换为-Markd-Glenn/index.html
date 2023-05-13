@@ -21,29 +21,29 @@
   <meta name="description" content="最近想构建一个本地知识库。 需要从知乎下载文章、专栏、回答，并以 Markdown 格式保存到本地。 自己写了个脚本，  可以判断给定 url 的类型，是文章、专栏还是回答，三种类型的处理方式不同； 然后将图片保存至本地，并将转换的 Markdown 中图片 url 更换为本地路径，使图片可以在本地显示。   完整代码如下： 123456789101112131415161718192021222">
 <meta property="og:type" content="article">
 <meta property="og:title" content="代码 | 将知乎专栏文章转换为 Markdown 文件保存到本地">
-<meta property="og:url" content="http://glennchen.cn/2023/05/12/%E4%BB%A3%E7%A0%81/%E4%BB%A3%E7%A0%81-%E5%B0%86%E7%9F%A5%E4%B9%8E%E4%B8%93%E6%A0%8F%E6%96%87%E7%AB%A0%E8%BD%AC%E6%8D%A2%E4%B8%BA-Markd-Glenn/index.html">
+<meta property="og:url" content="https://chenluda.github.io/2023/05/12/%E4%BB%A3%E7%A0%81/%E4%BB%A3%E7%A0%81-%E5%B0%86%E7%9F%A5%E4%B9%8E%E4%B8%93%E6%A0%8F%E6%96%87%E7%AB%A0%E8%BD%AC%E6%8D%A2%E4%B8%BA-Markd-Glenn/index.html">
 <meta property="og:site_name" content="Glenn">
 <meta property="og:description" content="最近想构建一个本地知识库。 需要从知乎下载文章、专栏、回答，并以 Markdown 格式保存到本地。 自己写了个脚本，  可以判断给定 url 的类型，是文章、专栏还是回答，三种类型的处理方式不同； 然后将图片保存至本地，并将转换的 Markdown 中图片 url 更换为本地路径，使图片可以在本地显示。   完整代码如下： 123456789101112131415161718192021222">
 <meta property="og:locale" content="zh_CN">
-<meta property="og:image" content="http://glennchen.cn/2023/05/12/%E4%BB%A3%E7%A0%81/%E4%BB%A3%E7%A0%81-%E5%B0%86%E7%9F%A5%E4%B9%8E%E4%B8%93%E6%A0%8F%E6%96%87%E7%AB%A0%E8%BD%AC%E6%8D%A2%E4%B8%BA-Markd-Glenn/v2-18737043bdc3b0ca62938801af3f20cb_r.jpg">
-<meta property="og:image" content="http://glennchen.cn/2023/05/12/%E4%BB%A3%E7%A0%81/%E4%BB%A3%E7%A0%81-%E5%B0%86%E7%9F%A5%E4%B9%8E%E4%B8%93%E6%A0%8F%E6%96%87%E7%AB%A0%E8%BD%AC%E6%8D%A2%E4%B8%BA-Markd-Glenn/v2-41f1a2aee9492701391f42ba0caae5c6_r.jpg">
-<meta property="og:image" content="http://glennchen.cn/2023/05/12/%E4%BB%A3%E7%A0%81/%E4%BB%A3%E7%A0%81-%E5%B0%86%E7%9F%A5%E4%B9%8E%E4%B8%93%E6%A0%8F%E6%96%87%E7%AB%A0%E8%BD%AC%E6%8D%A2%E4%B8%BA-Markd-Glenn/v2-397ce3bd2bf9334dd47871ed29b3b121_r.jpg">
-<meta property="og:image" content="http://glennchen.cn/2023/05/12/%E4%BB%A3%E7%A0%81/%E4%BB%A3%E7%A0%81-%E5%B0%86%E7%9F%A5%E4%B9%8E%E4%B8%93%E6%A0%8F%E6%96%87%E7%AB%A0%E8%BD%AC%E6%8D%A2%E4%B8%BA-Markd-Glenn/v2-3c0a89a1818eed3b597ae46c61f9498c_r.jpg">
-<meta property="og:image" content="http://glennchen.cn/2023/05/12/%E4%BB%A3%E7%A0%81/%E4%BB%A3%E7%A0%81-%E5%B0%86%E7%9F%A5%E4%B9%8E%E4%B8%93%E6%A0%8F%E6%96%87%E7%AB%A0%E8%BD%AC%E6%8D%A2%E4%B8%BA-Markd-Glenn/v2-103ec535d33a02bfbfcfaf353506ebb6_r.jpg">
-<meta property="og:image" content="http://glennchen.cn/2023/05/12/%E4%BB%A3%E7%A0%81/%E4%BB%A3%E7%A0%81-%E5%B0%86%E7%9F%A5%E4%B9%8E%E4%B8%93%E6%A0%8F%E6%96%87%E7%AB%A0%E8%BD%AC%E6%8D%A2%E4%B8%BA-Markd-Glenn/v2-5f9666d5a8a139712b87d5d9a07430eb_r.jpg">
-<meta property="og:image" content="http://glennchen.cn/2023/05/12/%E4%BB%A3%E7%A0%81/%E4%BB%A3%E7%A0%81-%E5%B0%86%E7%9F%A5%E4%B9%8E%E4%B8%93%E6%A0%8F%E6%96%87%E7%AB%A0%E8%BD%AC%E6%8D%A2%E4%B8%BA-Markd-Glenn/v2-04f1ba15453867745d22ffa823e266cc_r.jpg">
-<meta property="og:image" content="http://glennchen.cn/2023/05/12/%E4%BB%A3%E7%A0%81/%E4%BB%A3%E7%A0%81-%E5%B0%86%E7%9F%A5%E4%B9%8E%E4%B8%93%E6%A0%8F%E6%96%87%E7%AB%A0%E8%BD%AC%E6%8D%A2%E4%B8%BA-Markd-Glenn/v2-2f0c9f13e183446010ed3406c4a0c3e2_r.jpg">
-<meta property="og:image" content="http://glennchen.cn/2023/05/12/%E4%BB%A3%E7%A0%81/%E4%BB%A3%E7%A0%81-%E5%B0%86%E7%9F%A5%E4%B9%8E%E4%B8%93%E6%A0%8F%E6%96%87%E7%AB%A0%E8%BD%AC%E6%8D%A2%E4%B8%BA-Markd-Glenn/v2-3c52962df9d2e4725fa074991ab9e6ec_r.jpg">
+<meta property="og:image" content="https://chenluda.github.io/2023/05/12/%E4%BB%A3%E7%A0%81/%E4%BB%A3%E7%A0%81-%E5%B0%86%E7%9F%A5%E4%B9%8E%E4%B8%93%E6%A0%8F%E6%96%87%E7%AB%A0%E8%BD%AC%E6%8D%A2%E4%B8%BA-Markd-Glenn/v2-18737043bdc3b0ca62938801af3f20cb_r.jpg">
+<meta property="og:image" content="https://chenluda.github.io/2023/05/12/%E4%BB%A3%E7%A0%81/%E4%BB%A3%E7%A0%81-%E5%B0%86%E7%9F%A5%E4%B9%8E%E4%B8%93%E6%A0%8F%E6%96%87%E7%AB%A0%E8%BD%AC%E6%8D%A2%E4%B8%BA-Markd-Glenn/v2-41f1a2aee9492701391f42ba0caae5c6_r.jpg">
+<meta property="og:image" content="https://chenluda.github.io/2023/05/12/%E4%BB%A3%E7%A0%81/%E4%BB%A3%E7%A0%81-%E5%B0%86%E7%9F%A5%E4%B9%8E%E4%B8%93%E6%A0%8F%E6%96%87%E7%AB%A0%E8%BD%AC%E6%8D%A2%E4%B8%BA-Markd-Glenn/v2-397ce3bd2bf9334dd47871ed29b3b121_r.jpg">
+<meta property="og:image" content="https://chenluda.github.io/2023/05/12/%E4%BB%A3%E7%A0%81/%E4%BB%A3%E7%A0%81-%E5%B0%86%E7%9F%A5%E4%B9%8E%E4%B8%93%E6%A0%8F%E6%96%87%E7%AB%A0%E8%BD%AC%E6%8D%A2%E4%B8%BA-Markd-Glenn/v2-3c0a89a1818eed3b597ae46c61f9498c_r.jpg">
+<meta property="og:image" content="https://chenluda.github.io/2023/05/12/%E4%BB%A3%E7%A0%81/%E4%BB%A3%E7%A0%81-%E5%B0%86%E7%9F%A5%E4%B9%8E%E4%B8%93%E6%A0%8F%E6%96%87%E7%AB%A0%E8%BD%AC%E6%8D%A2%E4%B8%BA-Markd-Glenn/v2-103ec535d33a02bfbfcfaf353506ebb6_r.jpg">
+<meta property="og:image" content="https://chenluda.github.io/2023/05/12/%E4%BB%A3%E7%A0%81/%E4%BB%A3%E7%A0%81-%E5%B0%86%E7%9F%A5%E4%B9%8E%E4%B8%93%E6%A0%8F%E6%96%87%E7%AB%A0%E8%BD%AC%E6%8D%A2%E4%B8%BA-Markd-Glenn/v2-5f9666d5a8a139712b87d5d9a07430eb_r.jpg">
+<meta property="og:image" content="https://chenluda.github.io/2023/05/12/%E4%BB%A3%E7%A0%81/%E4%BB%A3%E7%A0%81-%E5%B0%86%E7%9F%A5%E4%B9%8E%E4%B8%93%E6%A0%8F%E6%96%87%E7%AB%A0%E8%BD%AC%E6%8D%A2%E4%B8%BA-Markd-Glenn/v2-04f1ba15453867745d22ffa823e266cc_r.jpg">
+<meta property="og:image" content="https://chenluda.github.io/2023/05/12/%E4%BB%A3%E7%A0%81/%E4%BB%A3%E7%A0%81-%E5%B0%86%E7%9F%A5%E4%B9%8E%E4%B8%93%E6%A0%8F%E6%96%87%E7%AB%A0%E8%BD%AC%E6%8D%A2%E4%B8%BA-Markd-Glenn/v2-2f0c9f13e183446010ed3406c4a0c3e2_r.jpg">
+<meta property="og:image" content="https://chenluda.github.io/2023/05/12/%E4%BB%A3%E7%A0%81/%E4%BB%A3%E7%A0%81-%E5%B0%86%E7%9F%A5%E4%B9%8E%E4%B8%93%E6%A0%8F%E6%96%87%E7%AB%A0%E8%BD%AC%E6%8D%A2%E4%B8%BA-Markd-Glenn/v2-3c52962df9d2e4725fa074991ab9e6ec_r.jpg">
 <meta property="article:published_time" content="2023-05-12T10:52:25.000Z">
 <meta property="article:modified_time" content="2023-05-12T12:20:29.279Z">
 <meta property="article:author" content="Glenn">
-<meta property="article:tag" content="DataBase">
 <meta property="article:tag" content="Zhihu">
 <meta property="article:tag" content="Markdown">
+<meta property="article:tag" content="DataBase">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:image" content="http://glennchen.cn/2023/05/12/%E4%BB%A3%E7%A0%81/%E4%BB%A3%E7%A0%81-%E5%B0%86%E7%9F%A5%E4%B9%8E%E4%B8%93%E6%A0%8F%E6%96%87%E7%AB%A0%E8%BD%AC%E6%8D%A2%E4%B8%BA-Markd-Glenn/v2-18737043bdc3b0ca62938801af3f20cb_r.jpg">
+<meta name="twitter:image" content="https://chenluda.github.io/2023/05/12/%E4%BB%A3%E7%A0%81/%E4%BB%A3%E7%A0%81-%E5%B0%86%E7%9F%A5%E4%B9%8E%E4%B8%93%E6%A0%8F%E6%96%87%E7%AB%A0%E8%BD%AC%E6%8D%A2%E4%B8%BA-Markd-Glenn/v2-18737043bdc3b0ca62938801af3f20cb_r.jpg">
   <!-- Canonical links -->
-  <link rel="canonical" href="http://glennchen.cn/2023/05/12/%E4%BB%A3%E7%A0%81/%E4%BB%A3%E7%A0%81-%E5%B0%86%E7%9F%A5%E4%B9%8E%E4%B8%93%E6%A0%8F%E6%96%87%E7%AB%A0%E8%BD%AC%E6%8D%A2%E4%B8%BA-Markd-Glenn/index.html">
+  <link rel="canonical" href="https://chenluda.github.io/2023/05/12/%E4%BB%A3%E7%A0%81/%E4%BB%A3%E7%A0%81-%E5%B0%86%E7%9F%A5%E4%B9%8E%E4%B8%93%E6%A0%8F%E6%96%87%E7%AB%A0%E8%BD%AC%E6%8D%A2%E4%B8%BA-Markd-Glenn/index.html">
   
     <link rel="alternate" href="/atom.xml" title="Glenn" type="application/atom+xml">
   
@@ -383,7 +383,7 @@
     
     <li class="post-copyright-link hidden-xs">
       <strong>本文链接：</strong>
-      <a href="http://glennchen.cn/2023/05/12/%E4%BB%A3%E7%A0%81/%E4%BB%A3%E7%A0%81-%E5%B0%86%E7%9F%A5%E4%B9%8E%E4%B8%93%E6%A0%8F%E6%96%87%E7%AB%A0%E8%BD%AC%E6%8D%A2%E4%B8%BA-Markd-Glenn/" title="代码 | 将知乎专栏文章转换为 Markdown 文件保存到本地" target="_blank" rel="external">http://glennchen.cn/2023/05/12/代码/代码-将知乎专栏文章转换为-Markd-Glenn/</a>
+      <a href="https://chenluda.github.io/2023/05/12/%E4%BB%A3%E7%A0%81/%E4%BB%A3%E7%A0%81-%E5%B0%86%E7%9F%A5%E4%B9%8E%E4%B8%93%E6%A0%8F%E6%96%87%E7%AB%A0%E8%BD%AC%E6%8D%A2%E4%B8%BA-Markd-Glenn/" title="代码 | 将知乎专栏文章转换为 Markdown 文件保存到本地" target="_blank" rel="external">https://chenluda.github.io/2023/05/12/代码/代码-将知乎专栏文章转换为-Markd-Glenn/</a>
     </li>
     
     <li class="post-copyright-license">

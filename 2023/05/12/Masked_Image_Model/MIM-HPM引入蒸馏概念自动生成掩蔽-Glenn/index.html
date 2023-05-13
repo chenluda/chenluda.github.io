@@ -21,30 +21,30 @@
   <meta name="description" content="题目：Hard Patches Mining for Masked Image Modeling单位：中国科学院、旷视、中国科学院大学论文网址：https:&#x2F;&#x2F;arxiv.org&#x2F;abs&#x2F;2304.05919论文代码： https:&#x2F;&#x2F;github.com&#x2F;Haochen-Wang409&#x2F;HPM首次发布时间：2023 年 4 月 12 日（收录于 CVPR 2023）  123456@arti">
 <meta property="og:type" content="article">
 <meta property="og:title" content="MIM | HPM：引入蒸馏概念自动生成掩蔽策略">
-<meta property="og:url" content="http://glennchen.cn/2023/05/12/Masked_Image_Model/MIM-HPM%E5%BC%95%E5%85%A5%E8%92%B8%E9%A6%8F%E6%A6%82%E5%BF%B5%E8%87%AA%E5%8A%A8%E7%94%9F%E6%88%90%E6%8E%A9%E8%94%BD-Glenn/index.html">
+<meta property="og:url" content="https://chenluda.github.io/2023/05/12/Masked_Image_Model/MIM-HPM%E5%BC%95%E5%85%A5%E8%92%B8%E9%A6%8F%E6%A6%82%E5%BF%B5%E8%87%AA%E5%8A%A8%E7%94%9F%E6%88%90%E6%8E%A9%E8%94%BD-Glenn/index.html">
 <meta property="og:site_name" content="Glenn">
 <meta property="og:description" content="题目：Hard Patches Mining for Masked Image Modeling单位：中国科学院、旷视、中国科学院大学论文网址：https:&#x2F;&#x2F;arxiv.org&#x2F;abs&#x2F;2304.05919论文代码： https:&#x2F;&#x2F;github.com&#x2F;Haochen-Wang409&#x2F;HPM首次发布时间：2023 年 4 月 12 日（收录于 CVPR 2023）  123456@arti">
 <meta property="og:locale" content="zh_CN">
-<meta property="og:image" content="http://glennchen.cn/2023/05/12/Masked_Image_Model/MIM-HPM%E5%BC%95%E5%85%A5%E8%92%B8%E9%A6%8F%E6%A6%82%E5%BF%B5%E8%87%AA%E5%8A%A8%E7%94%9F%E6%88%90%E6%8E%A9%E8%94%BD-Glenn/v2-0deff8109c694394c9df324f9153ac73_r.jpg">
-<meta property="og:image" content="http://glennchen.cn/2023/05/12/Masked_Image_Model/MIM-HPM%E5%BC%95%E5%85%A5%E8%92%B8%E9%A6%8F%E6%A6%82%E5%BF%B5%E8%87%AA%E5%8A%A8%E7%94%9F%E6%88%90%E6%8E%A9%E8%94%BD-Glenn/v2-2f45314ac507b4bfe0997f74d7463918_r.jpg">
-<meta property="og:image" content="http://glennchen.cn/2023/05/12/Masked_Image_Model/MIM-HPM%E5%BC%95%E5%85%A5%E8%92%B8%E9%A6%8F%E6%A6%82%E5%BF%B5%E8%87%AA%E5%8A%A8%E7%94%9F%E6%88%90%E6%8E%A9%E8%94%BD-Glenn/v2-f15927aa53bb967c63e39d4dbf54e2e7_r.jpg">
-<meta property="og:image" content="http://glennchen.cn/2023/05/12/Masked_Image_Model/MIM-HPM%E5%BC%95%E5%85%A5%E8%92%B8%E9%A6%8F%E6%A6%82%E5%BF%B5%E8%87%AA%E5%8A%A8%E7%94%9F%E6%88%90%E6%8E%A9%E8%94%BD-Glenn/v2-3f542d018bc6c669b6ea0c48e6436f38_r.jpg">
-<meta property="og:image" content="http://glennchen.cn/2023/05/12/Masked_Image_Model/MIM-HPM%E5%BC%95%E5%85%A5%E8%92%B8%E9%A6%8F%E6%A6%82%E5%BF%B5%E8%87%AA%E5%8A%A8%E7%94%9F%E6%88%90%E6%8E%A9%E8%94%BD-Glenn/v2-23fa5129f836f507581b4818124fb3c2_r.jpg">
-<meta property="og:image" content="http://glennchen.cn/2023/05/12/Masked_Image_Model/MIM-HPM%E5%BC%95%E5%85%A5%E8%92%B8%E9%A6%8F%E6%A6%82%E5%BF%B5%E8%87%AA%E5%8A%A8%E7%94%9F%E6%88%90%E6%8E%A9%E8%94%BD-Glenn/v2-d67f596bef993a6afabf102037fdeadb_r.jpg">
-<meta property="og:image" content="http://glennchen.cn/2023/05/12/Masked_Image_Model/MIM-HPM%E5%BC%95%E5%85%A5%E8%92%B8%E9%A6%8F%E6%A6%82%E5%BF%B5%E8%87%AA%E5%8A%A8%E7%94%9F%E6%88%90%E6%8E%A9%E8%94%BD-Glenn/v2-863c1b2ad2e2e6d2e90e507387ad6ef7_r.jpg">
-<meta property="og:image" content="http://glennchen.cn/2023/05/12/Masked_Image_Model/MIM-HPM%E5%BC%95%E5%85%A5%E8%92%B8%E9%A6%8F%E6%A6%82%E5%BF%B5%E8%87%AA%E5%8A%A8%E7%94%9F%E6%88%90%E6%8E%A9%E8%94%BD-Glenn/v2-43e69cbf631a8198b22098c1b3ba534f_r.jpg">
-<meta property="og:image" content="http://glennchen.cn/2023/05/12/Masked_Image_Model/MIM-HPM%E5%BC%95%E5%85%A5%E8%92%B8%E9%A6%8F%E6%A6%82%E5%BF%B5%E8%87%AA%E5%8A%A8%E7%94%9F%E6%88%90%E6%8E%A9%E8%94%BD-Glenn/v2-35bc1af65c2ff76a0786bfa7117db56e_r.jpg">
-<meta property="og:image" content="http://glennchen.cn/2023/05/12/Masked_Image_Model/MIM-HPM%E5%BC%95%E5%85%A5%E8%92%B8%E9%A6%8F%E6%A6%82%E5%BF%B5%E8%87%AA%E5%8A%A8%E7%94%9F%E6%88%90%E6%8E%A9%E8%94%BD-Glenn/v2-ae1df39df3f04c6b415de4973434c2cb_r.jpg">
-<meta property="og:image" content="http://glennchen.cn/2023/05/12/Masked_Image_Model/MIM-HPM%E5%BC%95%E5%85%A5%E8%92%B8%E9%A6%8F%E6%A6%82%E5%BF%B5%E8%87%AA%E5%8A%A8%E7%94%9F%E6%88%90%E6%8E%A9%E8%94%BD-Glenn/v2-fcdb7a7f6d91b053a91da2d4c95f1f76_r.jpg">
-<meta property="og:image" content="http://glennchen.cn/2023/05/12/Masked_Image_Model/MIM-HPM%E5%BC%95%E5%85%A5%E8%92%B8%E9%A6%8F%E6%A6%82%E5%BF%B5%E8%87%AA%E5%8A%A8%E7%94%9F%E6%88%90%E6%8E%A9%E8%94%BD-Glenn/v2-5d466361e3e092368572fe3ecb2a8002_r.jpg">
+<meta property="og:image" content="https://chenluda.github.io/2023/05/12/Masked_Image_Model/MIM-HPM%E5%BC%95%E5%85%A5%E8%92%B8%E9%A6%8F%E6%A6%82%E5%BF%B5%E8%87%AA%E5%8A%A8%E7%94%9F%E6%88%90%E6%8E%A9%E8%94%BD-Glenn/v2-0deff8109c694394c9df324f9153ac73_r.jpg">
+<meta property="og:image" content="https://chenluda.github.io/2023/05/12/Masked_Image_Model/MIM-HPM%E5%BC%95%E5%85%A5%E8%92%B8%E9%A6%8F%E6%A6%82%E5%BF%B5%E8%87%AA%E5%8A%A8%E7%94%9F%E6%88%90%E6%8E%A9%E8%94%BD-Glenn/v2-2f45314ac507b4bfe0997f74d7463918_r.jpg">
+<meta property="og:image" content="https://chenluda.github.io/2023/05/12/Masked_Image_Model/MIM-HPM%E5%BC%95%E5%85%A5%E8%92%B8%E9%A6%8F%E6%A6%82%E5%BF%B5%E8%87%AA%E5%8A%A8%E7%94%9F%E6%88%90%E6%8E%A9%E8%94%BD-Glenn/v2-f15927aa53bb967c63e39d4dbf54e2e7_r.jpg">
+<meta property="og:image" content="https://chenluda.github.io/2023/05/12/Masked_Image_Model/MIM-HPM%E5%BC%95%E5%85%A5%E8%92%B8%E9%A6%8F%E6%A6%82%E5%BF%B5%E8%87%AA%E5%8A%A8%E7%94%9F%E6%88%90%E6%8E%A9%E8%94%BD-Glenn/v2-3f542d018bc6c669b6ea0c48e6436f38_r.jpg">
+<meta property="og:image" content="https://chenluda.github.io/2023/05/12/Masked_Image_Model/MIM-HPM%E5%BC%95%E5%85%A5%E8%92%B8%E9%A6%8F%E6%A6%82%E5%BF%B5%E8%87%AA%E5%8A%A8%E7%94%9F%E6%88%90%E6%8E%A9%E8%94%BD-Glenn/v2-23fa5129f836f507581b4818124fb3c2_r.jpg">
+<meta property="og:image" content="https://chenluda.github.io/2023/05/12/Masked_Image_Model/MIM-HPM%E5%BC%95%E5%85%A5%E8%92%B8%E9%A6%8F%E6%A6%82%E5%BF%B5%E8%87%AA%E5%8A%A8%E7%94%9F%E6%88%90%E6%8E%A9%E8%94%BD-Glenn/v2-d67f596bef993a6afabf102037fdeadb_r.jpg">
+<meta property="og:image" content="https://chenluda.github.io/2023/05/12/Masked_Image_Model/MIM-HPM%E5%BC%95%E5%85%A5%E8%92%B8%E9%A6%8F%E6%A6%82%E5%BF%B5%E8%87%AA%E5%8A%A8%E7%94%9F%E6%88%90%E6%8E%A9%E8%94%BD-Glenn/v2-863c1b2ad2e2e6d2e90e507387ad6ef7_r.jpg">
+<meta property="og:image" content="https://chenluda.github.io/2023/05/12/Masked_Image_Model/MIM-HPM%E5%BC%95%E5%85%A5%E8%92%B8%E9%A6%8F%E6%A6%82%E5%BF%B5%E8%87%AA%E5%8A%A8%E7%94%9F%E6%88%90%E6%8E%A9%E8%94%BD-Glenn/v2-43e69cbf631a8198b22098c1b3ba534f_r.jpg">
+<meta property="og:image" content="https://chenluda.github.io/2023/05/12/Masked_Image_Model/MIM-HPM%E5%BC%95%E5%85%A5%E8%92%B8%E9%A6%8F%E6%A6%82%E5%BF%B5%E8%87%AA%E5%8A%A8%E7%94%9F%E6%88%90%E6%8E%A9%E8%94%BD-Glenn/v2-35bc1af65c2ff76a0786bfa7117db56e_r.jpg">
+<meta property="og:image" content="https://chenluda.github.io/2023/05/12/Masked_Image_Model/MIM-HPM%E5%BC%95%E5%85%A5%E8%92%B8%E9%A6%8F%E6%A6%82%E5%BF%B5%E8%87%AA%E5%8A%A8%E7%94%9F%E6%88%90%E6%8E%A9%E8%94%BD-Glenn/v2-ae1df39df3f04c6b415de4973434c2cb_r.jpg">
+<meta property="og:image" content="https://chenluda.github.io/2023/05/12/Masked_Image_Model/MIM-HPM%E5%BC%95%E5%85%A5%E8%92%B8%E9%A6%8F%E6%A6%82%E5%BF%B5%E8%87%AA%E5%8A%A8%E7%94%9F%E6%88%90%E6%8E%A9%E8%94%BD-Glenn/v2-fcdb7a7f6d91b053a91da2d4c95f1f76_r.jpg">
+<meta property="og:image" content="https://chenluda.github.io/2023/05/12/Masked_Image_Model/MIM-HPM%E5%BC%95%E5%85%A5%E8%92%B8%E9%A6%8F%E6%A6%82%E5%BF%B5%E8%87%AA%E5%8A%A8%E7%94%9F%E6%88%90%E6%8E%A9%E8%94%BD-Glenn/v2-5d466361e3e092368572fe3ecb2a8002_r.jpg">
 <meta property="article:published_time" content="2023-05-12T10:44:13.000Z">
 <meta property="article:modified_time" content="2023-05-12T12:17:04.465Z">
 <meta property="article:author" content="Glenn">
 <meta property="article:tag" content="Masked Image Modeling">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:image" content="http://glennchen.cn/2023/05/12/Masked_Image_Model/MIM-HPM%E5%BC%95%E5%85%A5%E8%92%B8%E9%A6%8F%E6%A6%82%E5%BF%B5%E8%87%AA%E5%8A%A8%E7%94%9F%E6%88%90%E6%8E%A9%E8%94%BD-Glenn/v2-0deff8109c694394c9df324f9153ac73_r.jpg">
+<meta name="twitter:image" content="https://chenluda.github.io/2023/05/12/Masked_Image_Model/MIM-HPM%E5%BC%95%E5%85%A5%E8%92%B8%E9%A6%8F%E6%A6%82%E5%BF%B5%E8%87%AA%E5%8A%A8%E7%94%9F%E6%88%90%E6%8E%A9%E8%94%BD-Glenn/v2-0deff8109c694394c9df324f9153ac73_r.jpg">
   <!-- Canonical links -->
-  <link rel="canonical" href="http://glennchen.cn/2023/05/12/Masked_Image_Model/MIM-HPM%E5%BC%95%E5%85%A5%E8%92%B8%E9%A6%8F%E6%A6%82%E5%BF%B5%E8%87%AA%E5%8A%A8%E7%94%9F%E6%88%90%E6%8E%A9%E8%94%BD-Glenn/index.html">
+  <link rel="canonical" href="https://chenluda.github.io/2023/05/12/Masked_Image_Model/MIM-HPM%E5%BC%95%E5%85%A5%E8%92%B8%E9%A6%8F%E6%A6%82%E5%BF%B5%E8%87%AA%E5%8A%A8%E7%94%9F%E6%88%90%E6%8E%A9%E8%94%BD-Glenn/index.html">
   
     <link rel="alternate" href="/atom.xml" title="Glenn" type="application/atom+xml">
   
@@ -428,7 +428,7 @@
     
     <li class="post-copyright-link hidden-xs">
       <strong>本文链接：</strong>
-      <a href="http://glennchen.cn/2023/05/12/Masked_Image_Model/MIM-HPM%E5%BC%95%E5%85%A5%E8%92%B8%E9%A6%8F%E6%A6%82%E5%BF%B5%E8%87%AA%E5%8A%A8%E7%94%9F%E6%88%90%E6%8E%A9%E8%94%BD-Glenn/" title="MIM | HPM：引入蒸馏概念自动生成掩蔽策略" target="_blank" rel="external">http://glennchen.cn/2023/05/12/Masked_Image_Model/MIM-HPM引入蒸馏概念自动生成掩蔽-Glenn/</a>
+      <a href="https://chenluda.github.io/2023/05/12/Masked_Image_Model/MIM-HPM%E5%BC%95%E5%85%A5%E8%92%B8%E9%A6%8F%E6%A6%82%E5%BF%B5%E8%87%AA%E5%8A%A8%E7%94%9F%E6%88%90%E6%8E%A9%E8%94%BD-Glenn/" title="MIM | HPM：引入蒸馏概念自动生成掩蔽策略" target="_blank" rel="external">https://chenluda.github.io/2023/05/12/Masked_Image_Model/MIM-HPM引入蒸馏概念自动生成掩蔽-Glenn/</a>
     </li>
     
     <li class="post-copyright-license">
