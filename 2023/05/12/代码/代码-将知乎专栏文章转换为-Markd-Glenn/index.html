@@ -1,0 +1,549 @@
+<!DOCTYPE html>
+<html lang=zh>
+<head>
+  <meta charset="utf-8">
+  
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=no, minimal-ui">
+  <meta name="renderer" content="webkit">
+  <meta http-equiv="Cache-Control" content="no-transform" />
+  <meta http-equiv="Cache-Control" content="no-siteapp" />
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black">
+  <meta name="format-detection" content="telephone=no,email=no,adress=no">
+  <!-- Color theme for statusbar -->
+  <meta name="theme-color" content="#000000" />
+  <!-- 强制页面在当前窗口以独立页面显示,防止别人在框架里调用页面 -->
+  <meta http-equiv="window-target" content="_top" />
+  
+  
+  <title>代码 | 将知乎专栏文章转换为 Markdown 文件保存到本地 | Hexo</title>
+  <meta name="description" content="最近想构建一个本地知识库。 需要从知乎下载文章、专栏、回答，并以 Markdown 格式保存到本地。 自己写了个脚本，  可以判断给定 url 的类型，是文章、专栏还是回答，三种类型的处理方式不同； 然后将图片保存至本地，并将转换的 Markdown 中图片 url 更换为本地路径，使图片可以在本地显示。   完整代码如下： 123456789101112131415161718192021222">
+<meta property="og:type" content="article">
+<meta property="og:title" content="代码 | 将知乎专栏文章转换为 Markdown 文件保存到本地">
+<meta property="og:url" content="http://glennchen.cn/2023/05/12/%E4%BB%A3%E7%A0%81/%E4%BB%A3%E7%A0%81-%E5%B0%86%E7%9F%A5%E4%B9%8E%E4%B8%93%E6%A0%8F%E6%96%87%E7%AB%A0%E8%BD%AC%E6%8D%A2%E4%B8%BA-Markd-Glenn/index.html">
+<meta property="og:site_name" content="Glenn">
+<meta property="og:description" content="最近想构建一个本地知识库。 需要从知乎下载文章、专栏、回答，并以 Markdown 格式保存到本地。 自己写了个脚本，  可以判断给定 url 的类型，是文章、专栏还是回答，三种类型的处理方式不同； 然后将图片保存至本地，并将转换的 Markdown 中图片 url 更换为本地路径，使图片可以在本地显示。   完整代码如下： 123456789101112131415161718192021222">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://glennchen.cn/2023/05/12/%E4%BB%A3%E7%A0%81/%E4%BB%A3%E7%A0%81-%E5%B0%86%E7%9F%A5%E4%B9%8E%E4%B8%93%E6%A0%8F%E6%96%87%E7%AB%A0%E8%BD%AC%E6%8D%A2%E4%B8%BA-Markd-Glenn/v2-18737043bdc3b0ca62938801af3f20cb_r.jpg">
+<meta property="og:image" content="http://glennchen.cn/2023/05/12/%E4%BB%A3%E7%A0%81/%E4%BB%A3%E7%A0%81-%E5%B0%86%E7%9F%A5%E4%B9%8E%E4%B8%93%E6%A0%8F%E6%96%87%E7%AB%A0%E8%BD%AC%E6%8D%A2%E4%B8%BA-Markd-Glenn/v2-41f1a2aee9492701391f42ba0caae5c6_r.jpg">
+<meta property="og:image" content="http://glennchen.cn/2023/05/12/%E4%BB%A3%E7%A0%81/%E4%BB%A3%E7%A0%81-%E5%B0%86%E7%9F%A5%E4%B9%8E%E4%B8%93%E6%A0%8F%E6%96%87%E7%AB%A0%E8%BD%AC%E6%8D%A2%E4%B8%BA-Markd-Glenn/v2-397ce3bd2bf9334dd47871ed29b3b121_r.jpg">
+<meta property="og:image" content="http://glennchen.cn/2023/05/12/%E4%BB%A3%E7%A0%81/%E4%BB%A3%E7%A0%81-%E5%B0%86%E7%9F%A5%E4%B9%8E%E4%B8%93%E6%A0%8F%E6%96%87%E7%AB%A0%E8%BD%AC%E6%8D%A2%E4%B8%BA-Markd-Glenn/v2-3c0a89a1818eed3b597ae46c61f9498c_r.jpg">
+<meta property="og:image" content="http://glennchen.cn/2023/05/12/%E4%BB%A3%E7%A0%81/%E4%BB%A3%E7%A0%81-%E5%B0%86%E7%9F%A5%E4%B9%8E%E4%B8%93%E6%A0%8F%E6%96%87%E7%AB%A0%E8%BD%AC%E6%8D%A2%E4%B8%BA-Markd-Glenn/v2-103ec535d33a02bfbfcfaf353506ebb6_r.jpg">
+<meta property="og:image" content="http://glennchen.cn/2023/05/12/%E4%BB%A3%E7%A0%81/%E4%BB%A3%E7%A0%81-%E5%B0%86%E7%9F%A5%E4%B9%8E%E4%B8%93%E6%A0%8F%E6%96%87%E7%AB%A0%E8%BD%AC%E6%8D%A2%E4%B8%BA-Markd-Glenn/v2-5f9666d5a8a139712b87d5d9a07430eb_r.jpg">
+<meta property="og:image" content="http://glennchen.cn/2023/05/12/%E4%BB%A3%E7%A0%81/%E4%BB%A3%E7%A0%81-%E5%B0%86%E7%9F%A5%E4%B9%8E%E4%B8%93%E6%A0%8F%E6%96%87%E7%AB%A0%E8%BD%AC%E6%8D%A2%E4%B8%BA-Markd-Glenn/v2-04f1ba15453867745d22ffa823e266cc_r.jpg">
+<meta property="og:image" content="http://glennchen.cn/2023/05/12/%E4%BB%A3%E7%A0%81/%E4%BB%A3%E7%A0%81-%E5%B0%86%E7%9F%A5%E4%B9%8E%E4%B8%93%E6%A0%8F%E6%96%87%E7%AB%A0%E8%BD%AC%E6%8D%A2%E4%B8%BA-Markd-Glenn/v2-2f0c9f13e183446010ed3406c4a0c3e2_r.jpg">
+<meta property="og:image" content="http://glennchen.cn/2023/05/12/%E4%BB%A3%E7%A0%81/%E4%BB%A3%E7%A0%81-%E5%B0%86%E7%9F%A5%E4%B9%8E%E4%B8%93%E6%A0%8F%E6%96%87%E7%AB%A0%E8%BD%AC%E6%8D%A2%E4%B8%BA-Markd-Glenn/v2-3c52962df9d2e4725fa074991ab9e6ec_r.jpg">
+<meta property="article:published_time" content="2023-05-12T10:52:25.000Z">
+<meta property="article:modified_time" content="2023-05-12T12:20:29.279Z">
+<meta property="article:author" content="Glenn">
+<meta property="article:tag" content="DataBase">
+<meta property="article:tag" content="Zhihu">
+<meta property="article:tag" content="Markdown">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://glennchen.cn/2023/05/12/%E4%BB%A3%E7%A0%81/%E4%BB%A3%E7%A0%81-%E5%B0%86%E7%9F%A5%E4%B9%8E%E4%B8%93%E6%A0%8F%E6%96%87%E7%AB%A0%E8%BD%AC%E6%8D%A2%E4%B8%BA-Markd-Glenn/v2-18737043bdc3b0ca62938801af3f20cb_r.jpg">
+  <!-- Canonical links -->
+  <link rel="canonical" href="http://glennchen.cn/2023/05/12/%E4%BB%A3%E7%A0%81/%E4%BB%A3%E7%A0%81-%E5%B0%86%E7%9F%A5%E4%B9%8E%E4%B8%93%E6%A0%8F%E6%96%87%E7%AB%A0%E8%BD%AC%E6%8D%A2%E4%B8%BA-Markd-Glenn/index.html">
+  
+    <link rel="alternate" href="/atom.xml" title="Glenn" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="/favicon.png" type="image/x-icon">
+  
+  
+<link rel="stylesheet" href="/css/style.css">
+
+  
+  
+  
+  
+<!-- hexo injector head_end start -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/katex.min.css">
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/hexo-math@4.0.0/dist/style.css">
+<!-- hexo injector head_end end --><meta name="generator" content="Hexo 6.3.0"></head>
+
+
+<body class="main-center theme-black" itemscope itemtype="http://schema.org/WebPage">
+  <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+  <div class="slimContent">
+    <div class="navbar-header">
+      
+      
+      <div class="profile-block text-center">
+        <a id="avatar" href="https://github.com/chenluda" target="_blank">
+          <img class="img-circle img-rotate" src="/images/avatar.png" width="200" height="200">
+        </a>
+        <h2 id="name" class="hidden-xs hidden-sm">Glenn</h2>
+        <h3 id="title" class="hidden-xs hidden-sm hidden-md">Stay hungry, stay foolish.</h3>
+        <small id="location" class="text-muted hidden-xs hidden-sm"><i class="icon icon-map-marker"></i> Yunnan, China</small>
+      </div>
+      
+      <div class="search" id="search-form-wrap">
+
+    <form class="search-form sidebar-form">
+        <div class="input-group">
+            <input type="text" class="search-form-input form-control" placeholder="搜索" />
+            <span class="input-group-btn">
+                <button type="submit" class="search-form-submit btn btn-flat" onclick="return false;"><i class="icon icon-search"></i></button>
+            </span>
+        </div>
+    </form>
+    <div class="ins-search">
+  <div class="ins-search-mask"></div>
+  <div class="ins-search-container">
+    <div class="ins-input-wrapper">
+      <input type="text" class="ins-search-input" placeholder="想要查找什么..." x-webkit-speech />
+      <button type="button" class="close ins-close ins-selectable" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span></button>
+    </div>
+    <div class="ins-section-wrapper">
+      <div class="ins-section-container"></div>
+    </div>
+  </div>
+</div>
+
+
+</div>
+      <button class="navbar-toggle collapsed" type="button" data-toggle="collapse" data-target="#main-navbar" aria-controls="main-navbar" aria-expanded="false">
+        <span class="sr-only">Toggle navigation</span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+    </div>
+    <nav id="main-navbar" class="collapse navbar-collapse" itemscope itemtype="http://schema.org/SiteNavigationElement" role="navigation">
+      <ul class="nav navbar-nav main-nav ">
+        
+        
+        <li class="menu-item menu-item-home">
+          <a href="/.">
+            
+            <i class="icon icon-home-fill"></i>
+            
+            <span class="menu-title">首页</span>
+          </a>
+        </li>
+        
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives">
+            
+            <i class="icon icon-archives-fill"></i>
+            
+            <span class="menu-title">归档</span>
+          </a>
+        </li>
+        
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories">
+            
+            <i class="icon icon-folder"></i>
+            
+            <span class="menu-title">分类</span>
+          </a>
+        </li>
+        
+      </ul>
+      
+	
+    <ul class="social-links">
+    	
+        <li><a href="https://github.com/chenluda" target="_blank" title="Github" data-toggle=tooltip data-placement=top><i class="icon icon-github"></i></a></li>
+        
+        <li><a href="https://www.zhihu.com/people/Glenn" target="_blank" title="Zhihu" data-toggle=tooltip data-placement=top><i class="icon icon-zhihu"></i></a></li>
+        
+    </ul>
+
+    </nav>
+  </div>
+</header>
+
+  
+    <aside class="sidebar" itemscope itemtype="http://schema.org/WPSideBar">
+  <div class="slimContent">
+    
+      <div class="widget">
+    <h3 class="widget-title">公告</h3>
+    <div class="widget-body">
+        <div id="board">
+            <div class="content">
+                <p>欢迎交流与分享经验!</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+    
+      
+  <div class="widget">
+    <h3 class="widget-title">分类</h3>
+    <div class="widget-body">
+      <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/%E4%BB%A3%E7%A0%81/">代码</a><span class="category-list-count">4</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/%E8%AE%BA%E6%96%87%E9%80%9F%E8%A7%88/">论文速览</a><span class="category-list-count">12</span></li></ul>
+    </div>
+  </div>
+
+
+    
+      
+  <div class="widget">
+    <h3 class="widget-title">标签</h3>
+    <div class="widget-body">
+      <ul class="tag-list" itemprop="keywords"><li class="tag-list-item"><a class="tag-list-link" href="/tags/Conference-paper/" rel="tag">Conference paper</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/DataBase/" rel="tag">DataBase</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Markdown/" rel="tag">Markdown</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Masked-Image-Modeling/" rel="tag">Masked Image Modeling</a><span class="tag-list-count">12</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/OpenReview/" rel="tag">OpenReview</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Organization/" rel="tag">Organization</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/WeChat/" rel="tag">WeChat</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Zhihu/" rel="tag">Zhihu</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/arXiv/" rel="tag">arXiv</a><span class="tag-list-count">2</span></li></ul>
+    </div>
+  </div>
+
+
+    
+      
+  <div class="widget">
+    <h3 class="widget-title">标签云</h3>
+    <div class="widget-body tagcloud">
+      <a href="/tags/Conference-paper/" style="font-size: 13px;">Conference paper</a> <a href="/tags/DataBase/" style="font-size: 13.5px;">DataBase</a> <a href="/tags/Markdown/" style="font-size: 13px;">Markdown</a> <a href="/tags/Masked-Image-Modeling/" style="font-size: 14px;">Masked Image Modeling</a> <a href="/tags/OpenReview/" style="font-size: 13px;">OpenReview</a> <a href="/tags/Organization/" style="font-size: 13px;">Organization</a> <a href="/tags/WeChat/" style="font-size: 13px;">WeChat</a> <a href="/tags/Zhihu/" style="font-size: 13px;">Zhihu</a> <a href="/tags/arXiv/" style="font-size: 13.5px;">arXiv</a>
+    </div>
+  </div>
+
+    
+      
+  <div class="widget">
+    <h3 class="widget-title">归档</h3>
+    <div class="widget-body">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2023/05/">五月 2023</a><span class="archive-list-count">16</span></li></ul>
+    </div>
+  </div>
+
+
+    
+      
+  <div class="widget">
+    <h3 class="widget-title">最新文章</h3>
+    <div class="widget-body">
+      <ul class="recent-post-list list-unstyled no-thumbnail">
+        
+          <li>
+            
+            <div class="item-inner">
+              <p class="item-category">
+                <a class="category-link" href="/categories/%E4%BB%A3%E7%A0%81/">代码</a>
+              </p>
+              <p class="item-title">
+                <a href="/2023/05/12/%E4%BB%A3%E7%A0%81/%E4%BB%A3%E7%A0%81-%E8%8E%B7%E5%8F%96-arXiv-%E8%AE%BA%E6%96%87%E4%BD%9C%E8%80%85%E5%8D%95%E4%BD%8D-Glenn/" class="title">代码 | 获取 arXiv 论文作者单位</a>
+              </p>
+              <p class="item-date">
+                <time datetime="2023-05-12T10:52:40.000Z" itemprop="datePublished">2023-05-12</time>
+              </p>
+            </div>
+          </li>
+          
+          <li>
+            
+            <div class="item-inner">
+              <p class="item-category">
+                <a class="category-link" href="/categories/%E4%BB%A3%E7%A0%81/">代码</a>
+              </p>
+              <p class="item-title">
+                <a href="/2023/05/12/%E4%BB%A3%E7%A0%81/%E4%BB%A3%E7%A0%81-%E6%AF%8F%E5%A4%A9%E5%AE%9A%E7%82%B9%E5%90%91%E5%BE%AE%E4%BF%A1%E6%8E%A8%E9%80%81-arXiv-Glenn/" class="title">代码 | 每天定点向微信推送 arXiv 最新文章</a>
+              </p>
+              <p class="item-date">
+                <time datetime="2023-05-12T10:52:34.000Z" itemprop="datePublished">2023-05-12</time>
+              </p>
+            </div>
+          </li>
+          
+          <li>
+            
+            <div class="item-inner">
+              <p class="item-category">
+                <a class="category-link" href="/categories/%E4%BB%A3%E7%A0%81/">代码</a>
+              </p>
+              <p class="item-title">
+                <a href="/2023/05/12/%E4%BB%A3%E7%A0%81/%E4%BB%A3%E7%A0%81-%E5%B0%86%E7%9F%A5%E4%B9%8E%E4%B8%93%E6%A0%8F%E6%96%87%E7%AB%A0%E8%BD%AC%E6%8D%A2%E4%B8%BA-Markd-Glenn/" class="title">代码 | 将知乎专栏文章转换为 Markdown 文件保存到本地</a>
+              </p>
+              <p class="item-date">
+                <time datetime="2023-05-12T10:52:25.000Z" itemprop="datePublished">2023-05-12</time>
+              </p>
+            </div>
+          </li>
+          
+          <li>
+            
+            <div class="item-inner">
+              <p class="item-category">
+                <a class="category-link" href="/categories/%E4%BB%A3%E7%A0%81/">代码</a>
+              </p>
+              <p class="item-title">
+                <a href="/2023/05/12/%E4%BB%A3%E7%A0%81/%E4%BB%A3%E7%A0%81-%E4%BB%8E-OpenReview-%E8%8E%B7%E5%8F%96%E9%A1%B6-Glenn/" class="title">代码 | 从 OpenReview 获取顶会接收论文集并保存至本地数据库</a>
+              </p>
+              <p class="item-date">
+                <time datetime="2023-05-12T10:52:15.000Z" itemprop="datePublished">2023-05-12</time>
+              </p>
+            </div>
+          </li>
+          
+          <li>
+            
+            <div class="item-inner">
+              <p class="item-category">
+                <a class="category-link" href="/categories/%E8%AE%BA%E6%96%87%E9%80%9F%E8%A7%88/">论文速览</a>
+              </p>
+              <p class="item-title">
+                <a href="/2023/05/12/Masked_Image_Model/MIM-%E7%90%86%E8%AE%BA%E6%8E%A9%E8%94%BD%E5%9B%BE%E5%83%8F%E5%BB%BA%E6%A8%A1%E6%9C%AC%E8%B4%A8%E4%B8%8A%E5%9C%A8%E5%AD%A6%E4%B9%A0%E9%81%AE-Glenn/" class="title">MIM | 理论：掩蔽图像建模本质上在学习遮挡不变特征</a>
+              </p>
+              <p class="item-date">
+                <time datetime="2023-05-12T10:44:48.000Z" itemprop="datePublished">2023-05-12</time>
+              </p>
+            </div>
+          </li>
+          
+      </ul>
+    </div>
+  </div>
+  
+
+    
+  </div>
+</aside>
+
+  
+  
+<main class="main" role="main">
+  <div class="content">
+  <article id="post-代码/代码-将知乎专栏文章转换为-Markd-Glenn" class="article article-type-post" itemscope itemtype="http://schema.org/BlogPosting">
+    
+    <div class="article-header">
+      
+        
+  
+    <h1 class="article-title" itemprop="name">
+      代码 | 将知乎专栏文章转换为 Markdown 文件保存到本地
+    </h1>
+  
+
+      
+      <div class="article-meta">
+        <span class="article-date">
+    <i class="icon icon-calendar-check"></i>
+	<a href="/2023/05/12/%E4%BB%A3%E7%A0%81/%E4%BB%A3%E7%A0%81-%E5%B0%86%E7%9F%A5%E4%B9%8E%E4%B8%93%E6%A0%8F%E6%96%87%E7%AB%A0%E8%BD%AC%E6%8D%A2%E4%B8%BA-Markd-Glenn/" class="article-date">
+	  <time datetime="2023-05-12T10:52:25.000Z" itemprop="datePublished">2023-05-12</time>
+	</a>
+</span>
+        
+  <span class="article-category">
+    <i class="icon icon-folder"></i>
+    <a class="article-category-link" href="/categories/%E4%BB%A3%E7%A0%81/">代码</a>
+  </span>
+
+        
+  <span class="article-tag">
+    <i class="icon icon-tags"></i>
+	<a class="article-tag-link-link" href="/tags/DataBase/" rel="tag">DataBase</a>, <a class="article-tag-link-link" href="/tags/Markdown/" rel="tag">Markdown</a>, <a class="article-tag-link-link" href="/tags/Zhihu/" rel="tag">Zhihu</a>
+  </span>
+
+
+        
+
+        <span class="post-comment"><i class="icon icon-comment"></i> <a href="/2023/05/12/%E4%BB%A3%E7%A0%81/%E4%BB%A3%E7%A0%81-%E5%B0%86%E7%9F%A5%E4%B9%8E%E4%B8%93%E6%A0%8F%E6%96%87%E7%AB%A0%E8%BD%AC%E6%8D%A2%E4%B8%BA-Markd-Glenn/#comments" class="article-comment-link">评论</a></span>
+        
+      </div>
+    </div>
+    <div class="article-entry marked-body" itemprop="articleBody">
+      
+        <p>最近想构建一个本地知识库。</p>
+<p>需要从知乎下载文章、专栏、回答，并以 Markdown 格式保存到本地。</p>
+<p>自己写了个脚本，</p>
+<ul>
+<li>可以判断给定 url 的类型，是文章、专栏还是回答，三种类型的处理方式不同；</li>
+<li>然后将图片保存至本地，并将转换的 Markdown 中图片 url 更换为本地路径，使图片可以在本地显示。</li>
+</ul>
+<hr>
+<p>完整代码如下：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br><span class="line">129</span><br><span class="line">130</span><br><span class="line">131</span><br><span class="line">132</span><br><span class="line">133</span><br><span class="line">134</span><br><span class="line">135</span><br><span class="line">136</span><br><span class="line">137</span><br><span class="line">138</span><br><span class="line">139</span><br><span class="line">140</span><br><span class="line">141</span><br><span class="line">142</span><br><span class="line">143</span><br><span class="line">144</span><br><span class="line">145</span><br><span class="line">146</span><br><span class="line">147</span><br><span class="line">148</span><br><span class="line">149</span><br><span class="line">150</span><br><span class="line">151</span><br><span class="line">152</span><br><span class="line">153</span><br><span class="line">154</span><br><span class="line">155</span><br><span class="line">156</span><br><span class="line">157</span><br><span class="line">158</span><br><span class="line">159</span><br><span class="line">160</span><br><span class="line">161</span><br><span class="line">162</span><br><span class="line">163</span><br><span class="line">164</span><br><span class="line">165</span><br><span class="line">166</span><br><span class="line">167</span><br><span class="line">168</span><br><span class="line">169</span><br><span class="line">170</span><br><span class="line">171</span><br><span class="line">172</span><br><span class="line">173</span><br><span class="line">174</span><br><span class="line">175</span><br><span class="line">176</span><br><span class="line">177</span><br><span class="line">178</span><br><span class="line">179</span><br><span class="line">180</span><br><span class="line">181</span><br><span class="line">182</span><br><span class="line">183</span><br><span class="line">184</span><br><span class="line">185</span><br><span class="line">186</span><br><span class="line">187</span><br><span class="line">188</span><br><span class="line">189</span><br><span class="line">190</span><br><span class="line">191</span><br><span class="line">192</span><br><span class="line">193</span><br><span class="line">194</span><br><span class="line">195</span><br><span class="line">196</span><br><span class="line">197</span><br><span class="line">198</span><br><span class="line">199</span><br><span class="line">200</span><br><span class="line">201</span><br><span class="line">202</span><br><span class="line">203</span><br><span class="line">204</span><br><span class="line">205</span><br></pre></td><td class="code"><pre><span class="line">&#x27;&#x27;&#x27;</span><br><span class="line">Description: 将知乎专栏文章转换为 Markdown 文件保存到本地</span><br><span class="line">Version: 1.0</span><br><span class="line">Author: 陈路达</span><br><span class="line">Email: chenluda01@outlook.com</span><br><span class="line">Date: 2023-04-18 10:48:38</span><br><span class="line">FilePath: \11-zhihuToMd\main.py</span><br><span class="line">Copyright (c) 2022 by Kust-BME, All Rights Reserved. </span><br><span class="line">&#x27;&#x27;&#x27;</span><br><span class="line"></span><br><span class="line">import os</span><br><span class="line">import re</span><br><span class="line">import urllib.parse</span><br><span class="line"></span><br><span class="line">import requests</span><br><span class="line">from bs4 import BeautifulSoup</span><br><span class="line">from markdownify import markdownify as md</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">def download\_image(url, save\_path):</span><br><span class="line">    &quot;&quot;&quot;</span><br><span class="line"> 从指定url下载图片并保存到本地</span><br><span class="line"> &quot;&quot;&quot;</span><br><span class="line">    if url.startswith(&quot;data:image/&quot;):</span><br><span class="line">        # 如果链接以 &quot;data:&quot; 开头，则直接写入数据到文件</span><br><span class="line">        with open(save\_path, &quot;wb&quot;) as f:</span><br><span class="line">            f.write(url.split(&quot;,&quot;, 1)[1].encode(&quot;utf-8&quot;))</span><br><span class="line">    else:</span><br><span class="line">        response = requests.get(url)</span><br><span class="line">        with open(save\_path, &quot;wb&quot;) as f:</span><br><span class="line">            f.write(response.content)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">def get\_valid\_filename(s):</span><br><span class="line">    &quot;&quot;&quot;</span><br><span class="line"> 将字符串转换为有效的文件名</span><br><span class="line"> &quot;&quot;&quot;</span><br><span class="line">    s = str(s).strip().replace(&#x27; &#x27;, &#x27;\_&#x27;)</span><br><span class="line">    return re.sub(r&#x27;(?u)[^-\w\_]&#x27;, &#x27;&#x27;, s)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">def judge\_zhihu\_type(url):</span><br><span class="line">    &quot;&quot;&quot;</span><br><span class="line"> 判断url类型</span><br><span class="line"> &quot;&quot;&quot;</span><br><span class="line">    response = requests.get(url)</span><br><span class="line">    soup = BeautifulSoup(response.content, &quot;html.parser&quot;)</span><br><span class="line"></span><br><span class="line">    if soup.text.find(&quot;知乎专栏&quot;) != -1:</span><br><span class="line">        # 如果是专栏，将所有文章放在一个以专栏标题命名的文件夹中</span><br><span class="line">        title = soup.text.split(&#x27;-&#x27;)[0].strip()</span><br><span class="line">        folder\_name = get\_valid\_filename(title)</span><br><span class="line">        os.makedirs(folder\_name, exist\_ok=True)</span><br><span class="line">        os.chdir(folder\_name)</span><br><span class="line">        parse\_zhihu\_column(url)</span><br><span class="line"></span><br><span class="line">    elif url.find(&quot;answer&quot;) != -1:</span><br><span class="line">        # 如果是回答</span><br><span class="line">        parse\_zhihu\_answer(url)</span><br><span class="line">        </span><br><span class="line">    else:</span><br><span class="line">        # 如果是单篇文章</span><br><span class="line">        parse\_zhihu\_article(url)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">def save\_and\_transform(title\_element, content\_element, author, url):</span><br><span class="line">    &quot;&quot;&quot;</span><br><span class="line"> 转化并保存为 Markdown 格式文件</span><br><span class="line"> &quot;&quot;&quot;</span><br><span class="line">    # 获取标题和内容</span><br><span class="line">    if title\_element is not None: </span><br><span class="line">        title = title\_element.text.strip()</span><br><span class="line">    else:</span><br><span class="line">        title = &quot;Untitled&quot;</span><br><span class="line">    # 防止文件名称太长，加载不出图像</span><br><span class="line">    markdown\_title = get\_valid\_filename(title)[0:20]</span><br><span class="line">    markdown\_title = f&quot;&#123;markdown\_title&#125;\_&#123;author&#125;&quot;</span><br><span class="line"></span><br><span class="line">    if content\_element is not None:</span><br><span class="line">        # 将 css 样式移除</span><br><span class="line">        for style\_tag in content\_element.find\_all(&quot;style&quot;):</span><br><span class="line">            style\_tag.decompose()</span><br><span class="line"></span><br><span class="line">        for img\_lazy in content\_element.find\_all(&quot;img&quot;, class\_=lambda x: &#x27;lazy&#x27; in x if x else True):</span><br><span class="line">            img\_lazy.decompose()</span><br><span class="line"></span><br><span class="line">        # 处理回答中的图片</span><br><span class="line">        for img in content\_element.find\_all(&quot;img&quot;):</span><br><span class="line">            # 将图片链接替换为本地路径</span><br><span class="line">            img\_url = img.get(&quot;data-original&quot;, img.get(&quot;src&quot;, None))</span><br><span class="line">            if img\_url is None:</span><br><span class="line">                continue</span><br><span class="line"></span><br><span class="line">            img\_name = urllib.parse.quote(os.path.basename(img\_url))</span><br><span class="line">            img\_path = f&quot;&#123;markdown\_title&#125;\_files/&#123;img\_name&#125;&quot;</span><br><span class="line"></span><br><span class="line">            # 如果图片链接中 .jpg 后面还有字符串则直接截停</span><br><span class="line">            if img\_path.find(&#x27;.jpg&#x27;) + 3 != len(img\_path) - 1:</span><br><span class="line">                img\_path = img\_path[0: img\_path.find(&#x27;.jpg&#x27;) + 4]</span><br><span class="line"></span><br><span class="line">            img[&quot;src&quot;] = img\_path</span><br><span class="line">            </span><br><span class="line">            # 下载图片并保存到本地</span><br><span class="line">            os.makedirs(os.path.dirname(img\_path), exist\_ok=True)</span><br><span class="line">            download\_image(img\_url, img\_path)</span><br><span class="line"></span><br><span class="line">            # 在图片后插入换行符</span><br><span class="line">            img.insert\_after(&#x27;\n\n&#x27;)</span><br><span class="line"></span><br><span class="line">        # 在 &lt;/figcaption&gt; 后面加上换行符</span><br><span class="line">        for figcaption in content\_element.find\_all(&quot;figcaption&quot;):</span><br><span class="line">            figcaption.insert\_after(&#x27;\n\n&#x27;)</span><br><span class="line"></span><br><span class="line">        # 获取回答文本内容</span><br><span class="line">        content = content\_element.decode\_contents().strip()</span><br><span class="line">        # 转换为 markdown</span><br><span class="line">        content = md(content)</span><br><span class="line">    else:</span><br><span class="line">        content = &quot;&quot;</span><br><span class="line"></span><br><span class="line">    # 转化为 Markdown 格式</span><br><span class="line">    if content:</span><br><span class="line">        markdown = f&quot;# &#123;title&#125;\n\n \*\*Author:\*\* [&#123;author&#125;]\n\n \*\*Link:\*\* [&#123;url&#125;]\n\n&#123;content&#125;&quot;</span><br><span class="line">    else:</span><br><span class="line">        markdown = f&quot;# &#123;title&#125;\n\nContent is empty.&quot;</span><br><span class="line"></span><br><span class="line">    # 保存 Markdown 文件</span><br><span class="line">    with open(f&quot;&#123;markdown\_title&#125;.md&quot;, &quot;w&quot;, encoding=&quot;utf-8&quot;) as f:</span><br><span class="line">        f.write(markdown)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">def parse\_zhihu\_article(url):</span><br><span class="line">    &quot;&quot;&quot;</span><br><span class="line"> 解析知乎文章并保存为Markdown格式文件</span><br><span class="line"> &quot;&quot;&quot;</span><br><span class="line">    # 发送GET请求获取网页内容</span><br><span class="line">    response = requests.get(url)</span><br><span class="line"></span><br><span class="line">    # 解析HTML</span><br><span class="line">    soup = BeautifulSoup(response.content, &quot;html.parser&quot;)</span><br><span class="line"></span><br><span class="line">    # 找到文章标题和内容所在的元素</span><br><span class="line">    title\_element = soup.select\_one(&quot;h1.Post-Title&quot;)</span><br><span class="line">    content\_element = soup.select\_one(&quot;div.Post-RichText&quot;)</span><br><span class="line">    author = soup.select\_one(&#x27;div.AuthorInfo &gt; div.AuthorInfo-content &gt; div.AuthorInfo-head&#x27;).text.strip()</span><br><span class="line"></span><br><span class="line">    # 解析知乎文章并保存为Markdown格式文件</span><br><span class="line">    save\_and\_transform(title\_element, content\_element, author, url)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">def parse\_zhihu\_answer(url):</span><br><span class="line">    &quot;&quot;&quot;</span><br><span class="line"> 解析知乎回答并保存为 Markdown 格式文件</span><br><span class="line"> &quot;&quot;&quot;</span><br><span class="line">    # 发送 GET 请求获取网页内容</span><br><span class="line">    response = requests.get(url)</span><br><span class="line"></span><br><span class="line">    # 解析 HTML</span><br><span class="line">    soup = BeautifulSoup(response.content, &quot;html.parser&quot;)</span><br><span class="line"></span><br><span class="line">    # 找到回答标题、内容、作者所在的元素</span><br><span class="line">    title\_element = soup.select\_one(&quot;h1.QuestionHeader-title&quot;)</span><br><span class="line">    content\_element = soup.select\_one(&quot;div.RichContent-inner&quot;)</span><br><span class="line">    author = soup.select\_one(&#x27;div.AuthorInfo &gt; div.AuthorInfo-content &gt; div.AuthorInfo-head&#x27;).text.strip()</span><br><span class="line"></span><br><span class="line">    # 解析知乎文章并保存为Markdown格式文件</span><br><span class="line">    save\_and\_transform(title\_element, content\_element, author, url)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">def parse\_zhihu\_column(url):</span><br><span class="line">    &quot;&quot;&quot;</span><br><span class="line"> 解析知乎专栏并获取所有文章链接</span><br><span class="line"> &quot;&quot;&quot;</span><br><span class="line">    # 获取所有文章链接</span><br><span class="line">    items = []</span><br><span class="line">    url\_template = &quot;https://zhuanlan.zhihu.com/p/&#123;id&#125;&quot;</span><br><span class="line">    offset = 0</span><br><span class="line">    while True:</span><br><span class="line">        api\_url = f&quot;/api/v4/columns/&#123;url.split(&#x27;/&#x27;)[-1]&#125;/items?limit=10&amp;offset=&#123;offset&#125;&quot;</span><br><span class="line">        response = requests.get(f&quot;https://www.zhihu.com&#123;api\_url&#125;&quot;)</span><br><span class="line">        data = response.json()</span><br><span class="line">        items += data[&quot;data&quot;]</span><br><span class="line">        if data[&quot;paging&quot;][&quot;is\_end&quot;]:</span><br><span class="line">            break</span><br><span class="line">        offset += 10</span><br><span class="line"></span><br><span class="line">    article\_links = [url\_template.format(id=item[&quot;id&quot;]) for item in items]</span><br><span class="line"></span><br><span class="line">    # 遍历所有文章链接，转换为Markdown并保存到本地</span><br><span class="line">    for article\_link in article\_links:</span><br><span class="line">        parse\_zhihu\_article(article\_link)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">if \_\_name\_\_==&quot;\_\_main\_\_&quot;:</span><br><span class="line"></span><br><span class="line">    # 回答</span><br><span class="line">    # url = &quot;https://www.zhihu.com/question/593914819/answer/2971671307&quot;</span><br><span class="line"></span><br><span class="line">    # 文章</span><br><span class="line">    # url = &quot;https://zhuanlan.zhihu.com/p/626703154&quot;</span><br><span class="line"></span><br><span class="line">    # 专栏</span><br><span class="line">    url = &quot;https://www.zhihu.com/column/c\_1620937636624703488&quot;</span><br><span class="line"></span><br><span class="line">    judge\_zhihu\_type(url)</span><br></pre></td></tr></table></figure>
+
+
+<hr>
+<h3 id="1-先扔个回答的-url"><a href="#1-先扔个回答的-url" class="headerlink" title="1. 先扔个回答的 url"></a>1. 先扔个回答的 url</h3><p>Meta 发布图像分割论文 Segment Anything，将给 CV 研究带来什么影响？ - Glenn的回答 - 知乎 <a target="_blank" rel="noopener" href="https://www.zhihu.com/question/593914819/answer/2971671307">https://www.zhihu.com/question/593914819/answer/2971671307</a></p>
+<p><img src="/2023/05/12/%E4%BB%A3%E7%A0%81/%E4%BB%A3%E7%A0%81-%E5%B0%86%E7%9F%A5%E4%B9%8E%E4%B8%93%E6%A0%8F%E6%96%87%E7%AB%A0%E8%BD%AC%E6%8D%A2%E4%B8%BA-Markd-Glenn/v2-18737043bdc3b0ca62938801af3f20cb_r.jpg"><br>将会生成一个以“问题标题 + ‘_‘ + 作者名称 + ‘_files’”命名的文件夹和以“问题标题 + ‘_‘ + 作者名称”命名的 .md 文件。</p>
+<ul>
+<li>文件夹中保存了本回答的所有图片。</li>
+<li>为防止问题标题太长，导致图片加载不出来，在第 20 个字符处做了截断。</li>
+</ul>
+<p><img src="/2023/05/12/%E4%BB%A3%E7%A0%81/%E4%BB%A3%E7%A0%81-%E5%B0%86%E7%9F%A5%E4%B9%8E%E4%B8%93%E6%A0%8F%E6%96%87%E7%AB%A0%E8%BD%AC%E6%8D%A2%E4%B8%BA-Markd-Glenn/v2-41f1a2aee9492701391f42ba0caae5c6_r.jpg"><br><img src="/2023/05/12/%E4%BB%A3%E7%A0%81/%E4%BB%A3%E7%A0%81-%E5%B0%86%E7%9F%A5%E4%B9%8E%E4%B8%93%E6%A0%8F%E6%96%87%E7%AB%A0%E8%BD%AC%E6%8D%A2%E4%B8%BA-Markd-Glenn/v2-397ce3bd2bf9334dd47871ed29b3b121_r.jpg"></p>
+<h3 id="2-单个文章的-url"><a href="#2-单个文章的-url" class="headerlink" title="2. 单个文章的 url"></a>2. 单个文章的 url</h3><p><a target="_blank" rel="noopener" href="https://zhuanlan.zhihu.com/p/621678533">Glenn：MIM | HPM：引入蒸馏概念自动生成掩蔽策略</a></p>
+<p><img src="/2023/05/12/%E4%BB%A3%E7%A0%81/%E4%BB%A3%E7%A0%81-%E5%B0%86%E7%9F%A5%E4%B9%8E%E4%B8%93%E6%A0%8F%E6%96%87%E7%AB%A0%E8%BD%AC%E6%8D%A2%E4%B8%BA-Markd-Glenn/v2-3c0a89a1818eed3b597ae46c61f9498c_r.jpg"><br>将会生成一个以“文章标题 + ‘_‘ + 作者名称 + ‘_files’”命名的文件夹和以“文章标题 + ‘_‘ + 作者名称”命名的 .md 文件。</p>
+<p><img src="/2023/05/12/%E4%BB%A3%E7%A0%81/%E4%BB%A3%E7%A0%81-%E5%B0%86%E7%9F%A5%E4%B9%8E%E4%B8%93%E6%A0%8F%E6%96%87%E7%AB%A0%E8%BD%AC%E6%8D%A2%E4%B8%BA-Markd-Glenn/v2-103ec535d33a02bfbfcfaf353506ebb6_r.jpg"><br><img src="/2023/05/12/%E4%BB%A3%E7%A0%81/%E4%BB%A3%E7%A0%81-%E5%B0%86%E7%9F%A5%E4%B9%8E%E4%B8%93%E6%A0%8F%E6%96%87%E7%AB%A0%E8%BD%AC%E6%8D%A2%E4%B8%BA-Markd-Glenn/v2-5f9666d5a8a139712b87d5d9a07430eb_r.jpg"></p>
+<h3 id="3-专栏文章-url"><a href="#3-专栏文章-url" class="headerlink" title="3. 专栏文章 url"></a>3. 专栏文章 url</h3><p><a target="_blank" rel="noopener" href="https://www.zhihu.com/column/c_1620937636624703488">MIM</a></p>
+<p><img src="/2023/05/12/%E4%BB%A3%E7%A0%81/%E4%BB%A3%E7%A0%81-%E5%B0%86%E7%9F%A5%E4%B9%8E%E4%B8%93%E6%A0%8F%E6%96%87%E7%AB%A0%E8%BD%AC%E6%8D%A2%E4%B8%BA-Markd-Glenn/v2-04f1ba15453867745d22ffa823e266cc_r.jpg"><br>将会生成一个以“专栏标题”命名的文件夹，里面包含了所有专栏文章的图像文件夹和 .md 文件。</p>
+<p><img src="/2023/05/12/%E4%BB%A3%E7%A0%81/%E4%BB%A3%E7%A0%81-%E5%B0%86%E7%9F%A5%E4%B9%8E%E4%B8%93%E6%A0%8F%E6%96%87%E7%AB%A0%E8%BD%AC%E6%8D%A2%E4%B8%BA-Markd-Glenn/v2-2f0c9f13e183446010ed3406c4a0c3e2_r.jpg"><br><img src="/2023/05/12/%E4%BB%A3%E7%A0%81/%E4%BB%A3%E7%A0%81-%E5%B0%86%E7%9F%A5%E4%B9%8E%E4%B8%93%E6%A0%8F%E6%96%87%E7%AB%A0%E8%BD%AC%E6%8D%A2%E4%B8%BA-Markd-Glenn/v2-3c52962df9d2e4725fa074991ab9e6ec_r.jpg"></p>
+
+      
+    </div>
+    <div class="article-footer">
+      <blockquote class="mt-2x">
+  <ul class="post-copyright list-unstyled">
+    
+    <li class="post-copyright-link hidden-xs">
+      <strong>本文链接：</strong>
+      <a href="http://glennchen.cn/2023/05/12/%E4%BB%A3%E7%A0%81/%E4%BB%A3%E7%A0%81-%E5%B0%86%E7%9F%A5%E4%B9%8E%E4%B8%93%E6%A0%8F%E6%96%87%E7%AB%A0%E8%BD%AC%E6%8D%A2%E4%B8%BA-Markd-Glenn/" title="代码 | 将知乎专栏文章转换为 Markdown 文件保存到本地" target="_blank" rel="external">http://glennchen.cn/2023/05/12/代码/代码-将知乎专栏文章转换为-Markd-Glenn/</a>
+    </li>
+    
+    <li class="post-copyright-license">
+      <strong>版权声明： </strong> 本博客所有文章除特别声明外，均采用 <a href="http://creativecommons.org/licenses/by/4.0/deed.zh" target="_blank" rel="external">CC BY 4.0 CN协议</a> 许可协议。转载请注明出处！
+    </li>
+  </ul>
+</blockquote>
+
+
+<div class="panel panel-default panel-badger">
+  <div class="panel-body">
+    <figure class="media">
+      <div class="media-left">
+        <a href="https://github.com/chenluda" target="_blank" class="img-burn thumb-sm visible-lg">
+          <img src="/images/avatar.png" class="img-rounded w-full" alt="">
+        </a>
+      </div>
+      <div class="media-body">
+        <h3 class="media-heading"><a href="https://github.com/chenluda" target="_blank"><span class="text-dark">Glenn</span><small class="ml-1x">Stay hungry, stay foolish.</small></a></h3>
+        <div>咖啡，健身，热爱生活。</div>
+      </div>
+    </figure>
+  </div>
+</div>
+
+
+    </div>
+  </article>
+  
+    
+  <section id="comments">
+  	
+      <div id="vcomments"></div>
+    
+  </section>
+
+
+  
+</div>
+
+  <nav class="bar bar-footer clearfix" data-stick-bottom>
+  <div class="bar-inner">
+  
+  <ul class="pager pull-left">
+    
+    <li class="prev">
+      <a href="/2023/05/12/%E4%BB%A3%E7%A0%81/%E4%BB%A3%E7%A0%81-%E6%AF%8F%E5%A4%A9%E5%AE%9A%E7%82%B9%E5%90%91%E5%BE%AE%E4%BF%A1%E6%8E%A8%E9%80%81-arXiv-Glenn/" title="代码 | 每天定点向微信推送 arXiv 最新文章"><i class="icon icon-angle-left" aria-hidden="true"></i><span>&nbsp;&nbsp;上一篇</span></a>
+    </li>
+    
+    
+    <li class="next">
+      <a href="/2023/05/12/%E4%BB%A3%E7%A0%81/%E4%BB%A3%E7%A0%81-%E4%BB%8E-OpenReview-%E8%8E%B7%E5%8F%96%E9%A1%B6-Glenn/" title="代码 | 从 OpenReview 获取顶会接收论文集并保存至本地数据库"><span>下一篇&nbsp;&nbsp;</span><i class="icon icon-angle-right" aria-hidden="true"></i></a>
+    </li>
+    
+    
+  </ul>
+  
+  
+  
+  <div class="bar-right">
+    
+    <div class="share-component" data-sites="weibo,qq,wechat,facebook,twitter" data-mobile-sites="weibo,qq,qzone"></div>
+    
+  </div>
+  </div>
+</nav>
+  
+
+
+</main>
+
+  <footer class="footer" itemscope itemtype="http://schema.org/WPFooter">
+	
+	
+    <ul class="social-links">
+    	
+        <li><a href="https://github.com/chenluda" target="_blank" title="Github" data-toggle=tooltip data-placement=top><i class="icon icon-github"></i></a></li>
+        
+        <li><a href="https://www.zhihu.com/people/Glenn" target="_blank" title="Zhihu" data-toggle=tooltip data-placement=top><i class="icon icon-zhihu"></i></a></li>
+        
+    </ul>
+
+    <div class="copyright">
+    	
+        <div class="publishby">
+        	Theme by <a href="https://github.com/cofess" target="_blank"> cofess </a>base on <a href="https://github.com/cofess/hexo-theme-pure" target="_blank">pure</a>.
+        </div>
+    </div>
+</footer>
+  <script src="//cdn.jsdelivr.net/npm/jquery@1.12.4/dist/jquery.min.js"></script>
+<script>
+window.jQuery || document.write('<script src="js/jquery.min.js"><\/script>')
+</script>
+
+<script src="/js/plugin.min.js"></script>
+
+
+<script src="/js/application.js"></script>
+
+
+    <script>
+(function (window) {
+    var INSIGHT_CONFIG = {
+        TRANSLATION: {
+            POSTS: '文章',
+            PAGES: '页面',
+            CATEGORIES: '分类',
+            TAGS: '标签',
+            UNTITLED: '(未命名)',
+        },
+        ROOT_URL: '/',
+        CONTENT_URL: '/content.json',
+    };
+    window.INSIGHT_CONFIG = INSIGHT_CONFIG;
+})(window);
+</script>
+
+<script src="/js/insight.js"></script>
+
+
+
+
+
+
+   
+
+
+
+
+   
+    
+  <script src="//cdn1.lncld.net/static/js/3.0.4/av-min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/valine"></script>
+  <script type="text/javascript">
+  var GUEST = ['nick', 'mail', 'link'];
+  var meta = 'nick,mail,link';
+  meta = meta.split(',').filter(function(item) {
+    return GUEST.indexOf(item) > -1;
+  });
+  new Valine({
+    el: '#vcomments',
+    verify: false,
+    notify: false,
+    appId: '',
+    appKey: '',
+    placeholder: 'Just go go',
+    avatar: 'mm',
+    meta: meta,
+    pageSize: '10' || 10,
+    visitor: false
+  });
+  </script>
+
+     
+
+
+
+
+
+
+
+</body>
+</html>

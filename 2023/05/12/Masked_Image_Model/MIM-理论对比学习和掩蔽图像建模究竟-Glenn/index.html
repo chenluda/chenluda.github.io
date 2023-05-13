@@ -1,0 +1,641 @@
+<!DOCTYPE html>
+<html lang=zh>
+<head>
+  <meta charset="utf-8">
+  
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=no, minimal-ui">
+  <meta name="renderer" content="webkit">
+  <meta http-equiv="Cache-Control" content="no-transform" />
+  <meta http-equiv="Cache-Control" content="no-siteapp" />
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black">
+  <meta name="format-detection" content="telephone=no,email=no,adress=no">
+  <!-- Color theme for statusbar -->
+  <meta name="theme-color" content="#000000" />
+  <!-- 强制页面在当前窗口以独立页面显示,防止别人在框架里调用页面 -->
+  <meta http-equiv="window-target" content="_top" />
+  
+  
+  <title>MIM | 理论：对比学习和掩蔽图像建模究竟有何不同？ | Hexo</title>
+  <meta name="description" content="题目： WHAT DO SELF-SUPERVISED VISION TRANSFORMERS LEARN?单位：基因泰克、NAVER AI Lab论文网址：https:&#x2F;&#x2F;arxiv.org&#x2F;abs&#x2F;2305.00729论文代码：未公开首次发布时间：2023 年 5 月 1 日（收录于 ICLR 2023）  123456@article&amp;#123;park2023self, title&#x3D;&amp;">
+<meta property="og:type" content="article">
+<meta property="og:title" content="MIM | 理论：对比学习和掩蔽图像建模究竟有何不同？">
+<meta property="og:url" content="http://glennchen.cn/2023/05/12/Masked_Image_Model/MIM-%E7%90%86%E8%AE%BA%E5%AF%B9%E6%AF%94%E5%AD%A6%E4%B9%A0%E5%92%8C%E6%8E%A9%E8%94%BD%E5%9B%BE%E5%83%8F%E5%BB%BA%E6%A8%A1%E7%A9%B6%E7%AB%9F-Glenn/index.html">
+<meta property="og:site_name" content="Glenn">
+<meta property="og:description" content="题目： WHAT DO SELF-SUPERVISED VISION TRANSFORMERS LEARN?单位：基因泰克、NAVER AI Lab论文网址：https:&#x2F;&#x2F;arxiv.org&#x2F;abs&#x2F;2305.00729论文代码：未公开首次发布时间：2023 年 5 月 1 日（收录于 ICLR 2023）  123456@article&amp;#123;park2023self, title&#x3D;&amp;">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://glennchen.cn/2023/05/12/Masked_Image_Model/MIM-%E7%90%86%E8%AE%BA%E5%AF%B9%E6%AF%94%E5%AD%A6%E4%B9%A0%E5%92%8C%E6%8E%A9%E8%94%BD%E5%9B%BE%E5%83%8F%E5%BB%BA%E6%A8%A1%E7%A9%B6%E7%AB%9F-Glenn/v2-d7a181b73ad6c9de7183ef674a9e3b5f_r.jpg">
+<meta property="og:image" content="http://glennchen.cn/2023/05/12/Masked_Image_Model/MIM-%E7%90%86%E8%AE%BA%E5%AF%B9%E6%AF%94%E5%AD%A6%E4%B9%A0%E5%92%8C%E6%8E%A9%E8%94%BD%E5%9B%BE%E5%83%8F%E5%BB%BA%E6%A8%A1%E7%A9%B6%E7%AB%9F-Glenn/v2-e24068bfca13d1e4d4f856561668e319_r.jpg">
+<meta property="og:image" content="http://glennchen.cn/2023/05/12/Masked_Image_Model/MIM-%E7%90%86%E8%AE%BA%E5%AF%B9%E6%AF%94%E5%AD%A6%E4%B9%A0%E5%92%8C%E6%8E%A9%E8%94%BD%E5%9B%BE%E5%83%8F%E5%BB%BA%E6%A8%A1%E7%A9%B6%E7%AB%9F-Glenn/v2-822a96a9a7df60abebf58a41a8fbbecd_r.jpg">
+<meta property="og:image" content="http://glennchen.cn/2023/05/12/Masked_Image_Model/MIM-%E7%90%86%E8%AE%BA%E5%AF%B9%E6%AF%94%E5%AD%A6%E4%B9%A0%E5%92%8C%E6%8E%A9%E8%94%BD%E5%9B%BE%E5%83%8F%E5%BB%BA%E6%A8%A1%E7%A9%B6%E7%AB%9F-Glenn/v2-ce4850a74cf8698dffecc06ccbd41322_r.jpg">
+<meta property="og:image" content="http://glennchen.cn/2023/05/12/Masked_Image_Model/MIM-%E7%90%86%E8%AE%BA%E5%AF%B9%E6%AF%94%E5%AD%A6%E4%B9%A0%E5%92%8C%E6%8E%A9%E8%94%BD%E5%9B%BE%E5%83%8F%E5%BB%BA%E6%A8%A1%E7%A9%B6%E7%AB%9F-Glenn/v2-396e51d9a6e5c5d5c3d00243a7c08535_b.jpg">
+<meta property="og:image" content="http://glennchen.cn/2023/05/12/Masked_Image_Model/MIM-%E7%90%86%E8%AE%BA%E5%AF%B9%E6%AF%94%E5%AD%A6%E4%B9%A0%E5%92%8C%E6%8E%A9%E8%94%BD%E5%9B%BE%E5%83%8F%E5%BB%BA%E6%A8%A1%E7%A9%B6%E7%AB%9F-Glenn/v2-26a78f6a26474ad44bef524c99dab347_r.jpg">
+<meta property="og:image" content="http://glennchen.cn/2023/05/12/Masked_Image_Model/MIM-%E7%90%86%E8%AE%BA%E5%AF%B9%E6%AF%94%E5%AD%A6%E4%B9%A0%E5%92%8C%E6%8E%A9%E8%94%BD%E5%9B%BE%E5%83%8F%E5%BB%BA%E6%A8%A1%E7%A9%B6%E7%AB%9F-Glenn/v2-61a6d56da919c17a5ff3e37520bd7ca4_r.jpg">
+<meta property="og:image" content="http://glennchen.cn/2023/05/12/Masked_Image_Model/MIM-%E7%90%86%E8%AE%BA%E5%AF%B9%E6%AF%94%E5%AD%A6%E4%B9%A0%E5%92%8C%E6%8E%A9%E8%94%BD%E5%9B%BE%E5%83%8F%E5%BB%BA%E6%A8%A1%E7%A9%B6%E7%AB%9F-Glenn/v2-37c0c731d8548f1f050cbac68f6f8fd1_b.jpg">
+<meta property="og:image" content="http://glennchen.cn/2023/05/12/Masked_Image_Model/MIM-%E7%90%86%E8%AE%BA%E5%AF%B9%E6%AF%94%E5%AD%A6%E4%B9%A0%E5%92%8C%E6%8E%A9%E8%94%BD%E5%9B%BE%E5%83%8F%E5%BB%BA%E6%A8%A1%E7%A9%B6%E7%AB%9F-Glenn/v2-477ae3c4ba930e081e733d473fca4bd1_r.jpg">
+<meta property="og:image" content="http://glennchen.cn/2023/05/12/Masked_Image_Model/MIM-%E7%90%86%E8%AE%BA%E5%AF%B9%E6%AF%94%E5%AD%A6%E4%B9%A0%E5%92%8C%E6%8E%A9%E8%94%BD%E5%9B%BE%E5%83%8F%E5%BB%BA%E6%A8%A1%E7%A9%B6%E7%AB%9F-Glenn/v2-11d46b0712c19b337e5542425076e154_b.jpg">
+<meta property="og:image" content="http://glennchen.cn/2023/05/12/Masked_Image_Model/MIM-%E7%90%86%E8%AE%BA%E5%AF%B9%E6%AF%94%E5%AD%A6%E4%B9%A0%E5%92%8C%E6%8E%A9%E8%94%BD%E5%9B%BE%E5%83%8F%E5%BB%BA%E6%A8%A1%E7%A9%B6%E7%AB%9F-Glenn/v2-e9d22211af8316a896955710f7b3e991_r.jpg">
+<meta property="og:image" content="http://glennchen.cn/2023/05/12/Masked_Image_Model/MIM-%E7%90%86%E8%AE%BA%E5%AF%B9%E6%AF%94%E5%AD%A6%E4%B9%A0%E5%92%8C%E6%8E%A9%E8%94%BD%E5%9B%BE%E5%83%8F%E5%BB%BA%E6%A8%A1%E7%A9%B6%E7%AB%9F-Glenn/v2-059da2a52458a9412dd41edd248789b8_r.jpg">
+<meta property="article:published_time" content="2023-05-12T10:44:41.000Z">
+<meta property="article:modified_time" content="2023-05-12T12:17:17.751Z">
+<meta property="article:author" content="Glenn">
+<meta property="article:tag" content="Masked Image Modeling">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://glennchen.cn/2023/05/12/Masked_Image_Model/MIM-%E7%90%86%E8%AE%BA%E5%AF%B9%E6%AF%94%E5%AD%A6%E4%B9%A0%E5%92%8C%E6%8E%A9%E8%94%BD%E5%9B%BE%E5%83%8F%E5%BB%BA%E6%A8%A1%E7%A9%B6%E7%AB%9F-Glenn/v2-d7a181b73ad6c9de7183ef674a9e3b5f_r.jpg">
+  <!-- Canonical links -->
+  <link rel="canonical" href="http://glennchen.cn/2023/05/12/Masked_Image_Model/MIM-%E7%90%86%E8%AE%BA%E5%AF%B9%E6%AF%94%E5%AD%A6%E4%B9%A0%E5%92%8C%E6%8E%A9%E8%94%BD%E5%9B%BE%E5%83%8F%E5%BB%BA%E6%A8%A1%E7%A9%B6%E7%AB%9F-Glenn/index.html">
+  
+    <link rel="alternate" href="/atom.xml" title="Glenn" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="/favicon.png" type="image/x-icon">
+  
+  
+<link rel="stylesheet" href="/css/style.css">
+
+  
+  
+  
+  
+<!-- hexo injector head_end start -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/katex.min.css">
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/hexo-math@4.0.0/dist/style.css">
+<!-- hexo injector head_end end --><meta name="generator" content="Hexo 6.3.0"></head>
+
+
+<body class="main-center theme-black" itemscope itemtype="http://schema.org/WebPage">
+  <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+  <div class="slimContent">
+    <div class="navbar-header">
+      
+      
+      <div class="profile-block text-center">
+        <a id="avatar" href="https://github.com/chenluda" target="_blank">
+          <img class="img-circle img-rotate" src="/images/avatar.png" width="200" height="200">
+        </a>
+        <h2 id="name" class="hidden-xs hidden-sm">Glenn</h2>
+        <h3 id="title" class="hidden-xs hidden-sm hidden-md">Stay hungry, stay foolish.</h3>
+        <small id="location" class="text-muted hidden-xs hidden-sm"><i class="icon icon-map-marker"></i> Yunnan, China</small>
+      </div>
+      
+      <div class="search" id="search-form-wrap">
+
+    <form class="search-form sidebar-form">
+        <div class="input-group">
+            <input type="text" class="search-form-input form-control" placeholder="搜索" />
+            <span class="input-group-btn">
+                <button type="submit" class="search-form-submit btn btn-flat" onclick="return false;"><i class="icon icon-search"></i></button>
+            </span>
+        </div>
+    </form>
+    <div class="ins-search">
+  <div class="ins-search-mask"></div>
+  <div class="ins-search-container">
+    <div class="ins-input-wrapper">
+      <input type="text" class="ins-search-input" placeholder="想要查找什么..." x-webkit-speech />
+      <button type="button" class="close ins-close ins-selectable" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span></button>
+    </div>
+    <div class="ins-section-wrapper">
+      <div class="ins-section-container"></div>
+    </div>
+  </div>
+</div>
+
+
+</div>
+      <button class="navbar-toggle collapsed" type="button" data-toggle="collapse" data-target="#main-navbar" aria-controls="main-navbar" aria-expanded="false">
+        <span class="sr-only">Toggle navigation</span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+    </div>
+    <nav id="main-navbar" class="collapse navbar-collapse" itemscope itemtype="http://schema.org/SiteNavigationElement" role="navigation">
+      <ul class="nav navbar-nav main-nav ">
+        
+        
+        <li class="menu-item menu-item-home">
+          <a href="/.">
+            
+            <i class="icon icon-home-fill"></i>
+            
+            <span class="menu-title">首页</span>
+          </a>
+        </li>
+        
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives">
+            
+            <i class="icon icon-archives-fill"></i>
+            
+            <span class="menu-title">归档</span>
+          </a>
+        </li>
+        
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories">
+            
+            <i class="icon icon-folder"></i>
+            
+            <span class="menu-title">分类</span>
+          </a>
+        </li>
+        
+      </ul>
+      
+	
+    <ul class="social-links">
+    	
+        <li><a href="https://github.com/chenluda" target="_blank" title="Github" data-toggle=tooltip data-placement=top><i class="icon icon-github"></i></a></li>
+        
+        <li><a href="https://www.zhihu.com/people/Glenn" target="_blank" title="Zhihu" data-toggle=tooltip data-placement=top><i class="icon icon-zhihu"></i></a></li>
+        
+    </ul>
+
+    </nav>
+  </div>
+</header>
+
+  
+    <aside class="sidebar" itemscope itemtype="http://schema.org/WPSideBar">
+  <div class="slimContent">
+    
+      <div class="widget">
+    <h3 class="widget-title">公告</h3>
+    <div class="widget-body">
+        <div id="board">
+            <div class="content">
+                <p>欢迎交流与分享经验!</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+    
+      
+  <div class="widget">
+    <h3 class="widget-title">分类</h3>
+    <div class="widget-body">
+      <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/%E4%BB%A3%E7%A0%81/">代码</a><span class="category-list-count">4</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/%E8%AE%BA%E6%96%87%E9%80%9F%E8%A7%88/">论文速览</a><span class="category-list-count">12</span></li></ul>
+    </div>
+  </div>
+
+
+    
+      
+  <div class="widget">
+    <h3 class="widget-title">标签</h3>
+    <div class="widget-body">
+      <ul class="tag-list" itemprop="keywords"><li class="tag-list-item"><a class="tag-list-link" href="/tags/Conference-paper/" rel="tag">Conference paper</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/DataBase/" rel="tag">DataBase</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Markdown/" rel="tag">Markdown</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Masked-Image-Modeling/" rel="tag">Masked Image Modeling</a><span class="tag-list-count">12</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/OpenReview/" rel="tag">OpenReview</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Organization/" rel="tag">Organization</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/WeChat/" rel="tag">WeChat</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Zhihu/" rel="tag">Zhihu</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/arXiv/" rel="tag">arXiv</a><span class="tag-list-count">2</span></li></ul>
+    </div>
+  </div>
+
+
+    
+      
+  <div class="widget">
+    <h3 class="widget-title">标签云</h3>
+    <div class="widget-body tagcloud">
+      <a href="/tags/Conference-paper/" style="font-size: 13px;">Conference paper</a> <a href="/tags/DataBase/" style="font-size: 13.5px;">DataBase</a> <a href="/tags/Markdown/" style="font-size: 13px;">Markdown</a> <a href="/tags/Masked-Image-Modeling/" style="font-size: 14px;">Masked Image Modeling</a> <a href="/tags/OpenReview/" style="font-size: 13px;">OpenReview</a> <a href="/tags/Organization/" style="font-size: 13px;">Organization</a> <a href="/tags/WeChat/" style="font-size: 13px;">WeChat</a> <a href="/tags/Zhihu/" style="font-size: 13px;">Zhihu</a> <a href="/tags/arXiv/" style="font-size: 13.5px;">arXiv</a>
+    </div>
+  </div>
+
+    
+      
+  <div class="widget">
+    <h3 class="widget-title">归档</h3>
+    <div class="widget-body">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2023/05/">五月 2023</a><span class="archive-list-count">16</span></li></ul>
+    </div>
+  </div>
+
+
+    
+      
+  <div class="widget">
+    <h3 class="widget-title">最新文章</h3>
+    <div class="widget-body">
+      <ul class="recent-post-list list-unstyled no-thumbnail">
+        
+          <li>
+            
+            <div class="item-inner">
+              <p class="item-category">
+                <a class="category-link" href="/categories/%E4%BB%A3%E7%A0%81/">代码</a>
+              </p>
+              <p class="item-title">
+                <a href="/2023/05/12/%E4%BB%A3%E7%A0%81/%E4%BB%A3%E7%A0%81-%E8%8E%B7%E5%8F%96-arXiv-%E8%AE%BA%E6%96%87%E4%BD%9C%E8%80%85%E5%8D%95%E4%BD%8D-Glenn/" class="title">代码 | 获取 arXiv 论文作者单位</a>
+              </p>
+              <p class="item-date">
+                <time datetime="2023-05-12T10:52:40.000Z" itemprop="datePublished">2023-05-12</time>
+              </p>
+            </div>
+          </li>
+          
+          <li>
+            
+            <div class="item-inner">
+              <p class="item-category">
+                <a class="category-link" href="/categories/%E4%BB%A3%E7%A0%81/">代码</a>
+              </p>
+              <p class="item-title">
+                <a href="/2023/05/12/%E4%BB%A3%E7%A0%81/%E4%BB%A3%E7%A0%81-%E6%AF%8F%E5%A4%A9%E5%AE%9A%E7%82%B9%E5%90%91%E5%BE%AE%E4%BF%A1%E6%8E%A8%E9%80%81-arXiv-Glenn/" class="title">代码 | 每天定点向微信推送 arXiv 最新文章</a>
+              </p>
+              <p class="item-date">
+                <time datetime="2023-05-12T10:52:34.000Z" itemprop="datePublished">2023-05-12</time>
+              </p>
+            </div>
+          </li>
+          
+          <li>
+            
+            <div class="item-inner">
+              <p class="item-category">
+                <a class="category-link" href="/categories/%E4%BB%A3%E7%A0%81/">代码</a>
+              </p>
+              <p class="item-title">
+                <a href="/2023/05/12/%E4%BB%A3%E7%A0%81/%E4%BB%A3%E7%A0%81-%E5%B0%86%E7%9F%A5%E4%B9%8E%E4%B8%93%E6%A0%8F%E6%96%87%E7%AB%A0%E8%BD%AC%E6%8D%A2%E4%B8%BA-Markd-Glenn/" class="title">代码 | 将知乎专栏文章转换为 Markdown 文件保存到本地</a>
+              </p>
+              <p class="item-date">
+                <time datetime="2023-05-12T10:52:25.000Z" itemprop="datePublished">2023-05-12</time>
+              </p>
+            </div>
+          </li>
+          
+          <li>
+            
+            <div class="item-inner">
+              <p class="item-category">
+                <a class="category-link" href="/categories/%E4%BB%A3%E7%A0%81/">代码</a>
+              </p>
+              <p class="item-title">
+                <a href="/2023/05/12/%E4%BB%A3%E7%A0%81/%E4%BB%A3%E7%A0%81-%E4%BB%8E-OpenReview-%E8%8E%B7%E5%8F%96%E9%A1%B6-Glenn/" class="title">代码 | 从 OpenReview 获取顶会接收论文集并保存至本地数据库</a>
+              </p>
+              <p class="item-date">
+                <time datetime="2023-05-12T10:52:15.000Z" itemprop="datePublished">2023-05-12</time>
+              </p>
+            </div>
+          </li>
+          
+          <li>
+            
+            <div class="item-inner">
+              <p class="item-category">
+                <a class="category-link" href="/categories/%E8%AE%BA%E6%96%87%E9%80%9F%E8%A7%88/">论文速览</a>
+              </p>
+              <p class="item-title">
+                <a href="/2023/05/12/Masked_Image_Model/MIM-%E7%90%86%E8%AE%BA%E6%8E%A9%E8%94%BD%E5%9B%BE%E5%83%8F%E5%BB%BA%E6%A8%A1%E6%9C%AC%E8%B4%A8%E4%B8%8A%E5%9C%A8%E5%AD%A6%E4%B9%A0%E9%81%AE-Glenn/" class="title">MIM | 理论：掩蔽图像建模本质上在学习遮挡不变特征</a>
+              </p>
+              <p class="item-date">
+                <time datetime="2023-05-12T10:44:48.000Z" itemprop="datePublished">2023-05-12</time>
+              </p>
+            </div>
+          </li>
+          
+      </ul>
+    </div>
+  </div>
+  
+
+    
+  </div>
+</aside>
+
+  
+  
+<main class="main" role="main">
+  <div class="content">
+  <article id="post-Masked_Image_Model/MIM-理论对比学习和掩蔽图像建模究竟-Glenn" class="article article-type-post" itemscope itemtype="http://schema.org/BlogPosting">
+    
+    <div class="article-header">
+      
+        
+  
+    <h1 class="article-title" itemprop="name">
+      MIM | 理论：对比学习和掩蔽图像建模究竟有何不同？
+    </h1>
+  
+
+      
+      <div class="article-meta">
+        <span class="article-date">
+    <i class="icon icon-calendar-check"></i>
+	<a href="/2023/05/12/Masked_Image_Model/MIM-%E7%90%86%E8%AE%BA%E5%AF%B9%E6%AF%94%E5%AD%A6%E4%B9%A0%E5%92%8C%E6%8E%A9%E8%94%BD%E5%9B%BE%E5%83%8F%E5%BB%BA%E6%A8%A1%E7%A9%B6%E7%AB%9F-Glenn/" class="article-date">
+	  <time datetime="2023-05-12T10:44:41.000Z" itemprop="datePublished">2023-05-12</time>
+	</a>
+</span>
+        
+  <span class="article-category">
+    <i class="icon icon-folder"></i>
+    <a class="article-category-link" href="/categories/%E8%AE%BA%E6%96%87%E9%80%9F%E8%A7%88/">论文速览</a>
+  </span>
+
+        
+  <span class="article-tag">
+    <i class="icon icon-tags"></i>
+	<a class="article-tag-link-link" href="/tags/Masked-Image-Modeling/" rel="tag">Masked Image Modeling</a>
+  </span>
+
+
+        
+
+        <span class="post-comment"><i class="icon icon-comment"></i> <a href="/2023/05/12/Masked_Image_Model/MIM-%E7%90%86%E8%AE%BA%E5%AF%B9%E6%AF%94%E5%AD%A6%E4%B9%A0%E5%92%8C%E6%8E%A9%E8%94%BD%E5%9B%BE%E5%83%8F%E5%BB%BA%E6%A8%A1%E7%A9%B6%E7%AB%9F-Glenn/#comments" class="article-comment-link">评论</a></span>
+        
+      </div>
+    </div>
+    <div class="article-entry marked-body" itemprop="articleBody">
+      
+        <p><img src="/2023/05/12/Masked_Image_Model/MIM-%E7%90%86%E8%AE%BA%E5%AF%B9%E6%AF%94%E5%AD%A6%E4%B9%A0%E5%92%8C%E6%8E%A9%E8%94%BD%E5%9B%BE%E5%83%8F%E5%BB%BA%E6%A8%A1%E7%A9%B6%E7%AB%9F-Glenn/v2-d7a181b73ad6c9de7183ef674a9e3b5f_r.jpg"></p>
+<blockquote>
+<p><em><strong>题目：</strong> WHAT DO SELF-SUPERVISED VISION TRANSFORMERS LEARN?</em><br><em><strong>单位：</strong>基因泰克、NAVER AI Lab</em><br><em><strong>论文网址：</strong><a href="https://link.zhihu.com/?target=https://arxiv.org/abs/2305.00729">https://arxiv.org/abs/2305.00729</a></em><br><em><strong>论文代码：</strong>未公开</em><br><em><strong>首次发布时间：</strong>2023 年 5 月 1 日（收录于 ICLR 2023）</em></p>
+</blockquote>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">@article&#123;park2023self,</span><br><span class="line"> title=&#123;What Do Self-Supervised Vision Transformers Learn?&#125;,</span><br><span class="line"> author=&#123;Park, Namuk and Kim, Wonjae and Heo, Byeongho and Kim, Taekyung and Yun, Sangdoo&#125;,</span><br><span class="line"> journal=&#123;arXiv preprint arXiv:2305.00729&#125;,</span><br><span class="line"> year=&#123;2023&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+<hr>
+<ol>
+<li>主要内容</li>
+</ol>
+<hr>
+<p>对比学习（CL）和掩蔽图像建模（MIM）是目前主流的自监督架构。由图 1 可得，CL 在线性探测和小模型方面优于 MIM，而 MIM 在微调精度、大模型和密集预测方面表现出色。</p>
+<p><img src="/2023/05/12/Masked_Image_Model/MIM-%E7%90%86%E8%AE%BA%E5%AF%B9%E6%AF%94%E5%AD%A6%E4%B9%A0%E5%92%8C%E6%8E%A9%E8%94%BD%E5%9B%BE%E5%83%8F%E5%BB%BA%E6%A8%A1%E7%A9%B6%E7%AB%9F-Glenn/v2-e24068bfca13d1e4d4f856561668e319_r.jpg"><br>图1. CL 和 MIM 的对比实验<br>作者对 CL 和 MIM 在表示和下游任务的性能方面的差异进行了比较研究。结果表明，基于 ViT 的这两种自监督架构具有以下特性：</p>
+<p>1）CL 相较于 MIM 能够更好地捕捉全局依赖，例如物体的形状。这主要体现在 ViT 的后期层。对比学习通过将不同的图像表示引入到相同的空间中，并让模型学习区分它们，从而帮助 ViT 在图像表示空间中实现线性分离。</p>
+<p>然而，CL 的这种特性也有一些缺点。它导致所有 query tokens 和 heads 的自注意力变得同质化（homogenized），这意味着所有 tokens 和 heads 的注意力权重变得相似。这种自注意力的同质性<strong>降低了表示的多样性</strong>，使得模型在应对不同任务和场景时的扩展性和密集预测性能受到影响。</p>
+<p>2）CL 利用低频信号，这些信号通常代表了图像中的全局信息和形状。因此，CL 倾向于关注形状特征。相反，MIM 则关注高频信号，这些信号通常代表了图像中的局部信息和纹理。因此，MIM 更倾向于关注纹理特征。</p>
+<p>3）CL 在后期层中起着至关重要的作用，而 MIM 主要关注早期层。</p>
+<p>这也从理论角度验证了最近一些将 MIM 和 CL 结合工作的有效性。</p>
+<hr>
+<ol start="2">
+<li>方法与结果讨论</li>
+</ol>
+<hr>
+<h3 id="2-1-从自注意力角度来解释图-1-的现象"><a href="#2-1-从自注意力角度来解释图-1-的现象" class="headerlink" title="2.1 从自注意力角度来解释图 1 的现象"></a>2.1 从自注意力角度来解释图 1 的现象</h3><p><strong>CL 主要捕捉全局依赖：</strong></p>
+<p>通过注意力距离（attention distance）来衡量自注意力（self-attention）的范围。注意力距离被定义为 query tokens 和 key tokens 之间的平均距离，同时考虑它们的自注意力权重。因此，注意力距离在概念上类似于 CNNs 中感受野的大小。</p>
+<p>图3显示，CL（MoCo）的注意力距离显著高于 MIM（SimMIM），尤其是在后面的层中。结合图 2 的定性可视化分析，这意味着 CL 的表示包含全局信息和形状特征，因此它可以帮助 ViT 模型在图像中区分不同的物体。</p>
+<p>相反，MIM的自注意力主要捕捉局部关系。这表明 MIM 在识别整个物体及其形状方面可能存在困难。</p>
+<p><img src="/2023/05/12/Masked_Image_Model/MIM-%E7%90%86%E8%AE%BA%E5%AF%B9%E6%AF%94%E5%AD%A6%E4%B9%A0%E5%92%8C%E6%8E%A9%E8%94%BD%E5%9B%BE%E5%83%8F%E5%BB%BA%E6%A8%A1%E7%A9%B6%E7%AB%9F-Glenn/v2-822a96a9a7df60abebf58a41a8fbbecd_r.jpg"><br>图2. CL 和 MIM 注意力距离的定性可视化分析<br><img src="/2023/05/12/Masked_Image_Model/MIM-%E7%90%86%E8%AE%BA%E5%AF%B9%E6%AF%94%E5%AD%A6%E4%B9%A0%E5%92%8C%E6%8E%A9%E8%94%BD%E5%9B%BE%E5%83%8F%E5%BB%BA%E6%A8%A1%E7%A9%B6%E7%AB%9F-Glenn/v2-ce4850a74cf8698dffecc06ccbd41322_r.jpg"><br>图3. CL 和 MIM 注意力距离的定量可视化分析<br><strong>CL 的自注意力会变得同质化：</strong></p>
+<p>图 2 还展示了来自两个不同空间位置的 query tokens 的注意力图。</p>
+<p>与 MIM 相比，CL 的自注意力对于这两个 query tokens 显示出几乎相同的物体形状。作者将这一现象称为注意力坍缩成同质性（attention collapse into homogeneity）。这种坍缩趋势在 CL 的所有 heads 和 query tokens 中都可以观察到。</p>
+<p>相比之下，MIM 的自注意力能更好地捕捉到这两个 query tokens 之间的差异，而 CL 的自注意力则更倾向于将它们视为相同的物体形状。</p>
+<p>作者还使用了<strong>归一化互信息</strong>（normalized mutual information，NMI）来测量注意力坍缩。</p>
+<blockquote>
+<p>假设 p(q) 是 query tokens 的分布，且这些 query tokens 在空间坐标上是均匀分布的，即 p(q) &#x3D; 1&#x2F;N ，其中 N 是 tokens 的数量。<br>那么 query tokens 和 key tokens 的联合分布为 p(q, k) &#x3D; π(k|q)p(q) ，其中 π(k|q) 是 softmax 归一化的自注意力矩阵。<br>因此，归一化互信息可以表示为 I(q, k) &#x2F; √(H(q)H(k)) ，其中 I(·, ·) 表示互信息， H(·) 表示边缘熵。</p>
+</blockquote>
+<p>归一化互信息的值较低意味着注意力图对 query tokens 的依赖较弱，这暗示了注意力坍缩成同质性。相反，归一化互信息的值较高表示注意力图对 query tokens 的依赖很强。</p>
+<p>如图 4 所示，在后期层中，CL 的互信息显著低于 MIM ，这意味着 CL 的自注意力更容易坍缩成同质化分布。</p>
+<p><img src="/2023/05/12/Masked_Image_Model/MIM-%E7%90%86%E8%AE%BA%E5%AF%B9%E6%AF%94%E5%AD%A6%E4%B9%A0%E5%92%8C%E6%8E%A9%E8%94%BD%E5%9B%BE%E5%83%8F%E5%BB%BA%E6%A8%A1%E7%A9%B6%E7%AB%9F-Glenn/v2-396e51d9a6e5c5d5c3d00243a7c08535_b.jpg"><br>图4. 关于 NMI 的注意力坍缩程度<br><strong>注意力坍缩会降低表征多样性：</strong></p>
+<p>作者猜想，自注意力坍缩成同质性最终会导致同质化的 token 表示。</p>
+<p>为了验证猜想，作者使用三种相似性：</p>
+<ul>
+<li>不同自注意力 heads 之间（heads）。衡量不同 heads 之间的表示相似性，用于评估不同 heads 是否捕获了多样性的特征。</li>
+<li>自注意力前期层和后期层之间（depths）。衡量自注意力前后层表示的相似性，用于评估表示在模型层中的变化程度。</li>
+<li>不同 tokens 之间（tokens）。衡量不同 tokens 之间表示的相似性，用于评估模型对不同输入 tokens 的响应程度。</li>
+</ul>
+<p>通过计算这三种余弦相似性，可以评估表示在不同自注意力 heads、depths 和 tokens 之间的多样性。如果观察到表示的余弦相似性较高，那么这可能意味着表示具有同质性；反之，则表明表示具有较高的多样性。</p>
+<p>如图 5 所示，CL 的相似性在后期层明显高于 MIM，表明 CL 的表示具有显著的同质性。即使增加模型的大小也不能解决 CL 所面临的问题，反而可能使其恶化：</p>
+<ul>
+<li>增加 heads 的数量（ViT-S 到 ViT-B；图 5a）提高了 MIM 的表示多样性，但对 CL 的多样性改善甚微。</li>
+<li>增加 CL 的深度（ViT-B 到 ViT-L；图 5b）降低了表示的多样性。</li>
+</ul>
+<p>这些结果进一步支持了前面提到的猜想，即自注意力坍缩成同质性最终导致同质化的 token 表示。对比学习 CL 的表示在后期层次中的同质性可能限制了模型的泛化能力和性能。</p>
+<p>同时，这些发现表明，通过调整模型参数（如 heads 的数量和层数）来改善表示多样性可能对 MIM 更有效，而对 CL 的影响有限。</p>
+<p><img src="/2023/05/12/Masked_Image_Model/MIM-%E7%90%86%E8%AE%BA%E5%AF%B9%E6%AF%94%E5%AD%A6%E4%B9%A0%E5%92%8C%E6%8E%A9%E8%94%BD%E5%9B%BE%E5%83%8F%E5%BB%BA%E6%A8%A1%E7%A9%B6%E7%AB%9F-Glenn/v2-26a78f6a26474ad44bef524c99dab347_r.jpg"><br>图5. 不同相似度的对比研究<br>此时，可以解释图 1 的现象：</p>
+<ul>
+<li>在线性探测任务中，CL 优于 MIM，因为它能捕捉形状信息，有助于识别物体并区分图像。尽管 MIM 保留了纹理和表示的多样性，但它们与物体或内容的关联可能不如形状那么强。</li>
+<li>注意力坍缩阻止了 CL 充分利用 ViTs 的 heads、depths 和 tokens。由于同质化的表示对于改善 token 表示没有太大帮助，使用 CL 训练的 ViTs 浪费了大部分网络能力。因此，在大型模型中，MIM 的微调准确率明显高于 CL。</li>
+<li>对于密集预测任务，CL 不太适用，因为 token 特征在空间坐标上呈同质化分布。</li>
+</ul>
+<h3 id="2-2-表征如何被转换？"><a href="#2-2-表征如何被转换？" class="headerlink" title="2.2 表征如何被转换？"></a>2.2 表征如何被转换？</h3><p><strong>CL 将所有 tokens 统一地进行转换，而 MIM 在处理 tokens 时更具个性化：</strong></p>
+<p>为了展示 CL 和 MIM 如何转换 token 表示，作者将它们可视化在表示空间中。</p>
+<p>图 6 展示了 ImageNet 验证集中单个图像样本在自注意力模块前后（第一层和最后一层）的196个（14×14 patches）tokens。</p>
+<ul>
+<li>图 6a 表明 CL 的自注意力将所有 tokens 统一地进行平移。这种现象的发生是因为其同质性。这意味着 CL 关心的是整体而非个别 tokens。然而，如图 6b 所示，CL 通过将表示分布的“中心”相互分离来帮助区分图像。简而言之，尽管 CL 失去了区分 tokens 的能力，但它使得图像在线性表示空间中可分离。</li>
+<li>与此相反，如图 6c 所示，MIM 在处理 tokens 时更具个性化，MIM 改变了单个图像中 tokens 之间的距离以及表示分布的体积。</li>
+</ul>
+<p><img src="/2023/05/12/Masked_Image_Model/MIM-%E7%90%86%E8%AE%BA%E5%AF%B9%E6%AF%94%E5%AD%A6%E4%B9%A0%E5%92%8C%E6%8E%A9%E8%94%BD%E5%9B%BE%E5%83%8F%E5%BB%BA%E6%A8%A1%E7%A9%B6%E7%AB%9F-Glenn/v2-61a6d56da919c17a5ff3e37520bd7ca4_r.jpg"><br>图6. CL 和 MIM 表征转换方式可视化<br><strong>CL 利用低频信号，MIM 则关注高频信号：</strong></p>
+<p>可以假设 CL 捕获空间维度上的低频信息，而 MIM 捕获高频信息。</p>
+<p>为了从频率的角度支持这个观点，作者对表示进行了傅立叶分析。</p>
+<p>图 7 显示了 CL 和 MIM 的相对振幅（表示的最高频率和最低频率之间的振幅差）。</p>
+<ul>
+<li>结果表明，CL 的高频振幅明显小于 MIM，说明 CL 主要利用了全局结构和形状等低频空间信息。</li>
+<li>相反，MIM 通常使用高频的空间信息，如局部结构和精细的纹理。</li>
+</ul>
+<p><img src="/2023/05/12/Masked_Image_Model/MIM-%E7%90%86%E8%AE%BA%E5%AF%B9%E6%AF%94%E5%AD%A6%E4%B9%A0%E5%92%8C%E6%8E%A9%E8%94%BD%E5%9B%BE%E5%83%8F%E5%BB%BA%E6%A8%A1%E7%A9%B6%E7%AB%9F-Glenn/v2-37c0c731d8548f1f050cbac68f6f8fd1_b.jpg"><br>图7. CL 和 MIM 的相对振幅<br><strong>CL 是形状偏置的，而 MIM 是纹理偏置的：</strong></p>
+<p>基于傅里叶分析的结果，可以假设 CL 和 MIM 各自对形状和纹理都具有偏置。</p>
+<p>为了证明这一说法，作者使用 Stylized ImageNet，这是一个使用 AdaIN 进行纹理改变的数据集。</p>
+<p>图 8a 报告了在 Stylized ImageNet 上的线性探测结果，以评估预训练模型对形状和纹理的偏好。</p>
+<p>与使用监督学习预训练的模型相比，CL 更依赖于图像的形状，而 MIM 更依赖于图像的纹理来进行图像分类。换句话说，<strong>CL 对纹理变化具有鲁棒性，而 MIM 对它们较为敏感</strong>。</p>
+<p>这种差异表明，根据任务需求，可以选择适当的预训练方法以获得对形状或纹理更敏感的模型。例如，在需要关注物体形状的任务中，CL 可能表现更好；而在需要关注纹理和细节的任务中，MIM 可能表现更优。</p>
+<p>另外，在 ImageNet 数据集上测量基于频率的随机噪声对准确率影响的实验也显示了同样的结果。</p>
+<p>如图 8b 所示，CL 对高频噪声具有鲁棒性，而 MIM 明显更易受影响。这也可以解释 CL 在对抗扰动下的鲁棒性。</p>
+<p><img src="/2023/05/12/Masked_Image_Model/MIM-%E7%90%86%E8%AE%BA%E5%AF%B9%E6%AF%94%E5%AD%A6%E4%B9%A0%E5%92%8C%E6%8E%A9%E8%94%BD%E5%9B%BE%E5%83%8F%E5%BB%BA%E6%A8%A1%E7%A9%B6%E7%AB%9F-Glenn/v2-477ae3c4ba930e081e733d473fca4bd1_r.jpg"><br>图7. 探究 CL 和 MIM 的形状和纹理偏置</p>
+<h3 id="2-3-哪些组件在-CL-和-MIM-种起到了重要作用？"><a href="#2-3-哪些组件在-CL-和-MIM-种起到了重要作用？" class="headerlink" title="2.3 哪些组件在 CL 和 MIM 种起到了重要作用？"></a>2.3 哪些组件在 CL 和 MIM 种起到了重要作用？</h3><p><strong>CL 的后期层和 MIM 的早期层是重要的：</strong></p>
+<p>在图 8 中，可以发现：</p>
+<ul>
+<li>MIM 在模型开始阶段的线性探测准确率高于 CL。而在模型结束时，CL 的表现优于 MIM。这个结果表明，CL 的后期层和 MIM 的早期层在产生线性可分离表示方面起着重要作用。</li>
+<li>CL 的准确率随着深度的增加而增加，但 MIM 在模型结束时的准确率却在降低，即 MIM 的后期层在分离表示方面并不是很有帮助。作者将这个现象解释为：具有浅预测 head 的 MIM 方法，如 SimMIM，将主干网络的后期层用作解码器。而具有深度自注意解码器的 MIM，例如 MAE，可以在线性探测性能方面发挥作用。此外，这也解释了为什么 SimMIM 在后期层中的高频分量会下降，如图 7 所示。</li>
+<li>即使是 MIM 的最高线性探测准确率也低于 CL。</li>
+</ul>
+<p><img src="/2023/05/12/Masked_Image_Model/MIM-%E7%90%86%E8%AE%BA%E5%AF%B9%E6%AF%94%E5%AD%A6%E4%B9%A0%E5%92%8C%E6%8E%A9%E8%94%BD%E5%9B%BE%E5%83%8F%E5%BB%BA%E6%A8%A1%E7%A9%B6%E7%AB%9F-Glenn/v2-11d46b0712c19b337e5542425076e154_b.jpg"><br>图8. CL 和 MIM 的线性探测随深度而改变<br><strong>显式解码器有助于 ViTs 进一步利用 MIM 的优势：</strong></p>
+<p>就如上面分析的那样，具有浅预测 head 的 MIM 的隐式解码器（如 SimMIM）可能会影响性能。</p>
+<p>MAE 通过引入深度显式 ViT 解码器并仅在单独的解码器中重构掩蔽 tokens 来解决这个问题。</p>
+<ul>
+<li>图 9a 的结果表明，MAE 在编码器的后几层中的互信息比 SimMIM 低，但在解码器中的互信息较高，这意味着解码器根据相邻的 tokens 重建被掩盖的 tokens。</li>
+</ul>
+<p>这种现象表明，MAE 在编码器部分与 SimMIM 具有类似的自注意力特性，但在解码器部分的自注意力表现有所不同。这种高互信息的存在表明，解码器在重建过程中更加关注局部信息，从而有助于在预训练阶段学习丰富的特征表示。</p>
+<ul>
+<li>图 9b 展示了 SimMIM 的后四层降低了高频分量。而 MAE 的后几层（除了最后一层）并未减少高频分量。与编码器相比，MAE 的解码器优先考虑低频信息，从而使主干网络能够更有效地利用高频信息。</li>
+</ul>
+<p>这种现象表明，通过引入显式解码器，MAE 能够在不损失高频信息的情况下关注低频信息。这使得 MAE 在捕捉图像中的局部纹理和细节方面表现更出色，进而在预训练和下游任务中取得更好的性能。</p>
+<p><img src="/2023/05/12/Masked_Image_Model/MIM-%E7%90%86%E8%AE%BA%E5%AF%B9%E6%AF%94%E5%AD%A6%E4%B9%A0%E5%92%8C%E6%8E%A9%E8%94%BD%E5%9B%BE%E5%83%8F%E5%BB%BA%E6%A8%A1%E7%A9%B6%E7%AB%9F-Glenn/v2-e9d22211af8316a896955710f7b3e991_r.jpg"><br>图9. 每个图的左侧代表编码器，右侧代表解码器。</p>
+<hr>
+<ol start="3">
+<li>结论</li>
+</ol>
+<hr>
+<p>上述结果表明，将 CL 和 MIM 结合起来训练主干网络可能有助于发挥两种方法的优势。</p>
+<p>为了证明 CL 和 MIM 是互补的，作者采用了最简单的方法来调和 CL 和 MIM，即线性组合两种损失，如 \mathcal L &#x3D; (1 − λ)\mathcal L_{MIM} + λ\mathcal L_{CL} ，其中 \mathcal L_{MIM} 和 \mathcal L_{CL} 分别表示 MIM 和 CL 的损失， λ 是 CL 的重要性权重。作者发现，这种简单的混合模型通过组合损失训练可以有效地利用两种方法的优势。</p>
+<p>图 10a 展示了在 ImageNet 上随着 λ 变化的线性探测和微调准确率。可以看出：</p>
+<p>混合模型在这两个方面都优于 MIM（ λ &#x3D; 0 ）和 CL（ λ &#x3D; 1 ）。</p>
+<p>图 10b 和图 10c 分别分析了 λ &#x3D; 0.2 的模型在互信息和频域的行为，可以看出：</p>
+<p>两个结果都显示混合模型在前几层利用 MIM 特性，在后几层利用 CL 特性。特别是，图 12b 表明，早期层的自注意力根据 query tokens 而改变，但后期层的自注意力则没有改变。同样，图 12c 显示，早期层利用高频信息，而后期层试图利用低频信息。</p>
+<p><img src="/2023/05/12/Masked_Image_Model/MIM-%E7%90%86%E8%AE%BA%E5%AF%B9%E6%AF%94%E5%AD%A6%E4%B9%A0%E5%92%8C%E6%8E%A9%E8%94%BD%E5%9B%BE%E5%83%8F%E5%BB%BA%E6%A8%A1%E7%A9%B6%E7%AB%9F-Glenn/v2-059da2a52458a9412dd41edd248789b8_r.jpg"><br>图10. CL 和 MIM 是互补的</p>
+<hr>
+<p>更多实验请查看原文。</p>
+
+      
+    </div>
+    <div class="article-footer">
+      <blockquote class="mt-2x">
+  <ul class="post-copyright list-unstyled">
+    
+    <li class="post-copyright-link hidden-xs">
+      <strong>本文链接：</strong>
+      <a href="http://glennchen.cn/2023/05/12/Masked_Image_Model/MIM-%E7%90%86%E8%AE%BA%E5%AF%B9%E6%AF%94%E5%AD%A6%E4%B9%A0%E5%92%8C%E6%8E%A9%E8%94%BD%E5%9B%BE%E5%83%8F%E5%BB%BA%E6%A8%A1%E7%A9%B6%E7%AB%9F-Glenn/" title="MIM | 理论：对比学习和掩蔽图像建模究竟有何不同？" target="_blank" rel="external">http://glennchen.cn/2023/05/12/Masked_Image_Model/MIM-理论对比学习和掩蔽图像建模究竟-Glenn/</a>
+    </li>
+    
+    <li class="post-copyright-license">
+      <strong>版权声明： </strong> 本博客所有文章除特别声明外，均采用 <a href="http://creativecommons.org/licenses/by/4.0/deed.zh" target="_blank" rel="external">CC BY 4.0 CN协议</a> 许可协议。转载请注明出处！
+    </li>
+  </ul>
+</blockquote>
+
+
+<div class="panel panel-default panel-badger">
+  <div class="panel-body">
+    <figure class="media">
+      <div class="media-left">
+        <a href="https://github.com/chenluda" target="_blank" class="img-burn thumb-sm visible-lg">
+          <img src="/images/avatar.png" class="img-rounded w-full" alt="">
+        </a>
+      </div>
+      <div class="media-body">
+        <h3 class="media-heading"><a href="https://github.com/chenluda" target="_blank"><span class="text-dark">Glenn</span><small class="ml-1x">Stay hungry, stay foolish.</small></a></h3>
+        <div>咖啡，健身，热爱生活。</div>
+      </div>
+    </figure>
+  </div>
+</div>
+
+
+    </div>
+  </article>
+  
+    
+  <section id="comments">
+  	
+      <div id="vcomments"></div>
+    
+  </section>
+
+
+  
+</div>
+
+  <nav class="bar bar-footer clearfix" data-stick-bottom>
+  <div class="bar-inner">
+  
+  <ul class="pager pull-left">
+    
+    <li class="prev">
+      <a href="/2023/05/12/Masked_Image_Model/MIM-%E7%90%86%E8%AE%BA%E6%8E%A9%E8%94%BD%E5%9B%BE%E5%83%8F%E5%BB%BA%E6%A8%A1%E6%9C%AC%E8%B4%A8%E4%B8%8A%E5%9C%A8%E5%AD%A6%E4%B9%A0%E9%81%AE-Glenn/" title="MIM | 理论：掩蔽图像建模本质上在学习遮挡不变特征"><i class="icon icon-angle-left" aria-hidden="true"></i><span>&nbsp;&nbsp;上一篇</span></a>
+    </li>
+    
+    
+    <li class="next">
+      <a href="/2023/05/12/Masked_Image_Model/MIM-PixMIM%E9%87%8D%E6%96%B0%E6%80%9D%E8%80%83%E6%8E%A9%E8%94%BD%E5%9B%BE%E5%83%8F%E5%BB%BA-Glenn/" title="MIM | PixMIM：重新思考掩蔽图像建模中的像素重建"><span>下一篇&nbsp;&nbsp;</span><i class="icon icon-angle-right" aria-hidden="true"></i></a>
+    </li>
+    
+    
+  </ul>
+  
+  
+  
+  <div class="bar-right">
+    
+    <div class="share-component" data-sites="weibo,qq,wechat,facebook,twitter" data-mobile-sites="weibo,qq,qzone"></div>
+    
+  </div>
+  </div>
+</nav>
+  
+
+
+</main>
+
+  <footer class="footer" itemscope itemtype="http://schema.org/WPFooter">
+	
+	
+    <ul class="social-links">
+    	
+        <li><a href="https://github.com/chenluda" target="_blank" title="Github" data-toggle=tooltip data-placement=top><i class="icon icon-github"></i></a></li>
+        
+        <li><a href="https://www.zhihu.com/people/Glenn" target="_blank" title="Zhihu" data-toggle=tooltip data-placement=top><i class="icon icon-zhihu"></i></a></li>
+        
+    </ul>
+
+    <div class="copyright">
+    	
+        <div class="publishby">
+        	Theme by <a href="https://github.com/cofess" target="_blank"> cofess </a>base on <a href="https://github.com/cofess/hexo-theme-pure" target="_blank">pure</a>.
+        </div>
+    </div>
+</footer>
+  <script src="//cdn.jsdelivr.net/npm/jquery@1.12.4/dist/jquery.min.js"></script>
+<script>
+window.jQuery || document.write('<script src="js/jquery.min.js"><\/script>')
+</script>
+
+<script src="/js/plugin.min.js"></script>
+
+
+<script src="/js/application.js"></script>
+
+
+    <script>
+(function (window) {
+    var INSIGHT_CONFIG = {
+        TRANSLATION: {
+            POSTS: '文章',
+            PAGES: '页面',
+            CATEGORIES: '分类',
+            TAGS: '标签',
+            UNTITLED: '(未命名)',
+        },
+        ROOT_URL: '/',
+        CONTENT_URL: '/content.json',
+    };
+    window.INSIGHT_CONFIG = INSIGHT_CONFIG;
+})(window);
+</script>
+
+<script src="/js/insight.js"></script>
+
+
+
+
+
+
+   
+
+
+
+
+   
+    
+  <script src="//cdn1.lncld.net/static/js/3.0.4/av-min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/valine"></script>
+  <script type="text/javascript">
+  var GUEST = ['nick', 'mail', 'link'];
+  var meta = 'nick,mail,link';
+  meta = meta.split(',').filter(function(item) {
+    return GUEST.indexOf(item) > -1;
+  });
+  new Valine({
+    el: '#vcomments',
+    verify: false,
+    notify: false,
+    appId: '',
+    appKey: '',
+    placeholder: 'Just go go',
+    avatar: 'mm',
+    meta: meta,
+    pageSize: '10' || 10,
+    visitor: false
+  });
+  </script>
+
+     
+
+
+
+
+
+
+
+</body>
+</html>

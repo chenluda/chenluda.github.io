@@ -1,0 +1,589 @@
+<!DOCTYPE html>
+<html lang=zh>
+<head>
+  <meta charset="utf-8">
+  
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=no, minimal-ui">
+  <meta name="renderer" content="webkit">
+  <meta http-equiv="Cache-Control" content="no-transform" />
+  <meta http-equiv="Cache-Control" content="no-siteapp" />
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black">
+  <meta name="format-detection" content="telephone=no,email=no,adress=no">
+  <!-- Color theme for statusbar -->
+  <meta name="theme-color" content="#000000" />
+  <!-- 强制页面在当前窗口以独立页面显示,防止别人在框架里调用页面 -->
+  <meta http-equiv="window-target" content="_top" />
+  
+  
+  <title>MIM | DeepMIM：将 Deep Supervision 引入掩蔽图像建模 | Hexo</title>
+  <meta name="description" content="题目：DeepMIM: Deep Supervision for Masked Image Modeling作者单位：微软亚研院、剑桥论文网址：https:&#x2F;&#x2F;arxiv.org&#x2F;abs&#x2F;2303.08817论文代码：https:&#x2F;&#x2F;github.com&#x2F;OliverRensu&#x2F;DeepMIM首次发布时间：2023 年 3 月 15 日  123456@article&amp;#123;ren2023">
+<meta property="og:type" content="article">
+<meta property="og:title" content="MIM | DeepMIM：将 Deep Supervision 引入掩蔽图像建模">
+<meta property="og:url" content="http://glennchen.cn/2023/05/12/Masked_Image_Model/MIM-DeepMIM%E5%B0%86-Deep-S-Glenn/index.html">
+<meta property="og:site_name" content="Glenn">
+<meta property="og:description" content="题目：DeepMIM: Deep Supervision for Masked Image Modeling作者单位：微软亚研院、剑桥论文网址：https:&#x2F;&#x2F;arxiv.org&#x2F;abs&#x2F;2303.08817论文代码：https:&#x2F;&#x2F;github.com&#x2F;OliverRensu&#x2F;DeepMIM首次发布时间：2023 年 3 月 15 日  123456@article&amp;#123;ren2023">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://glennchen.cn/2023/05/12/Masked_Image_Model/MIM-DeepMIM%E5%B0%86-Deep-S-Glenn/v2-82b28cd75d3b02cf2b5c40d34422aca0_r.jpg">
+<meta property="og:image" content="http://glennchen.cn/2023/05/12/Masked_Image_Model/MIM-DeepMIM%E5%B0%86-Deep-S-Glenn/v2-45d25b69fd7c5d25e9512d4d19c166ac_r.jpg">
+<meta property="og:image" content="http://glennchen.cn/2023/05/12/Masked_Image_Model/MIM-DeepMIM%E5%B0%86-Deep-S-Glenn/v2-236afe40221c8c6fc66d0e183dc69ee0_r.jpg">
+<meta property="og:image" content="http://glennchen.cn/2023/05/12/Masked_Image_Model/MIM-DeepMIM%E5%B0%86-Deep-S-Glenn/v2-d04abb521e045261dbc72fb96b0ee8df_r.jpg">
+<meta property="og:image" content="http://glennchen.cn/2023/05/12/Masked_Image_Model/MIM-DeepMIM%E5%B0%86-Deep-S-Glenn/v2-993c450aa9f31d7acdbf274f9b8b3ce7_r.jpg">
+<meta property="og:image" content="http://glennchen.cn/2023/05/12/Masked_Image_Model/MIM-DeepMIM%E5%B0%86-Deep-S-Glenn/v2-753ab777486b0fc065c36367325e0991_r.jpg">
+<meta property="og:image" content="http://glennchen.cn/2023/05/12/Masked_Image_Model/MIM-DeepMIM%E5%B0%86-Deep-S-Glenn/v2-53cf984a5ee5a9a9e2a97f9c0729d315_r.jpg">
+<meta property="og:image" content="http://glennchen.cn/2023/05/12/Masked_Image_Model/MIM-DeepMIM%E5%B0%86-Deep-S-Glenn/v2-fdc27b2a73add11f6f4fea51e02afc2f_r.jpg">
+<meta property="og:image" content="http://glennchen.cn/2023/05/12/Masked_Image_Model/MIM-DeepMIM%E5%B0%86-Deep-S-Glenn/v2-32ee32b9b7cf2b3a17fd7c8649cae34a_r.jpg">
+<meta property="article:published_time" content="2023-05-12T10:43:45.000Z">
+<meta property="article:modified_time" content="2023-05-12T12:16:46.522Z">
+<meta property="article:author" content="Glenn">
+<meta property="article:tag" content="Masked Image Modeling">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://glennchen.cn/2023/05/12/Masked_Image_Model/MIM-DeepMIM%E5%B0%86-Deep-S-Glenn/v2-82b28cd75d3b02cf2b5c40d34422aca0_r.jpg">
+  <!-- Canonical links -->
+  <link rel="canonical" href="http://glennchen.cn/2023/05/12/Masked_Image_Model/MIM-DeepMIM%E5%B0%86-Deep-S-Glenn/index.html">
+  
+    <link rel="alternate" href="/atom.xml" title="Glenn" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="/favicon.png" type="image/x-icon">
+  
+  
+<link rel="stylesheet" href="/css/style.css">
+
+  
+  
+  
+  
+<!-- hexo injector head_end start -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/katex.min.css">
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/hexo-math@4.0.0/dist/style.css">
+<!-- hexo injector head_end end --><meta name="generator" content="Hexo 6.3.0"></head>
+
+
+<body class="main-center theme-black" itemscope itemtype="http://schema.org/WebPage">
+  <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+  <div class="slimContent">
+    <div class="navbar-header">
+      
+      
+      <div class="profile-block text-center">
+        <a id="avatar" href="https://github.com/chenluda" target="_blank">
+          <img class="img-circle img-rotate" src="/images/avatar.png" width="200" height="200">
+        </a>
+        <h2 id="name" class="hidden-xs hidden-sm">Glenn</h2>
+        <h3 id="title" class="hidden-xs hidden-sm hidden-md">Stay hungry, stay foolish.</h3>
+        <small id="location" class="text-muted hidden-xs hidden-sm"><i class="icon icon-map-marker"></i> Yunnan, China</small>
+      </div>
+      
+      <div class="search" id="search-form-wrap">
+
+    <form class="search-form sidebar-form">
+        <div class="input-group">
+            <input type="text" class="search-form-input form-control" placeholder="搜索" />
+            <span class="input-group-btn">
+                <button type="submit" class="search-form-submit btn btn-flat" onclick="return false;"><i class="icon icon-search"></i></button>
+            </span>
+        </div>
+    </form>
+    <div class="ins-search">
+  <div class="ins-search-mask"></div>
+  <div class="ins-search-container">
+    <div class="ins-input-wrapper">
+      <input type="text" class="ins-search-input" placeholder="想要查找什么..." x-webkit-speech />
+      <button type="button" class="close ins-close ins-selectable" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span></button>
+    </div>
+    <div class="ins-section-wrapper">
+      <div class="ins-section-container"></div>
+    </div>
+  </div>
+</div>
+
+
+</div>
+      <button class="navbar-toggle collapsed" type="button" data-toggle="collapse" data-target="#main-navbar" aria-controls="main-navbar" aria-expanded="false">
+        <span class="sr-only">Toggle navigation</span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+    </div>
+    <nav id="main-navbar" class="collapse navbar-collapse" itemscope itemtype="http://schema.org/SiteNavigationElement" role="navigation">
+      <ul class="nav navbar-nav main-nav ">
+        
+        
+        <li class="menu-item menu-item-home">
+          <a href="/.">
+            
+            <i class="icon icon-home-fill"></i>
+            
+            <span class="menu-title">首页</span>
+          </a>
+        </li>
+        
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives">
+            
+            <i class="icon icon-archives-fill"></i>
+            
+            <span class="menu-title">归档</span>
+          </a>
+        </li>
+        
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories">
+            
+            <i class="icon icon-folder"></i>
+            
+            <span class="menu-title">分类</span>
+          </a>
+        </li>
+        
+      </ul>
+      
+	
+    <ul class="social-links">
+    	
+        <li><a href="https://github.com/chenluda" target="_blank" title="Github" data-toggle=tooltip data-placement=top><i class="icon icon-github"></i></a></li>
+        
+        <li><a href="https://www.zhihu.com/people/Glenn" target="_blank" title="Zhihu" data-toggle=tooltip data-placement=top><i class="icon icon-zhihu"></i></a></li>
+        
+    </ul>
+
+    </nav>
+  </div>
+</header>
+
+  
+    <aside class="sidebar" itemscope itemtype="http://schema.org/WPSideBar">
+  <div class="slimContent">
+    
+      <div class="widget">
+    <h3 class="widget-title">公告</h3>
+    <div class="widget-body">
+        <div id="board">
+            <div class="content">
+                <p>欢迎交流与分享经验!</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+    
+      
+  <div class="widget">
+    <h3 class="widget-title">分类</h3>
+    <div class="widget-body">
+      <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/%E4%BB%A3%E7%A0%81/">代码</a><span class="category-list-count">4</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/%E8%AE%BA%E6%96%87%E9%80%9F%E8%A7%88/">论文速览</a><span class="category-list-count">12</span></li></ul>
+    </div>
+  </div>
+
+
+    
+      
+  <div class="widget">
+    <h3 class="widget-title">标签</h3>
+    <div class="widget-body">
+      <ul class="tag-list" itemprop="keywords"><li class="tag-list-item"><a class="tag-list-link" href="/tags/Conference-paper/" rel="tag">Conference paper</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/DataBase/" rel="tag">DataBase</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Markdown/" rel="tag">Markdown</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Masked-Image-Modeling/" rel="tag">Masked Image Modeling</a><span class="tag-list-count">12</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/OpenReview/" rel="tag">OpenReview</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Organization/" rel="tag">Organization</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/WeChat/" rel="tag">WeChat</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Zhihu/" rel="tag">Zhihu</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/arXiv/" rel="tag">arXiv</a><span class="tag-list-count">2</span></li></ul>
+    </div>
+  </div>
+
+
+    
+      
+  <div class="widget">
+    <h3 class="widget-title">标签云</h3>
+    <div class="widget-body tagcloud">
+      <a href="/tags/Conference-paper/" style="font-size: 13px;">Conference paper</a> <a href="/tags/DataBase/" style="font-size: 13.5px;">DataBase</a> <a href="/tags/Markdown/" style="font-size: 13px;">Markdown</a> <a href="/tags/Masked-Image-Modeling/" style="font-size: 14px;">Masked Image Modeling</a> <a href="/tags/OpenReview/" style="font-size: 13px;">OpenReview</a> <a href="/tags/Organization/" style="font-size: 13px;">Organization</a> <a href="/tags/WeChat/" style="font-size: 13px;">WeChat</a> <a href="/tags/Zhihu/" style="font-size: 13px;">Zhihu</a> <a href="/tags/arXiv/" style="font-size: 13.5px;">arXiv</a>
+    </div>
+  </div>
+
+    
+      
+  <div class="widget">
+    <h3 class="widget-title">归档</h3>
+    <div class="widget-body">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2023/05/">五月 2023</a><span class="archive-list-count">16</span></li></ul>
+    </div>
+  </div>
+
+
+    
+      
+  <div class="widget">
+    <h3 class="widget-title">最新文章</h3>
+    <div class="widget-body">
+      <ul class="recent-post-list list-unstyled no-thumbnail">
+        
+          <li>
+            
+            <div class="item-inner">
+              <p class="item-category">
+                <a class="category-link" href="/categories/%E4%BB%A3%E7%A0%81/">代码</a>
+              </p>
+              <p class="item-title">
+                <a href="/2023/05/12/%E4%BB%A3%E7%A0%81/%E4%BB%A3%E7%A0%81-%E8%8E%B7%E5%8F%96-arXiv-%E8%AE%BA%E6%96%87%E4%BD%9C%E8%80%85%E5%8D%95%E4%BD%8D-Glenn/" class="title">代码 | 获取 arXiv 论文作者单位</a>
+              </p>
+              <p class="item-date">
+                <time datetime="2023-05-12T10:52:40.000Z" itemprop="datePublished">2023-05-12</time>
+              </p>
+            </div>
+          </li>
+          
+          <li>
+            
+            <div class="item-inner">
+              <p class="item-category">
+                <a class="category-link" href="/categories/%E4%BB%A3%E7%A0%81/">代码</a>
+              </p>
+              <p class="item-title">
+                <a href="/2023/05/12/%E4%BB%A3%E7%A0%81/%E4%BB%A3%E7%A0%81-%E6%AF%8F%E5%A4%A9%E5%AE%9A%E7%82%B9%E5%90%91%E5%BE%AE%E4%BF%A1%E6%8E%A8%E9%80%81-arXiv-Glenn/" class="title">代码 | 每天定点向微信推送 arXiv 最新文章</a>
+              </p>
+              <p class="item-date">
+                <time datetime="2023-05-12T10:52:34.000Z" itemprop="datePublished">2023-05-12</time>
+              </p>
+            </div>
+          </li>
+          
+          <li>
+            
+            <div class="item-inner">
+              <p class="item-category">
+                <a class="category-link" href="/categories/%E4%BB%A3%E7%A0%81/">代码</a>
+              </p>
+              <p class="item-title">
+                <a href="/2023/05/12/%E4%BB%A3%E7%A0%81/%E4%BB%A3%E7%A0%81-%E5%B0%86%E7%9F%A5%E4%B9%8E%E4%B8%93%E6%A0%8F%E6%96%87%E7%AB%A0%E8%BD%AC%E6%8D%A2%E4%B8%BA-Markd-Glenn/" class="title">代码 | 将知乎专栏文章转换为 Markdown 文件保存到本地</a>
+              </p>
+              <p class="item-date">
+                <time datetime="2023-05-12T10:52:25.000Z" itemprop="datePublished">2023-05-12</time>
+              </p>
+            </div>
+          </li>
+          
+          <li>
+            
+            <div class="item-inner">
+              <p class="item-category">
+                <a class="category-link" href="/categories/%E4%BB%A3%E7%A0%81/">代码</a>
+              </p>
+              <p class="item-title">
+                <a href="/2023/05/12/%E4%BB%A3%E7%A0%81/%E4%BB%A3%E7%A0%81-%E4%BB%8E-OpenReview-%E8%8E%B7%E5%8F%96%E9%A1%B6-Glenn/" class="title">代码 | 从 OpenReview 获取顶会接收论文集并保存至本地数据库</a>
+              </p>
+              <p class="item-date">
+                <time datetime="2023-05-12T10:52:15.000Z" itemprop="datePublished">2023-05-12</time>
+              </p>
+            </div>
+          </li>
+          
+          <li>
+            
+            <div class="item-inner">
+              <p class="item-category">
+                <a class="category-link" href="/categories/%E8%AE%BA%E6%96%87%E9%80%9F%E8%A7%88/">论文速览</a>
+              </p>
+              <p class="item-title">
+                <a href="/2023/05/12/Masked_Image_Model/MIM-%E7%90%86%E8%AE%BA%E6%8E%A9%E8%94%BD%E5%9B%BE%E5%83%8F%E5%BB%BA%E6%A8%A1%E6%9C%AC%E8%B4%A8%E4%B8%8A%E5%9C%A8%E5%AD%A6%E4%B9%A0%E9%81%AE-Glenn/" class="title">MIM | 理论：掩蔽图像建模本质上在学习遮挡不变特征</a>
+              </p>
+              <p class="item-date">
+                <time datetime="2023-05-12T10:44:48.000Z" itemprop="datePublished">2023-05-12</time>
+              </p>
+            </div>
+          </li>
+          
+      </ul>
+    </div>
+  </div>
+  
+
+    
+  </div>
+</aside>
+
+  
+  
+<main class="main" role="main">
+  <div class="content">
+  <article id="post-Masked_Image_Model/MIM-DeepMIM将-Deep-S-Glenn" class="article article-type-post" itemscope itemtype="http://schema.org/BlogPosting">
+    
+    <div class="article-header">
+      
+        
+  
+    <h1 class="article-title" itemprop="name">
+      MIM | DeepMIM：将 Deep Supervision 引入掩蔽图像建模
+    </h1>
+  
+
+      
+      <div class="article-meta">
+        <span class="article-date">
+    <i class="icon icon-calendar-check"></i>
+	<a href="/2023/05/12/Masked_Image_Model/MIM-DeepMIM%E5%B0%86-Deep-S-Glenn/" class="article-date">
+	  <time datetime="2023-05-12T10:43:45.000Z" itemprop="datePublished">2023-05-12</time>
+	</a>
+</span>
+        
+  <span class="article-category">
+    <i class="icon icon-folder"></i>
+    <a class="article-category-link" href="/categories/%E8%AE%BA%E6%96%87%E9%80%9F%E8%A7%88/">论文速览</a>
+  </span>
+
+        
+  <span class="article-tag">
+    <i class="icon icon-tags"></i>
+	<a class="article-tag-link-link" href="/tags/Masked-Image-Modeling/" rel="tag">Masked Image Modeling</a>
+  </span>
+
+
+        
+
+        <span class="post-comment"><i class="icon icon-comment"></i> <a href="/2023/05/12/Masked_Image_Model/MIM-DeepMIM%E5%B0%86-Deep-S-Glenn/#comments" class="article-comment-link">评论</a></span>
+        
+      </div>
+    </div>
+    <div class="article-entry marked-body" itemprop="articleBody">
+      
+        <p><img src="/2023/05/12/Masked_Image_Model/MIM-DeepMIM%E5%B0%86-Deep-S-Glenn/v2-82b28cd75d3b02cf2b5c40d34422aca0_r.jpg"></p>
+<blockquote>
+<p><em><strong>题目：</strong>DeepMIM: Deep Supervision for Masked Image Modeling</em><br><em><strong>作者单位：</strong>微软亚研院、剑桥</em><br><em><strong>论文网址：</strong><a href="https://link.zhihu.com/?target=https://arxiv.org/abs/2303.08817">https://arxiv.org/abs/2303.08817</a></em><br><em><strong>论文代码：</strong><a href="https://link.zhihu.com/?target=https://github.com/OliverRensu/DeepMIM">https://github.com/OliverRensu/DeepMIM</a></em><br><em><strong>首次发布时间：</strong>2023 年 3 月 15 日</em></p>
+</blockquote>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">@article&#123;ren2023deepmim,</span><br><span class="line">  title=&#123;DeepMIM: Deep Supervision for Masked Image Modeling&#125;,</span><br><span class="line">  author=&#123;Ren, Sucheng and Wei, Fangyun and Albanie, Samuel and Zhang, Zheng and Hu, Han&#125;,</span><br><span class="line">  journal=&#123;arXiv preprint arXiv:2303.08817&#125;,</span><br><span class="line">  year=&#123;2023&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+<hr>
+<h2 id="1-主要内容"><a href="#1-主要内容" class="headerlink" title="1. 主要内容"></a><strong>1. 主要内容</strong></h2><p>这篇论文也是在该团队 MIM 宇宙基础上提出的新架构 DeepMIM。主要内容是在 Masked Image Modeling 训练过程中加上 Deep Supervision，可以促进浅层学习更有意义的表示，加快模型收敛速度并扩大注意力的多样性。</p>
+<p>Deep Supervision（即在神经网络的中间层引入额外的监督）在早期的深度学习中，Deep Supervision 可以解决深度神经网络训练梯度消失和收敛速度过慢的问题， 而被广泛应用于 CV 领域，随着 normalization 和 residual connection 的出现，Deep Supervision 逐渐被淘汰。</p>
+<blockquote>
+<p> Deep supervision 解读看这里：</p>
+</blockquote>
+<hr>
+<h2 id="2-方法"><a href="#2-方法" class="headerlink" title="2. 方法"></a><strong>2. 方法</strong></h2><p>DeepMIM 采用编码器-多解码器架构进行 ViT 预训练的掩模和预测任务。具有12个Transformer 块的 ViT-B 作为编码器，4个独立的具有 4 层 Transformer 块的解码器分别置于编码器的第 6、8、10、12 个 Transformer 块后。</p>
+<p>在 Masked Image Modeling 上构建这种架构的难度主要在于，如何从原始输入中提取监督信号来指导中间层的学习。浅层 ViT 产生的特征区别较差，这些中间特征可能没有能力重构过于复杂的目标。</p>
+<p>对此，DeepMIM 提出可选择的 Hybrid Target Generator 模块，将预训练好的 MAE 产生的模糊重建结果与原始像素按比例混合后作为中间层的监督信号。</p>
+<p>t &#x3D; αx + (1 − α)\hat{x}. </p>
+<p>t_i 表示解码器 g^i_ξ 的重建目标。对于 g^1_ξ 、 g^2_ξ 和 g^3_ξ ，将 α 分别设置为 0、1&#x2F;3 和 2&#x2F;3。</p>
+<p>尽管使用 Hybrid Target 作为中间层监督信号可以提高微调性能，但存在额外的计算开销。所以作者建议，只有在有一个现成的一个预训练过的 MIM 模型时，才使用 Hybrid Target。 不使用 Hybrid Target，所有解码器设置为 α &#x3D; 1 。</p>
+<p>总损失是由 N 个额外解码器和 1 个主解码器产生的 N+1 个 \mathscr{L}_2 重建损失之和：</p>
+<p>\mathcal{L} &#x3D; \sum_{i&#x3D;1}^N||M(t_i)-p_i||^2_2+||M(x)-p||^2_2 </p>
+<p>其中， M(\cdot)  表示提取目标 masked patches 的操作，N 为额外解码器的数量。</p>
+<p>DeepMIM 也可以应用于一系列具有不同重建目标的 MIM 模型。</p>
+<p><img src="/2023/05/12/Masked_Image_Model/MIM-DeepMIM%E5%B0%86-Deep-S-Glenn/v2-45d25b69fd7c5d25e9512d4d19c166ac_r.jpg"><br>图1 DeepMIM 网络框架</p>
+<hr>
+<p>这篇论文让我想到了 CVPR23 的 LocalMIM（Masked Image Modeling with Local Multi-Scale Reconstruction）。这两篇应该是同时期论文，DeepMIM 在 arxiv 上提交的时间是 2023 年 3 月 15 ，LocalMIM 提交的时间是 2023 年3 月 9 日，从格式上看，猜测应该是在 CVPR 上撞车了)。</p>
+<p>LocalMIM 同样是将 Deep Supervision 引入到了 Masked Image Modeling 中，但他是从多尺度重建的角度讲故事。</p>
+<p>DeepMIM 主解码器和中间层解码器的监督信号在不使用 Hybrid Target 情况下是一致的。而 LocalMIM 不同层解码器的监督信号是不同的，使得较低层重构细尺度的监督信号，而较高层重构粗尺度的监督信号。</p>
+<p><img src="/2023/05/12/Masked_Image_Model/MIM-DeepMIM%E5%B0%86-Deep-S-Glenn/v2-236afe40221c8c6fc66d0e183dc69ee0_r.jpg"><br>图2 LocalMIM 网络框架</p>
+<blockquote>
+<p> LocalMIM 解读看这里：</p>
+</blockquote>
+<hr>
+<ol start="3">
+<li>讨论</li>
+</ol>
+<hr>
+<ul>
+<li>DeepMIM 使用训练集和验证集损失曲线，证明在下游任务的微调期间的表现要由于 MAE。根据该团队另一篇论文（On data scaling in masked image modeling）的理论，预训练中的验证损失可以很好的指示模型在下游任务的微调期间的表现。</li>
+</ul>
+<blockquote>
+<p>On data scaling in masked image modeling 解读看这里</p>
+</blockquote>
+<p><img src="/2023/05/12/Masked_Image_Model/MIM-DeepMIM%E5%B0%86-Deep-S-Glenn/v2-d04abb521e045261dbc72fb96b0ee8df_r.jpg"><br>图3 MAE 和 DeepMIM-MAE 的训练损失（左）和验证损失（右）的比较。只显示了 DeepMIM-MAE 的最后一层的重建损失</p>
+<ul>
+<li>DeepMIM 使用 centered kernel alignment（CKA）来识别最后一层产生的特征和中间层产生的特征之间的对应关系。从第一层到倒数第二层，DeepMIM-MAE 的 CKA 得分总是超过 MAE，说明DeepMIM-MAE 的中间层的特征更具鉴别性。</li>
+</ul>
+<p><img src="/2023/05/12/Masked_Image_Model/MIM-DeepMIM%E5%B0%86-Deep-S-Glenn/v2-993c450aa9f31d7acdbf274f9b8b3ce7_r.jpg"><br>图4 使用 CKA 评估来自最后一层的特征和来自中间层的特征之间的对应关系。蓝色：MAE；红色：DeepMIM-MAE</p>
+<ul>
+<li>DeepMIM 使用 CKA 来计算来自 MAE 第 8 层的特征与来自 DeepMIM-MAE 所有层的特征之间的相似性，MAE 的中间层（第8层）特征与 DeepMIM-MAE 的较浅的层特征（第3层和第4层）具有最大的对齐。相比之下，DeepMIM-MAE 的中间（第8层）特征与 MAE 的更深块（第层和第10层）的特征更加紧密。本研究表明，DeepMIM显著增强了特征对浅层的鉴别能力。</li>
+</ul>
+<p><img src="/2023/05/12/Masked_Image_Model/MIM-DeepMIM%E5%B0%86-Deep-S-Glenn/v2-753ab777486b0fc065c36367325e0991_r.jpg"><br>图5 由 CKA 评估的交叉特征相似性</p>
+<ul>
+<li>DeepMIM 计算不同 attention heads 之间的余弦相似性来探索 head 的多样性。根据该团队另一篇论文（Revealing the dark secrets of masked image modeling）的说法，更多样化的 head 表明有更强的代表能力。研究表明，与MAE相比，DeepMIM 产生的 head 更多样化。</li>
+</ul>
+<blockquote>
+<p>Revealing the dark secrets of masked image modeling 解读看这里：</p>
+</blockquote>
+<p><img src="/2023/05/12/Masked_Image_Model/MIM-DeepMIM%E5%B0%86-Deep-S-Glenn/v2-53cf984a5ee5a9a9e2a97f9c0729d315_r.jpg"><br>图6 比较 MAE（左）和 DeepMIM-MAE（右）在不同层上的 head 余弦相似度</p>
+<ul>
+<li>为了进一步评估来自浅块的特征的质量，DeepMIM 冻结了浅层的一个子集，并对其余的层进行微调。当可训练块的数量从 1 个（只有最后一个层是可训练的）变化到12个（所有层都是可训练的）时，DeepMIM-MAE 的性能始终显著优于 MAE。</li>
+</ul>
+<p><img src="/2023/05/12/Masked_Image_Model/MIM-DeepMIM%E5%B0%86-Deep-S-Glenn/v2-fdc27b2a73add11f6f4fea51e02afc2f_r.jpg"><br>图7 当将可训练层的数量从 1 改变到 12 时，DeepMIM-MAE 的性能始终明显优于 MAE</p>
+<ul>
+<li>DeepMIM 随机初始化预训练的 ViT-B 的最后 K 个层，然后以端到端的方式在 ImageNet 上对 ViT-B 进行微调。DeepMIM-MAE 在每种情况下都始终优于 MAE，这表明浅层的良好表示有利于更深层的学习，尤其是当它们被随机初始化时。</li>
+</ul>
+<p><img src="/2023/05/12/Masked_Image_Model/MIM-DeepMIM%E5%B0%86-Deep-S-Glenn/v2-32ee32b9b7cf2b3a17fd7c8649cae34a_r.jpg"><br>图8 在 ImageNet-1K 上的端到端微调</p>
+
+      
+    </div>
+    <div class="article-footer">
+      <blockquote class="mt-2x">
+  <ul class="post-copyright list-unstyled">
+    
+    <li class="post-copyright-link hidden-xs">
+      <strong>本文链接：</strong>
+      <a href="http://glennchen.cn/2023/05/12/Masked_Image_Model/MIM-DeepMIM%E5%B0%86-Deep-S-Glenn/" title="MIM | DeepMIM：将 Deep Supervision 引入掩蔽图像建模" target="_blank" rel="external">http://glennchen.cn/2023/05/12/Masked_Image_Model/MIM-DeepMIM将-Deep-S-Glenn/</a>
+    </li>
+    
+    <li class="post-copyright-license">
+      <strong>版权声明： </strong> 本博客所有文章除特别声明外，均采用 <a href="http://creativecommons.org/licenses/by/4.0/deed.zh" target="_blank" rel="external">CC BY 4.0 CN协议</a> 许可协议。转载请注明出处！
+    </li>
+  </ul>
+</blockquote>
+
+
+<div class="panel panel-default panel-badger">
+  <div class="panel-body">
+    <figure class="media">
+      <div class="media-left">
+        <a href="https://github.com/chenluda" target="_blank" class="img-burn thumb-sm visible-lg">
+          <img src="/images/avatar.png" class="img-rounded w-full" alt="">
+        </a>
+      </div>
+      <div class="media-body">
+        <h3 class="media-heading"><a href="https://github.com/chenluda" target="_blank"><span class="text-dark">Glenn</span><small class="ml-1x">Stay hungry, stay foolish.</small></a></h3>
+        <div>咖啡，健身，热爱生活。</div>
+      </div>
+    </figure>
+  </div>
+</div>
+
+
+    </div>
+  </article>
+  
+    
+  <section id="comments">
+  	
+      <div id="vcomments"></div>
+    
+  </section>
+
+
+  
+</div>
+
+  <nav class="bar bar-footer clearfix" data-stick-bottom>
+  <div class="bar-inner">
+  
+  <ul class="pager pull-left">
+    
+    <li class="prev">
+      <a href="/2023/05/12/Masked_Image_Model/MIM-DPPMask%E5%8F%AF%E4%BB%A5%E4%BF%9D%E7%95%99%E5%85%B7%E6%9C%89%E4%BB%A3%E8%A1%A8-Glenn/" title="MIM | DPPMask：可以保留具有代表性 patches 的掩蔽策略"><i class="icon icon-angle-left" aria-hidden="true"></i><span>&nbsp;&nbsp;上一篇</span></a>
+    </li>
+    
+    
+    <li class="next">
+      <a href="/2023/05/12/Masked_Image_Model/MIM-CCViT%E5%9F%BA%E4%BA%8E-Patches-Glenn/" title="MIM | CCViT：基于 Patches 质心重建的 MIM 框架"><span>下一篇&nbsp;&nbsp;</span><i class="icon icon-angle-right" aria-hidden="true"></i></a>
+    </li>
+    
+    
+  </ul>
+  
+  
+  
+  <div class="bar-right">
+    
+    <div class="share-component" data-sites="weibo,qq,wechat,facebook,twitter" data-mobile-sites="weibo,qq,qzone"></div>
+    
+  </div>
+  </div>
+</nav>
+  
+
+
+</main>
+
+  <footer class="footer" itemscope itemtype="http://schema.org/WPFooter">
+	
+	
+    <ul class="social-links">
+    	
+        <li><a href="https://github.com/chenluda" target="_blank" title="Github" data-toggle=tooltip data-placement=top><i class="icon icon-github"></i></a></li>
+        
+        <li><a href="https://www.zhihu.com/people/Glenn" target="_blank" title="Zhihu" data-toggle=tooltip data-placement=top><i class="icon icon-zhihu"></i></a></li>
+        
+    </ul>
+
+    <div class="copyright">
+    	
+        <div class="publishby">
+        	Theme by <a href="https://github.com/cofess" target="_blank"> cofess </a>base on <a href="https://github.com/cofess/hexo-theme-pure" target="_blank">pure</a>.
+        </div>
+    </div>
+</footer>
+  <script src="//cdn.jsdelivr.net/npm/jquery@1.12.4/dist/jquery.min.js"></script>
+<script>
+window.jQuery || document.write('<script src="js/jquery.min.js"><\/script>')
+</script>
+
+<script src="/js/plugin.min.js"></script>
+
+
+<script src="/js/application.js"></script>
+
+
+    <script>
+(function (window) {
+    var INSIGHT_CONFIG = {
+        TRANSLATION: {
+            POSTS: '文章',
+            PAGES: '页面',
+            CATEGORIES: '分类',
+            TAGS: '标签',
+            UNTITLED: '(未命名)',
+        },
+        ROOT_URL: '/',
+        CONTENT_URL: '/content.json',
+    };
+    window.INSIGHT_CONFIG = INSIGHT_CONFIG;
+})(window);
+</script>
+
+<script src="/js/insight.js"></script>
+
+
+
+
+
+
+   
+
+
+
+
+   
+    
+  <script src="//cdn1.lncld.net/static/js/3.0.4/av-min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/valine"></script>
+  <script type="text/javascript">
+  var GUEST = ['nick', 'mail', 'link'];
+  var meta = 'nick,mail,link';
+  meta = meta.split(',').filter(function(item) {
+    return GUEST.indexOf(item) > -1;
+  });
+  new Valine({
+    el: '#vcomments',
+    verify: false,
+    notify: false,
+    appId: '',
+    appKey: '',
+    placeholder: 'Just go go',
+    avatar: 'mm',
+    meta: meta,
+    pageSize: '10' || 10,
+    visitor: false
+  });
+  </script>
+
+     
+
+
+
+
+
+
+
+</body>
+</html>

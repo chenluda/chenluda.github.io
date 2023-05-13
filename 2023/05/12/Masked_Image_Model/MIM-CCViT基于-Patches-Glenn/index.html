@@ -1,0 +1,605 @@
+<!DOCTYPE html>
+<html lang=zh>
+<head>
+  <meta charset="utf-8">
+  
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=no, minimal-ui">
+  <meta name="renderer" content="webkit">
+  <meta http-equiv="Cache-Control" content="no-transform" />
+  <meta http-equiv="Cache-Control" content="no-siteapp" />
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black">
+  <meta name="format-detection" content="telephone=no,email=no,adress=no">
+  <!-- Color theme for statusbar -->
+  <meta name="theme-color" content="#000000" />
+  <!-- 强制页面在当前窗口以独立页面显示,防止别人在框架里调用页面 -->
+  <meta http-equiv="window-target" content="_top" />
+  
+  
+  <title>MIM | CCViT：基于 Patches 质心重建的 MIM 框架 | Hexo</title>
+  <meta name="description" content="题目：Centroid-centered Modeling for Efficient Vision Transformer Pre-training单位：武汉大学、京东、悉尼大学论文网址：https:&#x2F;&#x2F;arxiv.org&#x2F;abs&#x2F;2303.04664论文代码：未公开首次发布时间：2023 年 3 月 8 日   前言陶老师挂名的一篇论文。 之前介绍的都是以像素为重建目标的 MIM 模型，另">
+<meta property="og:type" content="article">
+<meta property="og:title" content="MIM | CCViT：基于 Patches 质心重建的 MIM 框架">
+<meta property="og:url" content="http://glennchen.cn/2023/05/12/Masked_Image_Model/MIM-CCViT%E5%9F%BA%E4%BA%8E-Patches-Glenn/index.html">
+<meta property="og:site_name" content="Glenn">
+<meta property="og:description" content="题目：Centroid-centered Modeling for Efficient Vision Transformer Pre-training单位：武汉大学、京东、悉尼大学论文网址：https:&#x2F;&#x2F;arxiv.org&#x2F;abs&#x2F;2303.04664论文代码：未公开首次发布时间：2023 年 3 月 8 日   前言陶老师挂名的一篇论文。 之前介绍的都是以像素为重建目标的 MIM 模型，另">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://glennchen.cn/2023/05/12/Masked_Image_Model/MIM-CCViT%E5%9F%BA%E4%BA%8E-Patches-Glenn/v2-0a82f5f1d90eaa082144750fe819a8d9_r.jpg">
+<meta property="og:image" content="http://glennchen.cn/2023/05/12/Masked_Image_Model/MIM-CCViT%E5%9F%BA%E4%BA%8E-Patches-Glenn/v2-7c43dd288d82150da720ae568c58cc0b_r.jpg">
+<meta property="og:image" content="http://glennchen.cn/2023/05/12/Masked_Image_Model/MIM-CCViT%E5%9F%BA%E4%BA%8E-Patches-Glenn/v2-244ffddd3111bb055384b714e0ba3c92_r.jpg">
+<meta property="og:image" content="http://glennchen.cn/2023/05/12/Masked_Image_Model/MIM-CCViT%E5%9F%BA%E4%BA%8E-Patches-Glenn/v2-51038802a0ad064770f19294dcb196d1_r.jpg">
+<meta property="og:image" content="http://glennchen.cn/2023/05/12/Masked_Image_Model/MIM-CCViT%E5%9F%BA%E4%BA%8E-Patches-Glenn/v2-3e145b3f0124e6ccada112061da4329a_r.jpg">
+<meta property="og:image" content="http://glennchen.cn/2023/05/12/Masked_Image_Model/MIM-CCViT%E5%9F%BA%E4%BA%8E-Patches-Glenn/v2-f90046a804c0221e4f5bb0f773897537_r.jpg">
+<meta property="og:image" content="http://glennchen.cn/2023/05/12/Masked_Image_Model/MIM-CCViT%E5%9F%BA%E4%BA%8E-Patches-Glenn/v2-17b0f7af198132d109786b116ef0ff73_r.jpg">
+<meta property="og:image" content="http://glennchen.cn/2023/05/12/Masked_Image_Model/MIM-CCViT%E5%9F%BA%E4%BA%8E-Patches-Glenn/v2-2e211aa606122de743bd9bb623418ef9_r.jpg">
+<meta property="article:published_time" content="2023-05-12T10:42:47.000Z">
+<meta property="article:modified_time" content="2023-05-12T12:16:43.493Z">
+<meta property="article:author" content="Glenn">
+<meta property="article:tag" content="Masked Image Modeling">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://glennchen.cn/2023/05/12/Masked_Image_Model/MIM-CCViT%E5%9F%BA%E4%BA%8E-Patches-Glenn/v2-0a82f5f1d90eaa082144750fe819a8d9_r.jpg">
+  <!-- Canonical links -->
+  <link rel="canonical" href="http://glennchen.cn/2023/05/12/Masked_Image_Model/MIM-CCViT%E5%9F%BA%E4%BA%8E-Patches-Glenn/index.html">
+  
+    <link rel="alternate" href="/atom.xml" title="Glenn" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="/favicon.png" type="image/x-icon">
+  
+  
+<link rel="stylesheet" href="/css/style.css">
+
+  
+  
+  
+  
+<!-- hexo injector head_end start -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/katex.min.css">
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/hexo-math@4.0.0/dist/style.css">
+<!-- hexo injector head_end end --><meta name="generator" content="Hexo 6.3.0"></head>
+
+
+<body class="main-center theme-black" itemscope itemtype="http://schema.org/WebPage">
+  <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+  <div class="slimContent">
+    <div class="navbar-header">
+      
+      
+      <div class="profile-block text-center">
+        <a id="avatar" href="https://github.com/chenluda" target="_blank">
+          <img class="img-circle img-rotate" src="/images/avatar.png" width="200" height="200">
+        </a>
+        <h2 id="name" class="hidden-xs hidden-sm">Glenn</h2>
+        <h3 id="title" class="hidden-xs hidden-sm hidden-md">Stay hungry, stay foolish.</h3>
+        <small id="location" class="text-muted hidden-xs hidden-sm"><i class="icon icon-map-marker"></i> Yunnan, China</small>
+      </div>
+      
+      <div class="search" id="search-form-wrap">
+
+    <form class="search-form sidebar-form">
+        <div class="input-group">
+            <input type="text" class="search-form-input form-control" placeholder="搜索" />
+            <span class="input-group-btn">
+                <button type="submit" class="search-form-submit btn btn-flat" onclick="return false;"><i class="icon icon-search"></i></button>
+            </span>
+        </div>
+    </form>
+    <div class="ins-search">
+  <div class="ins-search-mask"></div>
+  <div class="ins-search-container">
+    <div class="ins-input-wrapper">
+      <input type="text" class="ins-search-input" placeholder="想要查找什么..." x-webkit-speech />
+      <button type="button" class="close ins-close ins-selectable" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span></button>
+    </div>
+    <div class="ins-section-wrapper">
+      <div class="ins-section-container"></div>
+    </div>
+  </div>
+</div>
+
+
+</div>
+      <button class="navbar-toggle collapsed" type="button" data-toggle="collapse" data-target="#main-navbar" aria-controls="main-navbar" aria-expanded="false">
+        <span class="sr-only">Toggle navigation</span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+    </div>
+    <nav id="main-navbar" class="collapse navbar-collapse" itemscope itemtype="http://schema.org/SiteNavigationElement" role="navigation">
+      <ul class="nav navbar-nav main-nav ">
+        
+        
+        <li class="menu-item menu-item-home">
+          <a href="/.">
+            
+            <i class="icon icon-home-fill"></i>
+            
+            <span class="menu-title">首页</span>
+          </a>
+        </li>
+        
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives">
+            
+            <i class="icon icon-archives-fill"></i>
+            
+            <span class="menu-title">归档</span>
+          </a>
+        </li>
+        
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories">
+            
+            <i class="icon icon-folder"></i>
+            
+            <span class="menu-title">分类</span>
+          </a>
+        </li>
+        
+      </ul>
+      
+	
+    <ul class="social-links">
+    	
+        <li><a href="https://github.com/chenluda" target="_blank" title="Github" data-toggle=tooltip data-placement=top><i class="icon icon-github"></i></a></li>
+        
+        <li><a href="https://www.zhihu.com/people/Glenn" target="_blank" title="Zhihu" data-toggle=tooltip data-placement=top><i class="icon icon-zhihu"></i></a></li>
+        
+    </ul>
+
+    </nav>
+  </div>
+</header>
+
+  
+    <aside class="sidebar" itemscope itemtype="http://schema.org/WPSideBar">
+  <div class="slimContent">
+    
+      <div class="widget">
+    <h3 class="widget-title">公告</h3>
+    <div class="widget-body">
+        <div id="board">
+            <div class="content">
+                <p>欢迎交流与分享经验!</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+    
+      
+  <div class="widget">
+    <h3 class="widget-title">分类</h3>
+    <div class="widget-body">
+      <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/%E4%BB%A3%E7%A0%81/">代码</a><span class="category-list-count">4</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/%E8%AE%BA%E6%96%87%E9%80%9F%E8%A7%88/">论文速览</a><span class="category-list-count">12</span></li></ul>
+    </div>
+  </div>
+
+
+    
+      
+  <div class="widget">
+    <h3 class="widget-title">标签</h3>
+    <div class="widget-body">
+      <ul class="tag-list" itemprop="keywords"><li class="tag-list-item"><a class="tag-list-link" href="/tags/Conference-paper/" rel="tag">Conference paper</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/DataBase/" rel="tag">DataBase</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Markdown/" rel="tag">Markdown</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Masked-Image-Modeling/" rel="tag">Masked Image Modeling</a><span class="tag-list-count">12</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/OpenReview/" rel="tag">OpenReview</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Organization/" rel="tag">Organization</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/WeChat/" rel="tag">WeChat</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Zhihu/" rel="tag">Zhihu</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/arXiv/" rel="tag">arXiv</a><span class="tag-list-count">2</span></li></ul>
+    </div>
+  </div>
+
+
+    
+      
+  <div class="widget">
+    <h3 class="widget-title">标签云</h3>
+    <div class="widget-body tagcloud">
+      <a href="/tags/Conference-paper/" style="font-size: 13px;">Conference paper</a> <a href="/tags/DataBase/" style="font-size: 13.5px;">DataBase</a> <a href="/tags/Markdown/" style="font-size: 13px;">Markdown</a> <a href="/tags/Masked-Image-Modeling/" style="font-size: 14px;">Masked Image Modeling</a> <a href="/tags/OpenReview/" style="font-size: 13px;">OpenReview</a> <a href="/tags/Organization/" style="font-size: 13px;">Organization</a> <a href="/tags/WeChat/" style="font-size: 13px;">WeChat</a> <a href="/tags/Zhihu/" style="font-size: 13px;">Zhihu</a> <a href="/tags/arXiv/" style="font-size: 13.5px;">arXiv</a>
+    </div>
+  </div>
+
+    
+      
+  <div class="widget">
+    <h3 class="widget-title">归档</h3>
+    <div class="widget-body">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2023/05/">五月 2023</a><span class="archive-list-count">16</span></li></ul>
+    </div>
+  </div>
+
+
+    
+      
+  <div class="widget">
+    <h3 class="widget-title">最新文章</h3>
+    <div class="widget-body">
+      <ul class="recent-post-list list-unstyled no-thumbnail">
+        
+          <li>
+            
+            <div class="item-inner">
+              <p class="item-category">
+                <a class="category-link" href="/categories/%E4%BB%A3%E7%A0%81/">代码</a>
+              </p>
+              <p class="item-title">
+                <a href="/2023/05/12/%E4%BB%A3%E7%A0%81/%E4%BB%A3%E7%A0%81-%E8%8E%B7%E5%8F%96-arXiv-%E8%AE%BA%E6%96%87%E4%BD%9C%E8%80%85%E5%8D%95%E4%BD%8D-Glenn/" class="title">代码 | 获取 arXiv 论文作者单位</a>
+              </p>
+              <p class="item-date">
+                <time datetime="2023-05-12T10:52:40.000Z" itemprop="datePublished">2023-05-12</time>
+              </p>
+            </div>
+          </li>
+          
+          <li>
+            
+            <div class="item-inner">
+              <p class="item-category">
+                <a class="category-link" href="/categories/%E4%BB%A3%E7%A0%81/">代码</a>
+              </p>
+              <p class="item-title">
+                <a href="/2023/05/12/%E4%BB%A3%E7%A0%81/%E4%BB%A3%E7%A0%81-%E6%AF%8F%E5%A4%A9%E5%AE%9A%E7%82%B9%E5%90%91%E5%BE%AE%E4%BF%A1%E6%8E%A8%E9%80%81-arXiv-Glenn/" class="title">代码 | 每天定点向微信推送 arXiv 最新文章</a>
+              </p>
+              <p class="item-date">
+                <time datetime="2023-05-12T10:52:34.000Z" itemprop="datePublished">2023-05-12</time>
+              </p>
+            </div>
+          </li>
+          
+          <li>
+            
+            <div class="item-inner">
+              <p class="item-category">
+                <a class="category-link" href="/categories/%E4%BB%A3%E7%A0%81/">代码</a>
+              </p>
+              <p class="item-title">
+                <a href="/2023/05/12/%E4%BB%A3%E7%A0%81/%E4%BB%A3%E7%A0%81-%E5%B0%86%E7%9F%A5%E4%B9%8E%E4%B8%93%E6%A0%8F%E6%96%87%E7%AB%A0%E8%BD%AC%E6%8D%A2%E4%B8%BA-Markd-Glenn/" class="title">代码 | 将知乎专栏文章转换为 Markdown 文件保存到本地</a>
+              </p>
+              <p class="item-date">
+                <time datetime="2023-05-12T10:52:25.000Z" itemprop="datePublished">2023-05-12</time>
+              </p>
+            </div>
+          </li>
+          
+          <li>
+            
+            <div class="item-inner">
+              <p class="item-category">
+                <a class="category-link" href="/categories/%E4%BB%A3%E7%A0%81/">代码</a>
+              </p>
+              <p class="item-title">
+                <a href="/2023/05/12/%E4%BB%A3%E7%A0%81/%E4%BB%A3%E7%A0%81-%E4%BB%8E-OpenReview-%E8%8E%B7%E5%8F%96%E9%A1%B6-Glenn/" class="title">代码 | 从 OpenReview 获取顶会接收论文集并保存至本地数据库</a>
+              </p>
+              <p class="item-date">
+                <time datetime="2023-05-12T10:52:15.000Z" itemprop="datePublished">2023-05-12</time>
+              </p>
+            </div>
+          </li>
+          
+          <li>
+            
+            <div class="item-inner">
+              <p class="item-category">
+                <a class="category-link" href="/categories/%E8%AE%BA%E6%96%87%E9%80%9F%E8%A7%88/">论文速览</a>
+              </p>
+              <p class="item-title">
+                <a href="/2023/05/12/Masked_Image_Model/MIM-%E7%90%86%E8%AE%BA%E6%8E%A9%E8%94%BD%E5%9B%BE%E5%83%8F%E5%BB%BA%E6%A8%A1%E6%9C%AC%E8%B4%A8%E4%B8%8A%E5%9C%A8%E5%AD%A6%E4%B9%A0%E9%81%AE-Glenn/" class="title">MIM | 理论：掩蔽图像建模本质上在学习遮挡不变特征</a>
+              </p>
+              <p class="item-date">
+                <time datetime="2023-05-12T10:44:48.000Z" itemprop="datePublished">2023-05-12</time>
+              </p>
+            </div>
+          </li>
+          
+      </ul>
+    </div>
+  </div>
+  
+
+    
+  </div>
+</aside>
+
+  
+  
+<main class="main" role="main">
+  <div class="content">
+  <article id="post-Masked_Image_Model/MIM-CCViT基于-Patches-Glenn" class="article article-type-post" itemscope itemtype="http://schema.org/BlogPosting">
+    
+    <div class="article-header">
+      
+        
+  
+    <h1 class="article-title" itemprop="name">
+      MIM | CCViT：基于 Patches 质心重建的 MIM 框架
+    </h1>
+  
+
+      
+      <div class="article-meta">
+        <span class="article-date">
+    <i class="icon icon-calendar-check"></i>
+	<a href="/2023/05/12/Masked_Image_Model/MIM-CCViT%E5%9F%BA%E4%BA%8E-Patches-Glenn/" class="article-date">
+	  <time datetime="2023-05-12T10:42:47.000Z" itemprop="datePublished">2023-05-12</time>
+	</a>
+</span>
+        
+  <span class="article-category">
+    <i class="icon icon-folder"></i>
+    <a class="article-category-link" href="/categories/%E8%AE%BA%E6%96%87%E9%80%9F%E8%A7%88/">论文速览</a>
+  </span>
+
+        
+  <span class="article-tag">
+    <i class="icon icon-tags"></i>
+	<a class="article-tag-link-link" href="/tags/Masked-Image-Modeling/" rel="tag">Masked Image Modeling</a>
+  </span>
+
+
+        
+
+        <span class="post-comment"><i class="icon icon-comment"></i> <a href="/2023/05/12/Masked_Image_Model/MIM-CCViT%E5%9F%BA%E4%BA%8E-Patches-Glenn/#comments" class="article-comment-link">评论</a></span>
+        
+      </div>
+    </div>
+    <div class="article-entry marked-body" itemprop="articleBody">
+      
+        <p><img src="/2023/05/12/Masked_Image_Model/MIM-CCViT%E5%9F%BA%E4%BA%8E-Patches-Glenn/v2-0a82f5f1d90eaa082144750fe819a8d9_r.jpg"></p>
+<blockquote>
+<p><em><strong>题目：</strong>Centroid-centered Modeling for Efficient Vision Transformer Pre-training</em><br><em><strong>单位：</strong>武汉大学、京东、悉尼大学</em><br><em><strong>论文网址：</strong></em><a href="https://link.zhihu.com/?target=https://arxiv.org/abs/2303.04664">https://arxiv.org/abs/2303.04664</a><br><em><strong>论文代码：</strong>未公开</em><br><em><strong>首次发布时间：</strong>2023 年 3 月 8 日</em></p>
+</blockquote>
+<hr>
+<h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>陶老师挂名的一篇论文。</p>
+<p>之前介绍的都是以像素为重建目标的 MIM 模型，另一种主流的重建目标是 tokens，比如 BEiT、iBOT 等。而 CCViT 找出了以 tokens 为重建目标的 MIM 序列模型的缺陷，并提出了一种基于 patches 质心的 tokenizer 方式，可以有效缩短 tokens 生成的时间。</p>
+<blockquote>
+<p> DeepMIM 介绍看这里：</p>
+</blockquote>
+<blockquote>
+<p> PixMIM 介绍看这里：</p>
+</blockquote>
+<blockquote>
+<p> AutoMAE 介绍看这里：</p>
+</blockquote>
+<hr>
+<ol>
+<li>主要内容</li>
+</ol>
+<hr>
+<p>目前以重建目标为改进方向的 MIM 方法主要有两种类型：一种是基于像素重建的 MIM，另一种基于 token 或高级特征重建的 MIM。</p>
+<p>然而，这两种方式都有其缺点：</p>
+<ul>
+<li>首先，它们都引入了一个冗余模块来将潜在表示转换为原始像素。基于像素的 MIM（如MAE）需要一个冗余解码器。基于 token 的 MIM，如 BEiT，需要一个 tokenizer 模型来将图像像素转换为离散tokens。</li>
+<li>此外，来自 tokenizer 的 tokens 并不能表示对应的图像 patches，因为 tokenizer 是基于整个图像生成 tokens，而不是单个 patch。因此，即使某个 patch 保持不变，如果来自其他 patches 的像素被修改，则该 patch 生成的 token 也可能被改变。</li>
+<li>tokenizer 的训练通常需要消耗大量时间。</li>
+</ul>
+<p>对此，CCViT ：</p>
+<p>1）提出了一种 patch 质心 tokenizer，用于生成局部性 token；</p>
+<p>2）提出了一种新的掩蔽策略：质心 patch 替换，可以结合 BEiT 的 blockwise masking；</p>
+<p>3）提出了像素与 tokens 结合的混合重建目标。</p>
+<ol start="2">
+<li>方法</li>
+</ol>
+<hr>
+<h3 id="2-1-构建-patches-的质心-codebook"><a href="#2-1-构建-patches-的质心-codebook" class="headerlink" title="2.1 构建 patches 的质心 codebook"></a>2.1 构建 patches 的质心 codebook</h3><p>使用 k-means 聚类方法，从 N×n 个 patches \left{x_i^p\right}^{N×n}_{i&#x3D;1} <em>，</em>展平为向量形式\left{x_i^v \in \mathbb{R}^{C×P^2}\right}^{N×n}_{i&#x3D;1} 后，寻找其 K 个质心 \left{\mathcal C_k\in\mathbb R^{C×P^2}\right}^K_{k&#x3D;1} ，损失函数为：</p>
+<p>$$ \mathbb{E}(\mathcal C_1,…,\mathcal C_K)&#x3D;\frac{1}{N}\sum_{i&#x3D;1}^{N}||x_i^v-\mathcal C_{a(i)}||2\ a(i) &#x3D; argmin{k∈\left{1，…，K\right}}||x^v_i−\mathcal C_k||_2 $$ </p>
+<p>其中， N 是训练图像数量， n&#x3D;HW&#x2F;P^2 是单张图像 x\in\mathbb R^{C×H×W} 的 patches 数量。</p>
+<p>训练完成后，可以得到一个质心 codebook \left{\mathcal C_k\in\mathbb R^{C×P^2}\right}^K_{k&#x3D;1} 和对应的 index codebook \left{k\right}^K_{k&#x3D;1} 。</p>
+<p>给定一个图像 patch 将其展平为向量形式 x_i^v∈\mathbb R^{C×P^2} ，其 index token t_i 可以通过查找最近质心的索引得到：</p>
+<p>t_i&#x3D;argmin_{k\in \left{1,…,K\right}}||x_i^v-\mathcal C_k||_2 </p>
+<p>同时，将该 patch x_i^v∈\mathbb R^{C×P^2} 替换为 \mathcal C_{t_i}\in\mathbb R^{C×P^2} 后，可以得到一个质心 patch。</p>
+<p><img src="/2023/05/12/Masked_Image_Model/MIM-CCViT%E5%9F%BA%E4%BA%8E-Patches-Glenn/v2-7c43dd288d82150da720ae568c58cc0b_r.jpg"><br>图1. 构建 patches 的质心 codebook</p>
+<h3 id="2-2-设置掩蔽策略"><a href="#2-2-设置掩蔽策略" class="headerlink" title="2.2 设置掩蔽策略"></a>2.2 设置掩蔽策略</h3><p>掩蔽策略使用了 BEiT 的 blockwise masking 和质心 patch 替换两种方式。</p>
+<p>质心 patch 替换是指在 blockwise masking 后，随机使用对应的质心 patch 替换剩下的未被屏蔽的 patch。</p>
+<p>给定掩蔽比 r_m 和替换比 r_{re} ，掩蔽位置 \mathcal M∈\left{1，…，n\right}^{r_m×n} ，替换位置 \mathcal R∈\left{1，…，n\right}^{r_{re}×n} 。被替换位置的前提是该位置未被屏蔽，即 \mathcal M \bigcap R&#x3D;∅ 。</p>
+<p>给定一个图像 x∈\mathbb R^{C×H×W} 及其 patches \left{x_i^p\right}^n_{i&#x3D;1} ，经过掩蔽策略后转换为：</p>
+<p>$$ \tilde{x}&#x3D;\left{x_i^p \boldsymbol{E}p \mid i \notin \mathcal{M} \bigcup \mathcal{R}\right}{i&#x3D;1}^n \bigcup\left{e_m \mid i \in \mathcal{M}\right}{i&#x3D;1}^n \bigcup\left{C{a(i)} \boldsymbol{E}p \mid i \in \mathcal{R}\right}{i&#x3D;1}^n\ a(i) &#x3D; argmin_{k∈\left{1，…，K\right}}||x^v_i−\mathcal C_k||_2 $$ </p>
+<p>其中， e_m 是可学习的 mask token embedding，  x \boldsymbol{E}_p 表示 patch embedding 的计算过程。</p>
+<p><img src="/2023/05/12/Masked_Image_Model/MIM-CCViT%E5%9F%BA%E4%BA%8E-Patches-Glenn/v2-244ffddd3111bb055384b714e0ba3c92_r.jpg"><br>图2. 设置掩蔽策略</p>
+<h3 id="2-3-使用-ViT-作为主干网络"><a href="#2-3-使用-ViT-作为主干网络" class="headerlink" title="2.3 使用 ViT 作为主干网络"></a>2.3 使用 ViT 作为主干网络</h3><p>编码器分为像素预测模块和质心 index 预测模块。</p>
+<p>质心 index 预测模块使用完整的 ViT 网络，使用线性头 lin.1(\cdot) 将输入向量 \boldsymbol{H}0&#x3D;\left[\boldsymbol{E}_{\mathrm{CLS}}, \tilde{x_1} \boldsymbol{E}_p, \ldots, \tilde{x_n} \boldsymbol{E}_p\right] 通过 L 层 token block ψ_t^L(\tilde x) 后产生的表征映射到质心 index 空间中。</p>
+<p>由于基于质心的建模具有局部性，需要 CLS token 来显式地聚合全局表示，以补偿由于将原始图像 patch 降采样到质心所造成的信息损失。所以添加了一个像素预测模块用于收集全局信息。</p>
+<p>将从第 l 层获取的早期表征定义为 [h^l_1，…, h^l_n] ，最后一层第 L 层获取 CLS token 定义为 h^L_{CLS} 。</p>
+<p>像素预测模将表征 \boldsymbol{H}p&#x3D;\left[h^L_{CLS},h^l_1，…, h^l_n\right] 输入两层 pixel ViT block ψ_p^2(H_p) 中，再使用线性头 lin.2(\cdot) 将输出映射到原始像素空间中。</p>
+<p><img src="/2023/05/12/Masked_Image_Model/MIM-CCViT%E5%9F%BA%E4%BA%8E-Patches-Glenn/v2-51038802a0ad064770f19294dcb196d1_r.jpg"><br>图3. CCViT 完整框架<br>损失函数如下：</p>
+<p>$$ \begin{aligned}\mathcal{L}_{\mathrm{CE}} &amp; \left.&#x3D;-\sum{\tilde{x}} \sum_{i \in \mathcal{T}} \log \left(p_{\mathrm{CIM}}\left(t_i \mid \tilde{x}\right)\right)\right) \ p_{\mathrm{CIM}}\left(t_i \mid \tilde{x}\right) &amp;&#x3D; softmax_{t_i} (lin.1◦ψ_t^L(\tilde x)) \ \mathcal{L}_{\mathrm{MSE}} &amp; &#x3D;-\sum{\tilde{x}} \sum_{i \in \mathcal{T}} \frac{1}{\lambda\left(\tilde{x}^{\mathcal{T}}\right)}\left|x^{p \mathcal{T}}-\psi_p^2\left(\boldsymbol{H}p\right)^{\mathcal{T}}\right|2 \\mathcal{L}_{\mathrm{CIM}} &amp; &#x3D;\mathcal{L}{\mathrm{CE}}+\mathcal{L}_{\mathrm{MSE}}\end{aligned} $$ </p>
+<hr>
+<ol start="3">
+<li>结果</li>
+</ol>
+<hr>
+<p>实验参数设置请查看原文。</p>
+<p>1）基线模型对比。从表 1 可以得出：</p>
+<ul>
+<li>CCViT 比 MAE 和其他基于像素重建的 MIM 方法精度高，说明 CCViT 方法可行且有效。</li>
+<li>CCViT 比其他训练周期更长的 MIM 方法相比人有竞争力，这表明质心是比只用 token 和只用 pixel 更有效的重建目标。</li>
+<li>CCViT 比 BEiTv2 精度低，说明 CLIP Feature 作为重建目标还是顶的。</li>
+</ul>
+<p><img src="/2023/05/12/Masked_Image_Model/MIM-CCViT%E5%9F%BA%E4%BA%8E-Patches-Glenn/v2-3e145b3f0124e6ccada112061da4329a_r.jpg"><br>表1. ImageNet-1K 上图像分类 top-1 accuracy (%) 和 ADE20K 上语义分割的 mIoU (%) 的微调结果。†：MAE 复现结果。<br>2）消融实验。从表 2 可以得出：</p>
+<ul>
+<li>将 tokens 和像素同时作为目标可以获得最好的结果，说明基于质心的建模中同时学习 tokens 和像素是有益的。</li>
+<li>加上随机替代策略比仅用 blockwise masking 结果要好，说明使用随机替换策略将鼓励模型学习像素和 tokens 的对齐。</li>
+</ul>
+<p><img src="/2023/05/12/Masked_Image_Model/MIM-CCViT%E5%9F%BA%E4%BA%8E-Patches-Glenn/v2-f90046a804c0221e4f5bb0f773897537_r.jpg"><br>表2. 在 ImageNet-1K 和 ADE20K 上进行的消融实验。“Rep.” 指是否使用随机替代策略<br>3）在 tokenizer 训练过程中，给 patch 随机加噪声，观察对其他 patches tokens 生成的影响。在从表 3 可以得出：</p>
+<ul>
+<li>BEiT 和 BEiTv2 的 tokenizer 即使没有改变 patches 像素也会改变相应的 tokens（只有 1.41% 和3.97% 的 tokens 保持不变），这意味着它们不能保证图像 patches 和 tokens 之间的局部对应关系。</li>
+</ul>
+<p><img src="/2023/05/12/Masked_Image_Model/MIM-CCViT%E5%9F%BA%E4%BA%8E-Patches-Glenn/v2-17b0f7af198132d109786b116ef0ff73_r.jpg"><br>表3. 不同 tokenizers 的抗噪声能力比较。使用 tokens 不变 patches 的比率作为评价指标。<br>4）从表 4 可以得出：</p>
+<ul>
+<li>基于质心的 tokenizer 相比于 BEiT 等基于 dVAE 的 tokenizer 拥有更快的速度和推理时间；</li>
+<li>基于质心的 tokenizer 在预测精度上优于 BEiT 和 BEiTv2 tokenizer。这一方面表明，基于质心的 tokenizer 能够通过上下文来预测 token，另一方面，BEiT 和 BEiTv2 没有学习到足够的 patch 间关系，无法通过 patch 间关联进行掩蔽推理。这反映了 BEiTv2 的改进本质上是由离散特征蒸馏所带来的。</li>
+</ul>
+<p><img src="/2023/05/12/Masked_Image_Model/MIM-CCViT%E5%9F%BA%E4%BA%8E-Patches-Glenn/v2-2e211aa606122de743bd9bb623418ef9_r.jpg"><br>表4. 不同 tokenizers 的性能</p>
+
+      
+    </div>
+    <div class="article-footer">
+      <blockquote class="mt-2x">
+  <ul class="post-copyright list-unstyled">
+    
+    <li class="post-copyright-link hidden-xs">
+      <strong>本文链接：</strong>
+      <a href="http://glennchen.cn/2023/05/12/Masked_Image_Model/MIM-CCViT%E5%9F%BA%E4%BA%8E-Patches-Glenn/" title="MIM | CCViT：基于 Patches 质心重建的 MIM 框架" target="_blank" rel="external">http://glennchen.cn/2023/05/12/Masked_Image_Model/MIM-CCViT基于-Patches-Glenn/</a>
+    </li>
+    
+    <li class="post-copyright-license">
+      <strong>版权声明： </strong> 本博客所有文章除特别声明外，均采用 <a href="http://creativecommons.org/licenses/by/4.0/deed.zh" target="_blank" rel="external">CC BY 4.0 CN协议</a> 许可协议。转载请注明出处！
+    </li>
+  </ul>
+</blockquote>
+
+
+<div class="panel panel-default panel-badger">
+  <div class="panel-body">
+    <figure class="media">
+      <div class="media-left">
+        <a href="https://github.com/chenluda" target="_blank" class="img-burn thumb-sm visible-lg">
+          <img src="/images/avatar.png" class="img-rounded w-full" alt="">
+        </a>
+      </div>
+      <div class="media-body">
+        <h3 class="media-heading"><a href="https://github.com/chenluda" target="_blank"><span class="text-dark">Glenn</span><small class="ml-1x">Stay hungry, stay foolish.</small></a></h3>
+        <div>咖啡，健身，热爱生活。</div>
+      </div>
+    </figure>
+  </div>
+</div>
+
+
+    </div>
+  </article>
+  
+    
+  <section id="comments">
+  	
+      <div id="vcomments"></div>
+    
+  </section>
+
+
+  
+</div>
+
+  <nav class="bar bar-footer clearfix" data-stick-bottom>
+  <div class="bar-inner">
+  
+  <ul class="pager pull-left">
+    
+    <li class="prev">
+      <a href="/2023/05/12/Masked_Image_Model/MIM-DeepMIM%E5%B0%86-Deep-S-Glenn/" title="MIM | DeepMIM：将 Deep Supervision 引入掩蔽图像建模"><i class="icon icon-angle-left" aria-hidden="true"></i><span>&nbsp;&nbsp;上一篇</span></a>
+    </li>
+    
+    
+    <li class="next">
+      <a href="/2023/05/12/Masked_Image_Model/MIM-AutoMAE%E5%B0%86%E7%94%9F%E6%88%90%E5%AF%B9%E6%8A%97%E7%BD%91%E7%BB%9C%E7%94%A8-Glenn/" title="MIM | AutoMAE：将生成对抗网络用于优化掩蔽策略"><span>下一篇&nbsp;&nbsp;</span><i class="icon icon-angle-right" aria-hidden="true"></i></a>
+    </li>
+    
+    
+  </ul>
+  
+  
+  
+  <div class="bar-right">
+    
+    <div class="share-component" data-sites="weibo,qq,wechat,facebook,twitter" data-mobile-sites="weibo,qq,qzone"></div>
+    
+  </div>
+  </div>
+</nav>
+  
+
+
+</main>
+
+  <footer class="footer" itemscope itemtype="http://schema.org/WPFooter">
+	
+	
+    <ul class="social-links">
+    	
+        <li><a href="https://github.com/chenluda" target="_blank" title="Github" data-toggle=tooltip data-placement=top><i class="icon icon-github"></i></a></li>
+        
+        <li><a href="https://www.zhihu.com/people/Glenn" target="_blank" title="Zhihu" data-toggle=tooltip data-placement=top><i class="icon icon-zhihu"></i></a></li>
+        
+    </ul>
+
+    <div class="copyright">
+    	
+        <div class="publishby">
+        	Theme by <a href="https://github.com/cofess" target="_blank"> cofess </a>base on <a href="https://github.com/cofess/hexo-theme-pure" target="_blank">pure</a>.
+        </div>
+    </div>
+</footer>
+  <script src="//cdn.jsdelivr.net/npm/jquery@1.12.4/dist/jquery.min.js"></script>
+<script>
+window.jQuery || document.write('<script src="js/jquery.min.js"><\/script>')
+</script>
+
+<script src="/js/plugin.min.js"></script>
+
+
+<script src="/js/application.js"></script>
+
+
+    <script>
+(function (window) {
+    var INSIGHT_CONFIG = {
+        TRANSLATION: {
+            POSTS: '文章',
+            PAGES: '页面',
+            CATEGORIES: '分类',
+            TAGS: '标签',
+            UNTITLED: '(未命名)',
+        },
+        ROOT_URL: '/',
+        CONTENT_URL: '/content.json',
+    };
+    window.INSIGHT_CONFIG = INSIGHT_CONFIG;
+})(window);
+</script>
+
+<script src="/js/insight.js"></script>
+
+
+
+
+
+
+   
+
+
+
+
+   
+    
+  <script src="//cdn1.lncld.net/static/js/3.0.4/av-min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/valine"></script>
+  <script type="text/javascript">
+  var GUEST = ['nick', 'mail', 'link'];
+  var meta = 'nick,mail,link';
+  meta = meta.split(',').filter(function(item) {
+    return GUEST.indexOf(item) > -1;
+  });
+  new Valine({
+    el: '#vcomments',
+    verify: false,
+    notify: false,
+    appId: '',
+    appKey: '',
+    placeholder: 'Just go go',
+    avatar: 'mm',
+    meta: meta,
+    pageSize: '10' || 10,
+    visitor: false
+  });
+  </script>
+
+     
+
+
+
+
+
+
+
+</body>
+</html>

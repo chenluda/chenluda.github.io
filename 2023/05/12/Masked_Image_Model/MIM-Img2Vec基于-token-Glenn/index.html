@@ -1,0 +1,585 @@
+<!DOCTYPE html>
+<html lang=zh>
+<head>
+  <meta charset="utf-8">
+  
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=no, minimal-ui">
+  <meta name="renderer" content="webkit">
+  <meta http-equiv="Cache-Control" content="no-transform" />
+  <meta http-equiv="Cache-Control" content="no-siteapp" />
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black">
+  <meta name="format-detection" content="telephone=no,email=no,adress=no">
+  <!-- Color theme for statusbar -->
+  <meta name="theme-color" content="#000000" />
+  <!-- 强制页面在当前窗口以独立页面显示,防止别人在框架里调用页面 -->
+  <meta http-equiv="window-target" content="_top" />
+  
+  
+  <title>MIM | Img2Vec：基于 token 多样性原则选择教师模型 | Hexo</title>
+  <meta name="description" content="题目：Img2Vec: A Teacher of High Token-Diversity Helps Masked AutoEncoders单位：腾讯、浙江大学、北京大学论文网址：https:&#x2F;&#x2F;arxiv.org&#x2F;abs&#x2F;2304.12535论文代码： 未公开首次发布时间：2023 年 4 月 25 日  123456@article&amp;#123;pan2023img2vec,      t">
+<meta property="og:type" content="article">
+<meta property="og:title" content="MIM | Img2Vec：基于 token 多样性原则选择教师模型">
+<meta property="og:url" content="http://glennchen.cn/2023/05/12/Masked_Image_Model/MIM-Img2Vec%E5%9F%BA%E4%BA%8E-token-Glenn/index.html">
+<meta property="og:site_name" content="Glenn">
+<meta property="og:description" content="题目：Img2Vec: A Teacher of High Token-Diversity Helps Masked AutoEncoders单位：腾讯、浙江大学、北京大学论文网址：https:&#x2F;&#x2F;arxiv.org&#x2F;abs&#x2F;2304.12535论文代码： 未公开首次发布时间：2023 年 4 月 25 日  123456@article&amp;#123;pan2023img2vec,      t">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://glennchen.cn/2023/05/12/Masked_Image_Model/MIM-Img2Vec%E5%9F%BA%E4%BA%8E-token-Glenn/v2-7c0ae40c05b057e90705d70c811f656d_r.jpg">
+<meta property="og:image" content="http://glennchen.cn/2023/05/12/Masked_Image_Model/MIM-Img2Vec%E5%9F%BA%E4%BA%8E-token-Glenn/v2-810b7817f49121bd2a679818ba6e2e8f_r.jpg">
+<meta property="og:image" content="http://glennchen.cn/2023/05/12/Masked_Image_Model/MIM-Img2Vec%E5%9F%BA%E4%BA%8E-token-Glenn/v2-e4d7acc432bc23b10a2d31f1a862a11e_r.jpg">
+<meta property="og:image" content="http://glennchen.cn/2023/05/12/Masked_Image_Model/MIM-Img2Vec%E5%9F%BA%E4%BA%8E-token-Glenn/v2-c5de01529f4802c98c338f7fb75fbb34_r.jpg">
+<meta property="og:image" content="http://glennchen.cn/2023/05/12/Masked_Image_Model/MIM-Img2Vec%E5%9F%BA%E4%BA%8E-token-Glenn/v2-f79356f55f838cd4dff187796a643133_r.jpg">
+<meta property="og:image" content="http://glennchen.cn/2023/05/12/Masked_Image_Model/MIM-Img2Vec%E5%9F%BA%E4%BA%8E-token-Glenn/v2-93fb775711ec6a0cac3a3f7200e02a59_r.jpg">
+<meta property="og:image" content="http://glennchen.cn/2023/05/12/Masked_Image_Model/MIM-Img2Vec%E5%9F%BA%E4%BA%8E-token-Glenn/v2-32abbaa7c276d6bf64525e7841a05dc9_r.jpg">
+<meta property="article:published_time" content="2023-05-12T10:44:19.000Z">
+<meta property="article:modified_time" content="2023-05-12T12:17:07.718Z">
+<meta property="article:author" content="Glenn">
+<meta property="article:tag" content="Masked Image Modeling">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://glennchen.cn/2023/05/12/Masked_Image_Model/MIM-Img2Vec%E5%9F%BA%E4%BA%8E-token-Glenn/v2-7c0ae40c05b057e90705d70c811f656d_r.jpg">
+  <!-- Canonical links -->
+  <link rel="canonical" href="http://glennchen.cn/2023/05/12/Masked_Image_Model/MIM-Img2Vec%E5%9F%BA%E4%BA%8E-token-Glenn/index.html">
+  
+    <link rel="alternate" href="/atom.xml" title="Glenn" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="/favicon.png" type="image/x-icon">
+  
+  
+<link rel="stylesheet" href="/css/style.css">
+
+  
+  
+  
+  
+<!-- hexo injector head_end start -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/katex.min.css">
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/hexo-math@4.0.0/dist/style.css">
+<!-- hexo injector head_end end --><meta name="generator" content="Hexo 6.3.0"></head>
+
+
+<body class="main-center theme-black" itemscope itemtype="http://schema.org/WebPage">
+  <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+  <div class="slimContent">
+    <div class="navbar-header">
+      
+      
+      <div class="profile-block text-center">
+        <a id="avatar" href="https://github.com/chenluda" target="_blank">
+          <img class="img-circle img-rotate" src="/images/avatar.png" width="200" height="200">
+        </a>
+        <h2 id="name" class="hidden-xs hidden-sm">Glenn</h2>
+        <h3 id="title" class="hidden-xs hidden-sm hidden-md">Stay hungry, stay foolish.</h3>
+        <small id="location" class="text-muted hidden-xs hidden-sm"><i class="icon icon-map-marker"></i> Yunnan, China</small>
+      </div>
+      
+      <div class="search" id="search-form-wrap">
+
+    <form class="search-form sidebar-form">
+        <div class="input-group">
+            <input type="text" class="search-form-input form-control" placeholder="搜索" />
+            <span class="input-group-btn">
+                <button type="submit" class="search-form-submit btn btn-flat" onclick="return false;"><i class="icon icon-search"></i></button>
+            </span>
+        </div>
+    </form>
+    <div class="ins-search">
+  <div class="ins-search-mask"></div>
+  <div class="ins-search-container">
+    <div class="ins-input-wrapper">
+      <input type="text" class="ins-search-input" placeholder="想要查找什么..." x-webkit-speech />
+      <button type="button" class="close ins-close ins-selectable" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span></button>
+    </div>
+    <div class="ins-section-wrapper">
+      <div class="ins-section-container"></div>
+    </div>
+  </div>
+</div>
+
+
+</div>
+      <button class="navbar-toggle collapsed" type="button" data-toggle="collapse" data-target="#main-navbar" aria-controls="main-navbar" aria-expanded="false">
+        <span class="sr-only">Toggle navigation</span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+    </div>
+    <nav id="main-navbar" class="collapse navbar-collapse" itemscope itemtype="http://schema.org/SiteNavigationElement" role="navigation">
+      <ul class="nav navbar-nav main-nav ">
+        
+        
+        <li class="menu-item menu-item-home">
+          <a href="/.">
+            
+            <i class="icon icon-home-fill"></i>
+            
+            <span class="menu-title">首页</span>
+          </a>
+        </li>
+        
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives">
+            
+            <i class="icon icon-archives-fill"></i>
+            
+            <span class="menu-title">归档</span>
+          </a>
+        </li>
+        
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories">
+            
+            <i class="icon icon-folder"></i>
+            
+            <span class="menu-title">分类</span>
+          </a>
+        </li>
+        
+      </ul>
+      
+	
+    <ul class="social-links">
+    	
+        <li><a href="https://github.com/chenluda" target="_blank" title="Github" data-toggle=tooltip data-placement=top><i class="icon icon-github"></i></a></li>
+        
+        <li><a href="https://www.zhihu.com/people/Glenn" target="_blank" title="Zhihu" data-toggle=tooltip data-placement=top><i class="icon icon-zhihu"></i></a></li>
+        
+    </ul>
+
+    </nav>
+  </div>
+</header>
+
+  
+    <aside class="sidebar" itemscope itemtype="http://schema.org/WPSideBar">
+  <div class="slimContent">
+    
+      <div class="widget">
+    <h3 class="widget-title">公告</h3>
+    <div class="widget-body">
+        <div id="board">
+            <div class="content">
+                <p>欢迎交流与分享经验!</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+    
+      
+  <div class="widget">
+    <h3 class="widget-title">分类</h3>
+    <div class="widget-body">
+      <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/%E4%BB%A3%E7%A0%81/">代码</a><span class="category-list-count">4</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/%E8%AE%BA%E6%96%87%E9%80%9F%E8%A7%88/">论文速览</a><span class="category-list-count">12</span></li></ul>
+    </div>
+  </div>
+
+
+    
+      
+  <div class="widget">
+    <h3 class="widget-title">标签</h3>
+    <div class="widget-body">
+      <ul class="tag-list" itemprop="keywords"><li class="tag-list-item"><a class="tag-list-link" href="/tags/Conference-paper/" rel="tag">Conference paper</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/DataBase/" rel="tag">DataBase</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Markdown/" rel="tag">Markdown</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Masked-Image-Modeling/" rel="tag">Masked Image Modeling</a><span class="tag-list-count">12</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/OpenReview/" rel="tag">OpenReview</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Organization/" rel="tag">Organization</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/WeChat/" rel="tag">WeChat</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Zhihu/" rel="tag">Zhihu</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/arXiv/" rel="tag">arXiv</a><span class="tag-list-count">2</span></li></ul>
+    </div>
+  </div>
+
+
+    
+      
+  <div class="widget">
+    <h3 class="widget-title">标签云</h3>
+    <div class="widget-body tagcloud">
+      <a href="/tags/Conference-paper/" style="font-size: 13px;">Conference paper</a> <a href="/tags/DataBase/" style="font-size: 13.5px;">DataBase</a> <a href="/tags/Markdown/" style="font-size: 13px;">Markdown</a> <a href="/tags/Masked-Image-Modeling/" style="font-size: 14px;">Masked Image Modeling</a> <a href="/tags/OpenReview/" style="font-size: 13px;">OpenReview</a> <a href="/tags/Organization/" style="font-size: 13px;">Organization</a> <a href="/tags/WeChat/" style="font-size: 13px;">WeChat</a> <a href="/tags/Zhihu/" style="font-size: 13px;">Zhihu</a> <a href="/tags/arXiv/" style="font-size: 13.5px;">arXiv</a>
+    </div>
+  </div>
+
+    
+      
+  <div class="widget">
+    <h3 class="widget-title">归档</h3>
+    <div class="widget-body">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2023/05/">五月 2023</a><span class="archive-list-count">16</span></li></ul>
+    </div>
+  </div>
+
+
+    
+      
+  <div class="widget">
+    <h3 class="widget-title">最新文章</h3>
+    <div class="widget-body">
+      <ul class="recent-post-list list-unstyled no-thumbnail">
+        
+          <li>
+            
+            <div class="item-inner">
+              <p class="item-category">
+                <a class="category-link" href="/categories/%E4%BB%A3%E7%A0%81/">代码</a>
+              </p>
+              <p class="item-title">
+                <a href="/2023/05/12/%E4%BB%A3%E7%A0%81/%E4%BB%A3%E7%A0%81-%E8%8E%B7%E5%8F%96-arXiv-%E8%AE%BA%E6%96%87%E4%BD%9C%E8%80%85%E5%8D%95%E4%BD%8D-Glenn/" class="title">代码 | 获取 arXiv 论文作者单位</a>
+              </p>
+              <p class="item-date">
+                <time datetime="2023-05-12T10:52:40.000Z" itemprop="datePublished">2023-05-12</time>
+              </p>
+            </div>
+          </li>
+          
+          <li>
+            
+            <div class="item-inner">
+              <p class="item-category">
+                <a class="category-link" href="/categories/%E4%BB%A3%E7%A0%81/">代码</a>
+              </p>
+              <p class="item-title">
+                <a href="/2023/05/12/%E4%BB%A3%E7%A0%81/%E4%BB%A3%E7%A0%81-%E6%AF%8F%E5%A4%A9%E5%AE%9A%E7%82%B9%E5%90%91%E5%BE%AE%E4%BF%A1%E6%8E%A8%E9%80%81-arXiv-Glenn/" class="title">代码 | 每天定点向微信推送 arXiv 最新文章</a>
+              </p>
+              <p class="item-date">
+                <time datetime="2023-05-12T10:52:34.000Z" itemprop="datePublished">2023-05-12</time>
+              </p>
+            </div>
+          </li>
+          
+          <li>
+            
+            <div class="item-inner">
+              <p class="item-category">
+                <a class="category-link" href="/categories/%E4%BB%A3%E7%A0%81/">代码</a>
+              </p>
+              <p class="item-title">
+                <a href="/2023/05/12/%E4%BB%A3%E7%A0%81/%E4%BB%A3%E7%A0%81-%E5%B0%86%E7%9F%A5%E4%B9%8E%E4%B8%93%E6%A0%8F%E6%96%87%E7%AB%A0%E8%BD%AC%E6%8D%A2%E4%B8%BA-Markd-Glenn/" class="title">代码 | 将知乎专栏文章转换为 Markdown 文件保存到本地</a>
+              </p>
+              <p class="item-date">
+                <time datetime="2023-05-12T10:52:25.000Z" itemprop="datePublished">2023-05-12</time>
+              </p>
+            </div>
+          </li>
+          
+          <li>
+            
+            <div class="item-inner">
+              <p class="item-category">
+                <a class="category-link" href="/categories/%E4%BB%A3%E7%A0%81/">代码</a>
+              </p>
+              <p class="item-title">
+                <a href="/2023/05/12/%E4%BB%A3%E7%A0%81/%E4%BB%A3%E7%A0%81-%E4%BB%8E-OpenReview-%E8%8E%B7%E5%8F%96%E9%A1%B6-Glenn/" class="title">代码 | 从 OpenReview 获取顶会接收论文集并保存至本地数据库</a>
+              </p>
+              <p class="item-date">
+                <time datetime="2023-05-12T10:52:15.000Z" itemprop="datePublished">2023-05-12</time>
+              </p>
+            </div>
+          </li>
+          
+          <li>
+            
+            <div class="item-inner">
+              <p class="item-category">
+                <a class="category-link" href="/categories/%E8%AE%BA%E6%96%87%E9%80%9F%E8%A7%88/">论文速览</a>
+              </p>
+              <p class="item-title">
+                <a href="/2023/05/12/Masked_Image_Model/MIM-%E7%90%86%E8%AE%BA%E6%8E%A9%E8%94%BD%E5%9B%BE%E5%83%8F%E5%BB%BA%E6%A8%A1%E6%9C%AC%E8%B4%A8%E4%B8%8A%E5%9C%A8%E5%AD%A6%E4%B9%A0%E9%81%AE-Glenn/" class="title">MIM | 理论：掩蔽图像建模本质上在学习遮挡不变特征</a>
+              </p>
+              <p class="item-date">
+                <time datetime="2023-05-12T10:44:48.000Z" itemprop="datePublished">2023-05-12</time>
+              </p>
+            </div>
+          </li>
+          
+      </ul>
+    </div>
+  </div>
+  
+
+    
+  </div>
+</aside>
+
+  
+  
+<main class="main" role="main">
+  <div class="content">
+  <article id="post-Masked_Image_Model/MIM-Img2Vec基于-token-Glenn" class="article article-type-post" itemscope itemtype="http://schema.org/BlogPosting">
+    
+    <div class="article-header">
+      
+        
+  
+    <h1 class="article-title" itemprop="name">
+      MIM | Img2Vec：基于 token 多样性原则选择教师模型
+    </h1>
+  
+
+      
+      <div class="article-meta">
+        <span class="article-date">
+    <i class="icon icon-calendar-check"></i>
+	<a href="/2023/05/12/Masked_Image_Model/MIM-Img2Vec%E5%9F%BA%E4%BA%8E-token-Glenn/" class="article-date">
+	  <time datetime="2023-05-12T10:44:19.000Z" itemprop="datePublished">2023-05-12</time>
+	</a>
+</span>
+        
+  <span class="article-category">
+    <i class="icon icon-folder"></i>
+    <a class="article-category-link" href="/categories/%E8%AE%BA%E6%96%87%E9%80%9F%E8%A7%88/">论文速览</a>
+  </span>
+
+        
+  <span class="article-tag">
+    <i class="icon icon-tags"></i>
+	<a class="article-tag-link-link" href="/tags/Masked-Image-Modeling/" rel="tag">Masked Image Modeling</a>
+  </span>
+
+
+        
+
+        <span class="post-comment"><i class="icon icon-comment"></i> <a href="/2023/05/12/Masked_Image_Model/MIM-Img2Vec%E5%9F%BA%E4%BA%8E-token-Glenn/#comments" class="article-comment-link">评论</a></span>
+        
+      </div>
+    </div>
+    <div class="article-entry marked-body" itemprop="articleBody">
+      
+        <p><img src="/2023/05/12/Masked_Image_Model/MIM-Img2Vec%E5%9F%BA%E4%BA%8E-token-Glenn/v2-7c0ae40c05b057e90705d70c811f656d_r.jpg"></p>
+<blockquote>
+<p><em><strong>题目：</strong>Img2Vec: A Teacher of High Token-Diversity Helps Masked AutoEncoders<br><strong>单位：</strong>腾讯、浙江大学、北京大学<br><strong>论文网址：</strong><a href="https://link.zhihu.com/?target=https://arxiv.org/abs/2304.12535">https://arxiv.org/abs/2304.12535</a><br><strong>论文代码：</strong> 未公开<br><strong>首次发布时间：</strong>2023 年 4 月 25 日</em></p>
+</blockquote>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">@article&#123;pan2023img2vec,</span><br><span class="line">      title=&#123;Img2Vec: A Teacher of High Token-Diversity Helps Masked AutoEncoders&#125;, </span><br><span class="line">      author=&#123;Heng Pan and Chenyang Liu and Wenxiao Wang and Li Yuan and Hongfa Wang and Zhifeng Li and Wei Liu&#125;,</span><br><span class="line">      journal=&#123;arXiv preprint arXiv:2304.12535&#125;,</span><br><span class="line">      year=&#123;2023&#125;,</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+<hr>
+<h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>前面对 MIM 的小总结中提到，传统的像素级别重建任务可能会限制模型的表达能力。为了提高模型的性能，可以将重建目标替换为更高级的语义表示，如 MaskFeat 使用 HOG 特征，BEiT-v2 使用 CLIP 特征等。这将迫使模型学习更丰富的特征表示，从而有助于下游任务的性能。</p>
+<p><strong>究竟哪些高级特征对预训练最有效？</strong></p>
+<p>我们知道这些高级语义特征可以由另一个预训练模型或预训练模型（教师模型）的指数移动平均（EMA）生成。</p>
+<p>那么这个问题就可以转化为：<strong>在 MIM 中如何选择教师模型对预训练最有效？</strong></p>
+<p>对此，Img2Vec 提出了<strong>基于 token 多样性</strong>的原则选取教师模型。</p>
+<hr>
+<ol>
+<li>主要内容</li>
+</ol>
+<hr>
+<p>作者进行了初步分析，探讨了不同高级语义特征作为重建目标的影响以及对下游任务的影响，得出结论：在MIM中，具有出色表现的教师模型未必能带来更好的学生模型。</p>
+<p>为解决这一问题，作者提出了一个基于多样性原则的方法来选择 MIM 中的教师模型。基于这一原则，具有高 Token 多样性的较小模型可以表现更优。</p>
+<p>此外，作者还提出了一种新的自监督预训练框架，即 Img2Vec，使用小型 ResNet-50 模型作为教师模型，同时引入多特征学习和全局语义学习，以增强 Img2Vec。</p>
+<hr>
+<ol start="2">
+<li>方法</li>
+</ol>
+<hr>
+<h3 id="2-1-教师模型选择的标准：-token-多样性"><a href="#2-1-教师模型选择的标准：-token-多样性" class="headerlink" title="2.1 教师模型选择的标准： token 多样性"></a>2.1 教师模型选择的标准： token 多样性</h3><p>作者采用 ViT-B 作为学生模型，并对其进行 1600 个 epoch 的预训练。采用在不同自监督模型（MAE、SimCLR、DINO，为了公平对比，不使用 CLIP）预训练下的不同教师模型的输出特征作为重建目标。实验结果如表 1 所示，可视化如图 1 所示。</p>
+<p><img src="/2023/05/12/Masked_Image_Model/MIM-Img2Vec%E5%9F%BA%E4%BA%8E-token-Glenn/v2-810b7817f49121bd2a679818ba6e2e8f_r.jpg"><br>表1. 不同教师模型比较<br><img src="/2023/05/12/Masked_Image_Model/MIM-Img2Vec%E5%9F%BA%E4%BA%8E-token-Glenn/v2-e4d7acc432bc23b10a2d31f1a862a11e_r.jpg"><br>图1. 不同教师模型比较可视化</p>
+<ul>
+<li>最后一列显示了学生模型的 top-1 的微调精度。与 MAE-ViT-B 获得的 84.3% 的准确率相比，使用参数量更大的 MAE-ViT-L 作为教师模型可以将性能略微提高 0.1%。这可能归功于 ViT-L 更强的特征提取能力。</li>
+<li>相比之下，在相同的教师模型下，与 MAE ViT-B（84.6% 对 84.3%）相比，DINO ViT-B 可以带来显著的改善。这一显著结果表明，教师模型的选择比模型大小和性能影响力更大。</li>
+</ul>
+<p>因此，问题来了：<strong>影响教师模型选择最重要的因素是什么？</strong></p>
+<p>作者通过计算目标 token 的余弦相似度来可视化它们的关系，如图 2 所示。第一列中带有红色框的区域是 query patch。</p>
+<p><img src="/2023/05/12/Masked_Image_Model/MIM-Img2Vec%E5%9F%BA%E4%BA%8E-token-Glenn/v2-c5de01529f4802c98c338f7fb75fbb34_r.jpg"><br>图2. 来自不同教师模型的目标相似性的可视化。颜色越亮，值就越大，反之亦然。<br>在图 2 中，可以发现 MAE ViT-B 中的 tokens 之间更为相似，而 DINO ViT-B 中的相似的 tokens 要少得多。</p>
+<p>为了对这一现象进行定量分析，作者提出了一个名为“token 多样性”的指标。定义如下：</p>
+<blockquote>
+<p>对于具有 K 个 tokens \left{y_i\right}^K_{i&#x3D;1} 的教师特征样本，计算所有 tokens 之间的余弦相似性，并使用最大最小归一化将值映射到 [0，1] 中。然后再将这些相似性平均为样本值。 N 个样本的多样性为：<br>diver&#x3D;1-\frac{1}{N}\sum^N_{n&#x3D;1}sim_n<br>其中， sim_n&#x3D;\frac{1}{K(K-1)}\sum^K_{i\neq j}norm\left{cosine(y_i,y_j)\right} 是第 n 个样本的相似性。更大的 diver 说明了 tokens 越多样化。</p>
+</blockquote>
+<p>表 1 中还报告了 MAE ViT-B、MAE ViT-L 和 DINO ViT-B 的 token 多样性。这一比较验证了假设，即具有更高 token 多样性的 DINO ViT-B 训练出的学生模型性能更好。</p>
+<p>在 MIM 预训练中，掩蔽 ptaches 是通过可见 patches 重建的。如果掩蔽目标和可见目标高度相似，这就意味着，模型不需要学习到区分掩蔽目标和可见目标之间的特征，而只需要记住像素之间的具体匹配关系。这种情况下，模型的泛化能力会受到限制，因为它没有学习到更高级别的抽象特征。这会降低模型的表示学习能力，并导致模型在下游任务中的性能下降。</p>
+<p>举例来说，如果一个狐狸的耳朵被遮住了，那么一个基于 MAE 的教师模型可能会容忍学生模型将它预测为狐狸的可见身体特征，因为它们都属于狐狸的一部分。然而，一个基于 DINO 的教师模型则要求学生更准确地预测，因为它需要学生区分不同的视觉区域，而不是只依赖像素级别的匹配关系。</p>
+<p>表征的多样性反映了模型的不同辨别能力，即对于不同的视觉区域，模型学到的特征不同，这有助于提高模型的表示学习能力和泛化能力，从而在下游任务中表现更好。</p>
+<p>考虑到 ViT 在全局注意力机制中会处理所有的 tokens，它们的输出 tokens 往往彼此相似。而 ConvNets 具有局部性的归纳偏差，它提取邻居特征。因此，ConvNets 可能是生成 MIM 目标的良好替代方案。</p>
+<p>从表 1 和图 2 可以看出，SimCLR 和 DINO 预训练的 ResNet-50 比 ViT 获取了更高的 token 多样性。</p>
+<p>通过以上定性和定量分析，可以假设 token 多样性是衡量 MIM 重建目标的一个有价值和必要的视角。</p>
+<h3 id="2-2-Img2Vec-架构"><a href="#2-2-Img2Vec-架构" class="headerlink" title="2.2 Img2Vec 架构"></a>2.2 Img2Vec 架构</h3><p>根据以上讨论，作者提出了 MIM 新架构：Img2Vec。</p>
+<p>Img2Vec 采用高标记多样性模型，DINO ResNet-50 作为教师模型。此外，还包含两个新的模块，多块特征学习和全局语义学习。整个框架如图 3 所示。</p>
+<p><img src="/2023/05/12/Masked_Image_Model/MIM-Img2Vec%E5%9F%BA%E4%BA%8E-token-Glenn/v2-f79356f55f838cd4dff187796a643133_r.jpg"><br>图3. Img2Vec 架构<br>多块特征学习和全局语义学习是 MIM 的常见手段了。</p>
+<ul>
+<li>多块特征学习是指将编码器中所有 block 的输出平均后作为编码器的总输出。</li>
+<li>全局语义学习是指将编码器最后一个 block 的输出特征经过 mlp 和平均池化，与教师模型输出的重建目标经过平均池化后做损失计算。</li>
+</ul>
+<ol start="3">
+<li>结果</li>
+</ol>
+<hr>
+<p>如表 2 所示，为了进行公平的比较，所有方法都只在 ImageNet 训练集上进行预训练。</p>
+<ul>
+<li>ViT-B、ViT-L、ViT-H 表示各个自监督模型使用这三个模型在 ImageNet-1K 上的 top-1 微调精度；</li>
+<li>Linear 表示在 ImageNet-1K 上的线性探测结果；</li>
+<li>AP^{bbox}  和 AP^{mask} 表示各个自监督模型使用 Mask R-CNN 作为检测器在 COCO 上的对象检测和实例分割性能；</li>
+<li>mIoU 表示各个自监督模型使用 UperNet 在 ADE20k 上的语义分割结果。</li>
+</ul>
+<p><img src="/2023/05/12/Masked_Image_Model/MIM-Img2Vec%E5%9F%BA%E4%BA%8E-token-Glenn/v2-93fb775711ec6a0cac3a3f7200e02a59_r.jpg"><br>表2. 不同模型在不同下游任务上的比较<br>如表 3 所示，多块特征学习模块的在不同教师模型上的消融实验。</p>
+<p><img src="/2023/05/12/Masked_Image_Model/MIM-Img2Vec%E5%9F%BA%E4%BA%8E-token-Glenn/v2-32abbaa7c276d6bf64525e7841a05dc9_r.jpg"><br>表3. 多块特征学习模块的在不同教师模型上的消融实验</p>
+
+      
+    </div>
+    <div class="article-footer">
+      <blockquote class="mt-2x">
+  <ul class="post-copyright list-unstyled">
+    
+    <li class="post-copyright-link hidden-xs">
+      <strong>本文链接：</strong>
+      <a href="http://glennchen.cn/2023/05/12/Masked_Image_Model/MIM-Img2Vec%E5%9F%BA%E4%BA%8E-token-Glenn/" title="MIM | Img2Vec：基于 token 多样性原则选择教师模型" target="_blank" rel="external">http://glennchen.cn/2023/05/12/Masked_Image_Model/MIM-Img2Vec基于-token-Glenn/</a>
+    </li>
+    
+    <li class="post-copyright-license">
+      <strong>版权声明： </strong> 本博客所有文章除特别声明外，均采用 <a href="http://creativecommons.org/licenses/by/4.0/deed.zh" target="_blank" rel="external">CC BY 4.0 CN协议</a> 许可协议。转载请注明出处！
+    </li>
+  </ul>
+</blockquote>
+
+
+<div class="panel panel-default panel-badger">
+  <div class="panel-body">
+    <figure class="media">
+      <div class="media-left">
+        <a href="https://github.com/chenluda" target="_blank" class="img-burn thumb-sm visible-lg">
+          <img src="/images/avatar.png" class="img-rounded w-full" alt="">
+        </a>
+      </div>
+      <div class="media-body">
+        <h3 class="media-heading"><a href="https://github.com/chenluda" target="_blank"><span class="text-dark">Glenn</span><small class="ml-1x">Stay hungry, stay foolish.</small></a></h3>
+        <div>咖啡，健身，热爱生活。</div>
+      </div>
+    </figure>
+  </div>
+</div>
+
+
+    </div>
+  </article>
+  
+    
+  <section id="comments">
+  	
+      <div id="vcomments"></div>
+    
+  </section>
+
+
+  
+</div>
+
+  <nav class="bar bar-footer clearfix" data-stick-bottom>
+  <div class="bar-inner">
+  
+  <ul class="pager pull-left">
+    
+    <li class="prev">
+      <a href="/2023/05/12/Masked_Image_Model/MIM-MixedAEPatch-Mi-Glenn/" title="MIM | MixedAE：Patch Mix 的调教手册"><i class="icon icon-angle-left" aria-hidden="true"></i><span>&nbsp;&nbsp;上一篇</span></a>
+    </li>
+    
+    
+    <li class="next">
+      <a href="/2023/05/12/Masked_Image_Model/MIM-HPM%E5%BC%95%E5%85%A5%E8%92%B8%E9%A6%8F%E6%A6%82%E5%BF%B5%E8%87%AA%E5%8A%A8%E7%94%9F%E6%88%90%E6%8E%A9%E8%94%BD-Glenn/" title="MIM | HPM：引入蒸馏概念自动生成掩蔽策略"><span>下一篇&nbsp;&nbsp;</span><i class="icon icon-angle-right" aria-hidden="true"></i></a>
+    </li>
+    
+    
+  </ul>
+  
+  
+  
+  <div class="bar-right">
+    
+    <div class="share-component" data-sites="weibo,qq,wechat,facebook,twitter" data-mobile-sites="weibo,qq,qzone"></div>
+    
+  </div>
+  </div>
+</nav>
+  
+
+
+</main>
+
+  <footer class="footer" itemscope itemtype="http://schema.org/WPFooter">
+	
+	
+    <ul class="social-links">
+    	
+        <li><a href="https://github.com/chenluda" target="_blank" title="Github" data-toggle=tooltip data-placement=top><i class="icon icon-github"></i></a></li>
+        
+        <li><a href="https://www.zhihu.com/people/Glenn" target="_blank" title="Zhihu" data-toggle=tooltip data-placement=top><i class="icon icon-zhihu"></i></a></li>
+        
+    </ul>
+
+    <div class="copyright">
+    	
+        <div class="publishby">
+        	Theme by <a href="https://github.com/cofess" target="_blank"> cofess </a>base on <a href="https://github.com/cofess/hexo-theme-pure" target="_blank">pure</a>.
+        </div>
+    </div>
+</footer>
+  <script src="//cdn.jsdelivr.net/npm/jquery@1.12.4/dist/jquery.min.js"></script>
+<script>
+window.jQuery || document.write('<script src="js/jquery.min.js"><\/script>')
+</script>
+
+<script src="/js/plugin.min.js"></script>
+
+
+<script src="/js/application.js"></script>
+
+
+    <script>
+(function (window) {
+    var INSIGHT_CONFIG = {
+        TRANSLATION: {
+            POSTS: '文章',
+            PAGES: '页面',
+            CATEGORIES: '分类',
+            TAGS: '标签',
+            UNTITLED: '(未命名)',
+        },
+        ROOT_URL: '/',
+        CONTENT_URL: '/content.json',
+    };
+    window.INSIGHT_CONFIG = INSIGHT_CONFIG;
+})(window);
+</script>
+
+<script src="/js/insight.js"></script>
+
+
+
+
+
+
+   
+
+
+
+
+   
+    
+  <script src="//cdn1.lncld.net/static/js/3.0.4/av-min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/valine"></script>
+  <script type="text/javascript">
+  var GUEST = ['nick', 'mail', 'link'];
+  var meta = 'nick,mail,link';
+  meta = meta.split(',').filter(function(item) {
+    return GUEST.indexOf(item) > -1;
+  });
+  new Valine({
+    el: '#vcomments',
+    verify: false,
+    notify: false,
+    appId: '',
+    appKey: '',
+    placeholder: 'Just go go',
+    avatar: 'mm',
+    meta: meta,
+    pageSize: '10' || 10,
+    visitor: false
+  });
+  </script>
+
+     
+
+
+
+
+
+
+
+</body>
+</html>

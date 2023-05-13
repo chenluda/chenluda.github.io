@@ -1,0 +1,593 @@
+<!DOCTYPE html>
+<html lang=zh>
+<head>
+  <meta charset="utf-8">
+  
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=no, minimal-ui">
+  <meta name="renderer" content="webkit">
+  <meta http-equiv="Cache-Control" content="no-transform" />
+  <meta http-equiv="Cache-Control" content="no-siteapp" />
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black">
+  <meta name="format-detection" content="telephone=no,email=no,adress=no">
+  <!-- Color theme for statusbar -->
+  <meta name="theme-color" content="#000000" />
+  <!-- 强制页面在当前窗口以独立页面显示,防止别人在框架里调用页面 -->
+  <meta http-equiv="window-target" content="_top" />
+  
+  
+  <title>MIM | AutoMAE：将生成对抗网络用于优化掩蔽策略 | Hexo</title>
+  <meta name="description" content="题目：Improving Masked Autoencoders by Learning Where to Mask作者单位：上海交通大学论文网址：https:&#x2F;&#x2F;arxiv.org&#x2F;abs&#x2F;2303.06583论文代码：未公开首次发布时间：2023 年 3 月 12 日   前言为了减少前景 patch 的掩蔽概率，PixMIM 使用 Simple Resized Crop 代替原始 MAE">
+<meta property="og:type" content="article">
+<meta property="og:title" content="MIM | AutoMAE：将生成对抗网络用于优化掩蔽策略">
+<meta property="og:url" content="http://glennchen.cn/2023/05/12/Masked_Image_Model/MIM-AutoMAE%E5%B0%86%E7%94%9F%E6%88%90%E5%AF%B9%E6%8A%97%E7%BD%91%E7%BB%9C%E7%94%A8-Glenn/index.html">
+<meta property="og:site_name" content="Glenn">
+<meta property="og:description" content="题目：Improving Masked Autoencoders by Learning Where to Mask作者单位：上海交通大学论文网址：https:&#x2F;&#x2F;arxiv.org&#x2F;abs&#x2F;2303.06583论文代码：未公开首次发布时间：2023 年 3 月 12 日   前言为了减少前景 patch 的掩蔽概率，PixMIM 使用 Simple Resized Crop 代替原始 MAE">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://glennchen.cn/2023/05/12/Masked_Image_Model/MIM-AutoMAE%E5%B0%86%E7%94%9F%E6%88%90%E5%AF%B9%E6%8A%97%E7%BD%91%E7%BB%9C%E7%94%A8-Glenn/v2-281332dc78a374a6c6d9db8676dbe3b8_r.jpg">
+<meta property="og:image" content="http://glennchen.cn/2023/05/12/Masked_Image_Model/MIM-AutoMAE%E5%B0%86%E7%94%9F%E6%88%90%E5%AF%B9%E6%8A%97%E7%BD%91%E7%BB%9C%E7%94%A8-Glenn/v2-39ee36a783bb11dea7b180f7b128e800_r.jpg">
+<meta property="og:image" content="http://glennchen.cn/2023/05/12/Masked_Image_Model/MIM-AutoMAE%E5%B0%86%E7%94%9F%E6%88%90%E5%AF%B9%E6%8A%97%E7%BD%91%E7%BB%9C%E7%94%A8-Glenn/v2-fb856f248ef974e361c9f5db0a81eedc_r.jpg">
+<meta property="og:image" content="http://glennchen.cn/2023/05/12/Masked_Image_Model/MIM-AutoMAE%E5%B0%86%E7%94%9F%E6%88%90%E5%AF%B9%E6%8A%97%E7%BD%91%E7%BB%9C%E7%94%A8-Glenn/v2-147524e193b1478d042cb6e67d8ffe09_r.jpg">
+<meta property="og:image" content="http://glennchen.cn/2023/05/12/Masked_Image_Model/MIM-AutoMAE%E5%B0%86%E7%94%9F%E6%88%90%E5%AF%B9%E6%8A%97%E7%BD%91%E7%BB%9C%E7%94%A8-Glenn/v2-cd26441b5598df456960299e68c62517_r.jpg">
+<meta property="article:published_time" content="2023-05-12T10:33:06.000Z">
+<meta property="article:modified_time" content="2023-05-12T12:16:37.955Z">
+<meta property="article:author" content="Glenn">
+<meta property="article:tag" content="Masked Image Modeling">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://glennchen.cn/2023/05/12/Masked_Image_Model/MIM-AutoMAE%E5%B0%86%E7%94%9F%E6%88%90%E5%AF%B9%E6%8A%97%E7%BD%91%E7%BB%9C%E7%94%A8-Glenn/v2-281332dc78a374a6c6d9db8676dbe3b8_r.jpg">
+  <!-- Canonical links -->
+  <link rel="canonical" href="http://glennchen.cn/2023/05/12/Masked_Image_Model/MIM-AutoMAE%E5%B0%86%E7%94%9F%E6%88%90%E5%AF%B9%E6%8A%97%E7%BD%91%E7%BB%9C%E7%94%A8-Glenn/index.html">
+  
+    <link rel="alternate" href="/atom.xml" title="Glenn" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="/favicon.png" type="image/x-icon">
+  
+  
+<link rel="stylesheet" href="/css/style.css">
+
+  
+  
+  
+  
+<!-- hexo injector head_end start -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/katex.min.css">
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/hexo-math@4.0.0/dist/style.css">
+<!-- hexo injector head_end end --><meta name="generator" content="Hexo 6.3.0"></head>
+
+
+<body class="main-center theme-black" itemscope itemtype="http://schema.org/WebPage">
+  <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+  <div class="slimContent">
+    <div class="navbar-header">
+      
+      
+      <div class="profile-block text-center">
+        <a id="avatar" href="https://github.com/chenluda" target="_blank">
+          <img class="img-circle img-rotate" src="/images/avatar.png" width="200" height="200">
+        </a>
+        <h2 id="name" class="hidden-xs hidden-sm">Glenn</h2>
+        <h3 id="title" class="hidden-xs hidden-sm hidden-md">Stay hungry, stay foolish.</h3>
+        <small id="location" class="text-muted hidden-xs hidden-sm"><i class="icon icon-map-marker"></i> Yunnan, China</small>
+      </div>
+      
+      <div class="search" id="search-form-wrap">
+
+    <form class="search-form sidebar-form">
+        <div class="input-group">
+            <input type="text" class="search-form-input form-control" placeholder="搜索" />
+            <span class="input-group-btn">
+                <button type="submit" class="search-form-submit btn btn-flat" onclick="return false;"><i class="icon icon-search"></i></button>
+            </span>
+        </div>
+    </form>
+    <div class="ins-search">
+  <div class="ins-search-mask"></div>
+  <div class="ins-search-container">
+    <div class="ins-input-wrapper">
+      <input type="text" class="ins-search-input" placeholder="想要查找什么..." x-webkit-speech />
+      <button type="button" class="close ins-close ins-selectable" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span></button>
+    </div>
+    <div class="ins-section-wrapper">
+      <div class="ins-section-container"></div>
+    </div>
+  </div>
+</div>
+
+
+</div>
+      <button class="navbar-toggle collapsed" type="button" data-toggle="collapse" data-target="#main-navbar" aria-controls="main-navbar" aria-expanded="false">
+        <span class="sr-only">Toggle navigation</span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+    </div>
+    <nav id="main-navbar" class="collapse navbar-collapse" itemscope itemtype="http://schema.org/SiteNavigationElement" role="navigation">
+      <ul class="nav navbar-nav main-nav ">
+        
+        
+        <li class="menu-item menu-item-home">
+          <a href="/.">
+            
+            <i class="icon icon-home-fill"></i>
+            
+            <span class="menu-title">首页</span>
+          </a>
+        </li>
+        
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives">
+            
+            <i class="icon icon-archives-fill"></i>
+            
+            <span class="menu-title">归档</span>
+          </a>
+        </li>
+        
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories">
+            
+            <i class="icon icon-folder"></i>
+            
+            <span class="menu-title">分类</span>
+          </a>
+        </li>
+        
+      </ul>
+      
+	
+    <ul class="social-links">
+    	
+        <li><a href="https://github.com/chenluda" target="_blank" title="Github" data-toggle=tooltip data-placement=top><i class="icon icon-github"></i></a></li>
+        
+        <li><a href="https://www.zhihu.com/people/Glenn" target="_blank" title="Zhihu" data-toggle=tooltip data-placement=top><i class="icon icon-zhihu"></i></a></li>
+        
+    </ul>
+
+    </nav>
+  </div>
+</header>
+
+  
+    <aside class="sidebar" itemscope itemtype="http://schema.org/WPSideBar">
+  <div class="slimContent">
+    
+      <div class="widget">
+    <h3 class="widget-title">公告</h3>
+    <div class="widget-body">
+        <div id="board">
+            <div class="content">
+                <p>欢迎交流与分享经验!</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+    
+      
+  <div class="widget">
+    <h3 class="widget-title">分类</h3>
+    <div class="widget-body">
+      <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/%E4%BB%A3%E7%A0%81/">代码</a><span class="category-list-count">4</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/%E8%AE%BA%E6%96%87%E9%80%9F%E8%A7%88/">论文速览</a><span class="category-list-count">12</span></li></ul>
+    </div>
+  </div>
+
+
+    
+      
+  <div class="widget">
+    <h3 class="widget-title">标签</h3>
+    <div class="widget-body">
+      <ul class="tag-list" itemprop="keywords"><li class="tag-list-item"><a class="tag-list-link" href="/tags/Conference-paper/" rel="tag">Conference paper</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/DataBase/" rel="tag">DataBase</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Markdown/" rel="tag">Markdown</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Masked-Image-Modeling/" rel="tag">Masked Image Modeling</a><span class="tag-list-count">12</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/OpenReview/" rel="tag">OpenReview</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Organization/" rel="tag">Organization</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/WeChat/" rel="tag">WeChat</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Zhihu/" rel="tag">Zhihu</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/arXiv/" rel="tag">arXiv</a><span class="tag-list-count">2</span></li></ul>
+    </div>
+  </div>
+
+
+    
+      
+  <div class="widget">
+    <h3 class="widget-title">标签云</h3>
+    <div class="widget-body tagcloud">
+      <a href="/tags/Conference-paper/" style="font-size: 13px;">Conference paper</a> <a href="/tags/DataBase/" style="font-size: 13.5px;">DataBase</a> <a href="/tags/Markdown/" style="font-size: 13px;">Markdown</a> <a href="/tags/Masked-Image-Modeling/" style="font-size: 14px;">Masked Image Modeling</a> <a href="/tags/OpenReview/" style="font-size: 13px;">OpenReview</a> <a href="/tags/Organization/" style="font-size: 13px;">Organization</a> <a href="/tags/WeChat/" style="font-size: 13px;">WeChat</a> <a href="/tags/Zhihu/" style="font-size: 13px;">Zhihu</a> <a href="/tags/arXiv/" style="font-size: 13.5px;">arXiv</a>
+    </div>
+  </div>
+
+    
+      
+  <div class="widget">
+    <h3 class="widget-title">归档</h3>
+    <div class="widget-body">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2023/05/">五月 2023</a><span class="archive-list-count">16</span></li></ul>
+    </div>
+  </div>
+
+
+    
+      
+  <div class="widget">
+    <h3 class="widget-title">最新文章</h3>
+    <div class="widget-body">
+      <ul class="recent-post-list list-unstyled no-thumbnail">
+        
+          <li>
+            
+            <div class="item-inner">
+              <p class="item-category">
+                <a class="category-link" href="/categories/%E4%BB%A3%E7%A0%81/">代码</a>
+              </p>
+              <p class="item-title">
+                <a href="/2023/05/12/%E4%BB%A3%E7%A0%81/%E4%BB%A3%E7%A0%81-%E8%8E%B7%E5%8F%96-arXiv-%E8%AE%BA%E6%96%87%E4%BD%9C%E8%80%85%E5%8D%95%E4%BD%8D-Glenn/" class="title">代码 | 获取 arXiv 论文作者单位</a>
+              </p>
+              <p class="item-date">
+                <time datetime="2023-05-12T10:52:40.000Z" itemprop="datePublished">2023-05-12</time>
+              </p>
+            </div>
+          </li>
+          
+          <li>
+            
+            <div class="item-inner">
+              <p class="item-category">
+                <a class="category-link" href="/categories/%E4%BB%A3%E7%A0%81/">代码</a>
+              </p>
+              <p class="item-title">
+                <a href="/2023/05/12/%E4%BB%A3%E7%A0%81/%E4%BB%A3%E7%A0%81-%E6%AF%8F%E5%A4%A9%E5%AE%9A%E7%82%B9%E5%90%91%E5%BE%AE%E4%BF%A1%E6%8E%A8%E9%80%81-arXiv-Glenn/" class="title">代码 | 每天定点向微信推送 arXiv 最新文章</a>
+              </p>
+              <p class="item-date">
+                <time datetime="2023-05-12T10:52:34.000Z" itemprop="datePublished">2023-05-12</time>
+              </p>
+            </div>
+          </li>
+          
+          <li>
+            
+            <div class="item-inner">
+              <p class="item-category">
+                <a class="category-link" href="/categories/%E4%BB%A3%E7%A0%81/">代码</a>
+              </p>
+              <p class="item-title">
+                <a href="/2023/05/12/%E4%BB%A3%E7%A0%81/%E4%BB%A3%E7%A0%81-%E5%B0%86%E7%9F%A5%E4%B9%8E%E4%B8%93%E6%A0%8F%E6%96%87%E7%AB%A0%E8%BD%AC%E6%8D%A2%E4%B8%BA-Markd-Glenn/" class="title">代码 | 将知乎专栏文章转换为 Markdown 文件保存到本地</a>
+              </p>
+              <p class="item-date">
+                <time datetime="2023-05-12T10:52:25.000Z" itemprop="datePublished">2023-05-12</time>
+              </p>
+            </div>
+          </li>
+          
+          <li>
+            
+            <div class="item-inner">
+              <p class="item-category">
+                <a class="category-link" href="/categories/%E4%BB%A3%E7%A0%81/">代码</a>
+              </p>
+              <p class="item-title">
+                <a href="/2023/05/12/%E4%BB%A3%E7%A0%81/%E4%BB%A3%E7%A0%81-%E4%BB%8E-OpenReview-%E8%8E%B7%E5%8F%96%E9%A1%B6-Glenn/" class="title">代码 | 从 OpenReview 获取顶会接收论文集并保存至本地数据库</a>
+              </p>
+              <p class="item-date">
+                <time datetime="2023-05-12T10:52:15.000Z" itemprop="datePublished">2023-05-12</time>
+              </p>
+            </div>
+          </li>
+          
+          <li>
+            
+            <div class="item-inner">
+              <p class="item-category">
+                <a class="category-link" href="/categories/%E8%AE%BA%E6%96%87%E9%80%9F%E8%A7%88/">论文速览</a>
+              </p>
+              <p class="item-title">
+                <a href="/2023/05/12/Masked_Image_Model/MIM-%E7%90%86%E8%AE%BA%E6%8E%A9%E8%94%BD%E5%9B%BE%E5%83%8F%E5%BB%BA%E6%A8%A1%E6%9C%AC%E8%B4%A8%E4%B8%8A%E5%9C%A8%E5%AD%A6%E4%B9%A0%E9%81%AE-Glenn/" class="title">MIM | 理论：掩蔽图像建模本质上在学习遮挡不变特征</a>
+              </p>
+              <p class="item-date">
+                <time datetime="2023-05-12T10:44:48.000Z" itemprop="datePublished">2023-05-12</time>
+              </p>
+            </div>
+          </li>
+          
+      </ul>
+    </div>
+  </div>
+  
+
+    
+  </div>
+</aside>
+
+  
+  
+<main class="main" role="main">
+  <div class="content">
+  <article id="post-Masked_Image_Model/MIM-AutoMAE将生成对抗网络用-Glenn" class="article article-type-post" itemscope itemtype="http://schema.org/BlogPosting">
+    
+    <div class="article-header">
+      
+        
+  
+    <h1 class="article-title" itemprop="name">
+      MIM | AutoMAE：将生成对抗网络用于优化掩蔽策略
+    </h1>
+  
+
+      
+      <div class="article-meta">
+        <span class="article-date">
+    <i class="icon icon-calendar-check"></i>
+	<a href="/2023/05/12/Masked_Image_Model/MIM-AutoMAE%E5%B0%86%E7%94%9F%E6%88%90%E5%AF%B9%E6%8A%97%E7%BD%91%E7%BB%9C%E7%94%A8-Glenn/" class="article-date">
+	  <time datetime="2023-05-12T10:33:06.000Z" itemprop="datePublished">2023-05-12</time>
+	</a>
+</span>
+        
+  <span class="article-category">
+    <i class="icon icon-folder"></i>
+    <a class="article-category-link" href="/categories/%E8%AE%BA%E6%96%87%E9%80%9F%E8%A7%88/">论文速览</a>
+  </span>
+
+        
+  <span class="article-tag">
+    <i class="icon icon-tags"></i>
+	<a class="article-tag-link-link" href="/tags/Masked-Image-Modeling/" rel="tag">Masked Image Modeling</a>
+  </span>
+
+
+        
+
+        <span class="post-comment"><i class="icon icon-comment"></i> <a href="/2023/05/12/Masked_Image_Model/MIM-AutoMAE%E5%B0%86%E7%94%9F%E6%88%90%E5%AF%B9%E6%8A%97%E7%BD%91%E7%BB%9C%E7%94%A8-Glenn/#comments" class="article-comment-link">评论</a></span>
+        
+      </div>
+    </div>
+    <div class="article-entry marked-body" itemprop="articleBody">
+      
+        <p><img src="/2023/05/12/Masked_Image_Model/MIM-AutoMAE%E5%B0%86%E7%94%9F%E6%88%90%E5%AF%B9%E6%8A%97%E7%BD%91%E7%BB%9C%E7%94%A8-Glenn/v2-281332dc78a374a6c6d9db8676dbe3b8_r.jpg"></p>
+<blockquote>
+<p><em><strong>题目：</strong>Improving Masked Autoencoders by Learning Where to Mask</em><br><em><strong>作者单位：</strong>上海交通大学</em><br><em><strong>论文网址：</strong><a href="https://link.zhihu.com/?target=https://arxiv.org/abs/2303.06583">https://arxiv.org/abs/2303.06583</a></em><br><em><strong>论文代码：</strong>未公开</em><br><em><strong>首次发布时间：</strong>2023 年 3 月 12 日</em></p>
+</blockquote>
+<hr>
+<h1 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h1><p>为了减少前景 patch 的掩蔽概率，PixMIM 使用 Simple Resized Crop 代替原始 MAE 使用的 Random Resized Crop。然而今天介绍的 AutoMAE 用实验证明，略微增加前景 patch 的掩蔽概率可以提高线性探测结果，但过度提高前景 patch 的掩蔽概率时反而会降低性能。</p>
+<blockquote>
+<p> PixMIM 解读看这里：</p>
+</blockquote>
+<hr>
+<h1 id="1-主要内容"><a href="#1-主要内容" class="headerlink" title="1. 主要内容"></a>1. 主要内容</h1><p>MIM 的输入 Patch 通常采用随机掩蔽的方式，这在很大程度上忽略了 Patch 之间的信息密度差异。那么是否存在比随机采样更好的掩蔽策略，我们如何学习它？</p>
+<p>对此，本篇论文提出了 AutoMAE 框架。如图1 所示，相比于独立训练指示器的 SemMAE（Semmae: Semantic-guided masking for learning masked autoencoders） ，AutoMAE 是在一个端到端完全可微的 MAE 框架下优化掩蔽策略的初步研究。</p>
+<p><img src="/2023/05/12/Masked_Image_Model/MIM-AutoMAE%E5%B0%86%E7%94%9F%E6%88%90%E5%AF%B9%E6%8A%97%E7%BD%91%E7%BB%9C%E7%94%A8-Glenn/v2-39ee36a783bb11dea7b180f7b128e800_r.jpg"><br>图1. 掩蔽策略的比较。(a) MAE：以均匀的概率随机掩码 75% 的图像补丁。(b) SemMAE 使用一个手动设计的 easy-to-hard 的 masking schedule，由一个独立训练的语义指示器引导。(c) AutoMAE 是一个完全可微的框架，它将一个反向训练的掩码生成器集成到掩码图像建模中。</p>
+<hr>
+<h1 id="2-分析"><a href="#2-分析" class="headerlink" title="2. 分析"></a>2. 分析</h1><p>什么应该是一个好的掩蔽策略？一般来说，像素重建的难度与相应的图像 patch 的信息密度有关。</p>
+<ul>
+<li>如果我们掩盖了大量的“困难” Patch（如前景对象），模型可能无法感知高语义区域；</li>
+<li>然而，如果我们掩盖了大量的“简单” Patch（如背景），自监督训练任务可能过于简单，模型无法学习有效的表示。</li>
+</ul>
+<p>在初步的实验中，可以发现这两种情况都导致学习的视觉表征的退化。作者将这种经验现象称为 MAE 中的 patch selection dilemma（patch 选择困境）。</p>
+<h3 id="初步实验"><a href="#初步实验" class="headerlink" title="初步实验"></a>初步实验</h3><p>随机选择 ImageNet 数据集的一个子集（10%），并使用提供的前景边界框（什么方法？）来指示前景位置，如图2 右所示。</p>
+<p>图2 左中 β 表示前景 patch 相对于背景 patch 提高的掩蔽概率（例如，总掩蔽率为 75%，当 β&#x3D;15 % 时，前景 patch 掩蔽率为 45%，背景 patch 掩蔽率为 30%）。手动提高边界框内 patch 的掩蔽率，并使用这些样本进行自监督预训练，图2 左显示了线性探测结果。从图中可以得到两个观察结果：</p>
+<ul>
+<li>与随机掩蔽相比，略微增加前景 patch 的掩蔽概率，显著提高了线性探测结果。</li>
+<li>过度提高前景 patch 的掩蔽概率，可能会影响 pretext task 的有效性，降低其性能。</li>
+</ul>
+<p>可以看出，掩蔽策略是一个 trade-off 的问题，前景掩蔽率越高，通过掩蔽图像建模获得的信息越多，但同时解码器的重建难度也越高。一个自然的解决方案是将<strong>掩模生成</strong>和<strong>图像重建</strong>集成到一个完全可微的框架中。也就是说，我们希望在获得的具有较高信息密度的区域内找到重建难度较低的 patch 。</p>
+<p><img src="/2023/05/12/Masked_Image_Model/MIM-AutoMAE%E5%B0%86%E7%94%9F%E6%88%90%E5%AF%B9%E6%8A%97%E7%BD%91%E7%BB%9C%E7%94%A8-Glenn/v2-fb856f248ef974e361c9f5db0a81eedc_r.jpg"><br>图2. 通过 β 提高掩蔽概率对前景边界框内的 patch 的影响。模型在 ImageNet 数据集的一个子集（10%）上进行训练。红色虚线表示使用原始随机掩蔽策略的结果。</p>
+<hr>
+<h1 id="3-方法"><a href="#3-方法" class="headerlink" title="3. 方法"></a>3. 方法</h1><p>通过上述实验，现在需要设计一个新的自监督框架，它可以学习选择信息更丰富的前景 patch 来掩蔽，且后续的重建难度较低，其中需要解决两个关键的问题：</p>
+<ul>
+<li>如何在没有任何明确监督的情况下指导 ViT 模型挖掘具有较高信息密度的前景 patch？</li>
+<li>如何通过自适应学习的掩蔽策略来控制 pretext task 的难度？</li>
+</ul>
+<p><img src="/2023/05/12/Masked_Image_Model/MIM-AutoMAE%E5%B0%86%E7%94%9F%E6%88%90%E5%AF%B9%E6%8A%97%E7%BD%91%E7%BB%9C%E7%94%A8-Glenn/v2-147524e193b1478d042cb6e67d8ffe09_r.jpg"><br>图3. AutoMAE 的端到端框架。</p>
+<h3 id="3-1-掩模生成器"><a href="#3-1-掩模生成器" class="headerlink" title="3.1 掩模生成器"></a>3.1 掩模生成器</h3><p>对于第一个问题，作者提出了一个可微的掩模生成器 G 来生成包含每个图像 patch 重要权重的掩模图像。掩模生成器包含一个预训练的 ViT 编码器（参数冻结）和两个可训练的卷积层。通过预先训练的 ViT 编码器从最后一个 Transformer 块中提取 multi-head self-attention maps，再通过卷积层进行进一步处理以生成掩模。此时获得的掩膜图像中包含了模糊的不同语义区域的指示，但仍需要突出该样本的前景。</p>
+<p>因此，作者引入了一种以前景为中心的对抗性训练策略，来指导掩模生成器在可能存在前景的 patch 上产生更高的权重。具体来说，首先随机生成一张伪掩模图像（在全黑图像中随机涂白一个矩形，然后在整张图像上加随机噪声，其中白色矩形区域多加个 \alpha&#x3D;0.5 ），作为“真实”样本，该样本可以模拟前景和背景补丁之间的差异，并使用对抗性训练策略来最小化生成的掩模和“真实”采样之间的分布偏移。</p>
+<blockquote>
+<p> multi-head self-attention maps A_i 计算公式如下：</p>
+</blockquote>
+<p>$$ A_i&#x3D;softmax(q^c_iK_i^T&#x2F;\sqrt {d’}) $$ </p>
+<p>其中， q_i^c \in \mathbb{R}^{1×d’} 表示 [CLS] token 的 query embedding， K_i\in \mathbb {R}^{\frac{hw}{p^2}×d’} 表示其他 patch token 的 key embedding。</p>
+<blockquote>
+<p> 两个卷积层再加 ReLU 的操作 f_\theta(\cdot) 如下：</p>
+</blockquote>
+<p>$$ F &#x3D; f_θ(A) $$ </p>
+<blockquote>
+<p> 最终掩模图像 M\in\mathbb{R}^{1×\frac{h}{2}×\frac{w}{2}} 计算公式如下：</p>
+</blockquote>
+<p>$$ f_i’&#x3D;log(\frac{exp(f_i)}{\sum^{hw&#x2F;p}_{k&#x3D;1}exp(f_k)})+z $$ </p>
+<p>$$ m_i&#x3D;\frac{exp(f_i’)}{\sum^{hw&#x2F;p}_{k&#x3D;1}exp(f_k’)} $$ </p>
+<p>其中， z 表示从 Gumbel 分布中采样的随机噪声，这里的 log(softmax(\cdot))  用于稳定训练过程。 f_i 是 F 的展平， m_i 是掩膜图像 M 的展平。</p>
+<blockquote>
+<p>在全黑图像 M^b\in\mathbb{R}^{1×\frac{h}{2}×\frac{w}{2}} 中随机涂白一个矩形 X&#x3D;(20%\sim80%)M^b ，伪掩模图像 M^p 的计算公式如下：</p>
+</blockquote>
+<p>$$ m^p_i&#x3D; \epsilon + \begin{cases} \alpha,i\in X\ 0,i\in X \end{cases} $$ </p>
+<p>其中， \epsilon\sim U(0,1) 表示随机噪声。 α 表示矩形内的额外权重，在实验中设置为 0.5。</p>
+<blockquote>
+<p> 使用 LSGAN（Least squares generative adversarial networks） 中的损失函数进行对抗性训练：  </p>
+</blockquote>
+<p>$$ \mathcal{L}_{adv}&#x3D;-\mathbb{E}_M[(D(M)-c)^2] $$ </p>
+<p>$$ \mathcal{L}{adv}^D&#x3D;\mathbb{E}{M^p}[(D(M^p)-b)^2]+\mathbb{E}_M[(D(M)-a)^2] $$ </p>
+<p>其中 D 表示鉴别器， a&#x3D;−1 ， b&#x3D;1 ， c&#x3D;0 。</p>
+<h3 id="3-2-梯度回传"><a href="#3-2-梯度回传" class="headerlink" title="3.2 梯度回传"></a>3.2 梯度回传</h3><p>对于第二个问题，为了在保证掩模具有较高信息密度的同时，后续的重建难度较低，作者直接将梯度从 MAE 传播回掩模生成器，并同步训练这两个模块。MAE 通过重建损失来约束掩模生成器不生成过于困难的掩模图像，从而鼓励掩模生成器产生容易推断掩蔽信息的重要 Patch，而鉴别器则约束掩模生成器更加关注前景而非背景。</p>
+<blockquote>
+<p> 允许来自掩码自动编码器的梯度可以传播回掩码生成器，作者改变了输入 patch token Z&#x3D;\left{z_i\right}^n_{i&#x3D;1} 的公式，生成的新输入 patch token Z’&#x3D;\left{z’_ i \right}^n_{i&#x3D;1} 的计算公式如下：  </p>
+</blockquote>
+<p>$$ z’_i &#x3D; z_i\cdot m_i+z_i\cdot sg(1 − m_i) $$ </p>
+<p>其中， sg(\cdot) 表示停止梯度操作。</p>
+<blockquote>
+<p> 结合对抗损失，掩码生成器的最终损失函数可以写为：  </p>
+</blockquote>
+<p>$$ L_G &#x3D; L_{recon} + λL_{adv} $$ </p>
+<p>其中，作者通过 grid search 将 λ 设置为 0.2。</p>
+<p>（中间还有个生成 Final Mask 的操作没说，那个就是利用生成的掩膜经过几个 Top-K 操作，感兴趣的可以去原文 3.3 小节查看）</p>
+<hr>
+<h1 id="4-结果"><a href="#4-结果" class="headerlink" title="4. 结果"></a>4. 结果</h1><p><img src="/2023/05/12/Masked_Image_Model/MIM-AutoMAE%E5%B0%86%E7%94%9F%E6%88%90%E5%AF%B9%E6%8A%97%E7%BD%91%E7%BB%9C%E7%94%A8-Glenn/v2-cd26441b5598df456960299e68c62517_r.jpg"><br>图4. 由掩模生成器产生的 ImageNet 上的高加权掩模图像。<br>具体结果查看原文。</p>
+<hr>
+<p>又是一篇观点矛盾的论文，PixMIM 认为较高的前景掩蔽率阻碍了模型有效捕获形状和语义先验的能力，从而限制了表征的质量；而 AutoMAE 认为略微增加前景 patch 的掩蔽概率可以提高模型性能。</p>
+<p>说实话，感觉 AutoMAE 的模型有些复杂了。</p>
+
+      
+    </div>
+    <div class="article-footer">
+      <blockquote class="mt-2x">
+  <ul class="post-copyright list-unstyled">
+    
+    <li class="post-copyright-link hidden-xs">
+      <strong>本文链接：</strong>
+      <a href="http://glennchen.cn/2023/05/12/Masked_Image_Model/MIM-AutoMAE%E5%B0%86%E7%94%9F%E6%88%90%E5%AF%B9%E6%8A%97%E7%BD%91%E7%BB%9C%E7%94%A8-Glenn/" title="MIM | AutoMAE：将生成对抗网络用于优化掩蔽策略" target="_blank" rel="external">http://glennchen.cn/2023/05/12/Masked_Image_Model/MIM-AutoMAE将生成对抗网络用-Glenn/</a>
+    </li>
+    
+    <li class="post-copyright-license">
+      <strong>版权声明： </strong> 本博客所有文章除特别声明外，均采用 <a href="http://creativecommons.org/licenses/by/4.0/deed.zh" target="_blank" rel="external">CC BY 4.0 CN协议</a> 许可协议。转载请注明出处！
+    </li>
+  </ul>
+</blockquote>
+
+
+<div class="panel panel-default panel-badger">
+  <div class="panel-body">
+    <figure class="media">
+      <div class="media-left">
+        <a href="https://github.com/chenluda" target="_blank" class="img-burn thumb-sm visible-lg">
+          <img src="/images/avatar.png" class="img-rounded w-full" alt="">
+        </a>
+      </div>
+      <div class="media-body">
+        <h3 class="media-heading"><a href="https://github.com/chenluda" target="_blank"><span class="text-dark">Glenn</span><small class="ml-1x">Stay hungry, stay foolish.</small></a></h3>
+        <div>咖啡，健身，热爱生活。</div>
+      </div>
+    </figure>
+  </div>
+</div>
+
+
+    </div>
+  </article>
+  
+    
+  <section id="comments">
+  	
+      <div id="vcomments"></div>
+    
+  </section>
+
+
+  
+</div>
+
+  <nav class="bar bar-footer clearfix" data-stick-bottom>
+  <div class="bar-inner">
+  
+  <ul class="pager pull-left">
+    
+    <li class="prev">
+      <a href="/2023/05/12/Masked_Image_Model/MIM-CCViT%E5%9F%BA%E4%BA%8E-Patches-Glenn/" title="MIM | CCViT：基于 Patches 质心重建的 MIM 框架"><i class="icon icon-angle-left" aria-hidden="true"></i><span>&nbsp;&nbsp;上一篇</span></a>
+    </li>
+    
+    
+    
+  </ul>
+  
+  
+  
+  <div class="bar-right">
+    
+    <div class="share-component" data-sites="weibo,qq,wechat,facebook,twitter" data-mobile-sites="weibo,qq,qzone"></div>
+    
+  </div>
+  </div>
+</nav>
+  
+
+
+</main>
+
+  <footer class="footer" itemscope itemtype="http://schema.org/WPFooter">
+	
+	
+    <ul class="social-links">
+    	
+        <li><a href="https://github.com/chenluda" target="_blank" title="Github" data-toggle=tooltip data-placement=top><i class="icon icon-github"></i></a></li>
+        
+        <li><a href="https://www.zhihu.com/people/Glenn" target="_blank" title="Zhihu" data-toggle=tooltip data-placement=top><i class="icon icon-zhihu"></i></a></li>
+        
+    </ul>
+
+    <div class="copyright">
+    	
+        <div class="publishby">
+        	Theme by <a href="https://github.com/cofess" target="_blank"> cofess </a>base on <a href="https://github.com/cofess/hexo-theme-pure" target="_blank">pure</a>.
+        </div>
+    </div>
+</footer>
+  <script src="//cdn.jsdelivr.net/npm/jquery@1.12.4/dist/jquery.min.js"></script>
+<script>
+window.jQuery || document.write('<script src="js/jquery.min.js"><\/script>')
+</script>
+
+<script src="/js/plugin.min.js"></script>
+
+
+<script src="/js/application.js"></script>
+
+
+    <script>
+(function (window) {
+    var INSIGHT_CONFIG = {
+        TRANSLATION: {
+            POSTS: '文章',
+            PAGES: '页面',
+            CATEGORIES: '分类',
+            TAGS: '标签',
+            UNTITLED: '(未命名)',
+        },
+        ROOT_URL: '/',
+        CONTENT_URL: '/content.json',
+    };
+    window.INSIGHT_CONFIG = INSIGHT_CONFIG;
+})(window);
+</script>
+
+<script src="/js/insight.js"></script>
+
+
+
+
+
+
+   
+
+
+
+
+   
+    
+  <script src="//cdn1.lncld.net/static/js/3.0.4/av-min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/valine"></script>
+  <script type="text/javascript">
+  var GUEST = ['nick', 'mail', 'link'];
+  var meta = 'nick,mail,link';
+  meta = meta.split(',').filter(function(item) {
+    return GUEST.indexOf(item) > -1;
+  });
+  new Valine({
+    el: '#vcomments',
+    verify: false,
+    notify: false,
+    appId: '',
+    appKey: '',
+    placeholder: 'Just go go',
+    avatar: 'mm',
+    meta: meta,
+    pageSize: '10' || 10,
+    visitor: false
+  });
+  </script>
+
+     
+
+
+
+
+
+
+
+</body>
+</html>

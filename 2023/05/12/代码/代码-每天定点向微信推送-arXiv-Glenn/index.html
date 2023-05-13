@@ -1,0 +1,599 @@
+<!DOCTYPE html>
+<html lang=zh>
+<head>
+  <meta charset="utf-8">
+  
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=no, minimal-ui">
+  <meta name="renderer" content="webkit">
+  <meta http-equiv="Cache-Control" content="no-transform" />
+  <meta http-equiv="Cache-Control" content="no-siteapp" />
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black">
+  <meta name="format-detection" content="telephone=no,email=no,adress=no">
+  <!-- Color theme for statusbar -->
+  <meta name="theme-color" content="#000000" />
+  <!-- 强制页面在当前窗口以独立页面显示,防止别人在框架里调用页面 -->
+  <meta http-equiv="window-target" content="_top" />
+  
+  
+  <title>代码 | 每天定点向微信推送 arXiv 最新文章 | Hexo</title>
+  <meta name="description" content="作为科研人，每天早起的第一件事， 就是打开 arXiv 查找自己 follow 的领域有没有最新的文章。 现在我想把这件事自动化： 类似部署自动打卡函数，在阿里云函数计算 FC 中设置一个带有定时触发器的云函数， 再将每天定点向微信推送 arXiv 最新文章的脚本程序部署上去， 实现：  根据关键词搜索在 arXiv 发布的文章； 判断文章的发布日期是否是前一天（或指定日期），如果是，则保留； 使">
+<meta property="og:type" content="article">
+<meta property="og:title" content="代码 | 每天定点向微信推送 arXiv 最新文章">
+<meta property="og:url" content="http://glennchen.cn/2023/05/12/%E4%BB%A3%E7%A0%81/%E4%BB%A3%E7%A0%81-%E6%AF%8F%E5%A4%A9%E5%AE%9A%E7%82%B9%E5%90%91%E5%BE%AE%E4%BF%A1%E6%8E%A8%E9%80%81-arXiv-Glenn/index.html">
+<meta property="og:site_name" content="Glenn">
+<meta property="og:description" content="作为科研人，每天早起的第一件事， 就是打开 arXiv 查找自己 follow 的领域有没有最新的文章。 现在我想把这件事自动化： 类似部署自动打卡函数，在阿里云函数计算 FC 中设置一个带有定时触发器的云函数， 再将每天定点向微信推送 arXiv 最新文章的脚本程序部署上去， 实现：  根据关键词搜索在 arXiv 发布的文章； 判断文章的发布日期是否是前一天（或指定日期），如果是，则保留； 使">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://glennchen.cn/2023/05/12/%E4%BB%A3%E7%A0%81/%E4%BB%A3%E7%A0%81-%E6%AF%8F%E5%A4%A9%E5%AE%9A%E7%82%B9%E5%90%91%E5%BE%AE%E4%BF%A1%E6%8E%A8%E9%80%81-arXiv-Glenn/v2-355b149e84e6c2fd2187ac4ed0367a9e_r.jpg">
+<meta property="og:image" content="http://glennchen.cn/2023/05/12/%E4%BB%A3%E7%A0%81/%E4%BB%A3%E7%A0%81-%E6%AF%8F%E5%A4%A9%E5%AE%9A%E7%82%B9%E5%90%91%E5%BE%AE%E4%BF%A1%E6%8E%A8%E9%80%81-arXiv-Glenn/v2-4d23cff0002f5e93877024bc5a6edd9e_r.jpg">
+<meta property="og:image" content="http://glennchen.cn/2023/05/12/%E4%BB%A3%E7%A0%81/%E4%BB%A3%E7%A0%81-%E6%AF%8F%E5%A4%A9%E5%AE%9A%E7%82%B9%E5%90%91%E5%BE%AE%E4%BF%A1%E6%8E%A8%E9%80%81-arXiv-Glenn/v2-587eb4ca5ceea2b737b4684cff55d7f5_r.jpg">
+<meta property="og:image" content="http://glennchen.cn/2023/05/12/%E4%BB%A3%E7%A0%81/%E4%BB%A3%E7%A0%81-%E6%AF%8F%E5%A4%A9%E5%AE%9A%E7%82%B9%E5%90%91%E5%BE%AE%E4%BF%A1%E6%8E%A8%E9%80%81-arXiv-Glenn/v2-c4a167c2ec104c813ddf0dbb0f397b40_r.jpg">
+<meta property="og:image" content="http://glennchen.cn/2023/05/12/%E4%BB%A3%E7%A0%81/%E4%BB%A3%E7%A0%81-%E6%AF%8F%E5%A4%A9%E5%AE%9A%E7%82%B9%E5%90%91%E5%BE%AE%E4%BF%A1%E6%8E%A8%E9%80%81-arXiv-Glenn/v2-377dd3392a35bc7edb25dc26aaa02f2c_r.jpg">
+<meta property="og:image" content="http://glennchen.cn/2023/05/12/%E4%BB%A3%E7%A0%81/%E4%BB%A3%E7%A0%81-%E6%AF%8F%E5%A4%A9%E5%AE%9A%E7%82%B9%E5%90%91%E5%BE%AE%E4%BF%A1%E6%8E%A8%E9%80%81-arXiv-Glenn/v2-8d5671a3180dd4dfa8fde17aba69fbc8_r.jpg">
+<meta property="og:image" content="http://glennchen.cn/2023/05/12/%E4%BB%A3%E7%A0%81/%E4%BB%A3%E7%A0%81-%E6%AF%8F%E5%A4%A9%E5%AE%9A%E7%82%B9%E5%90%91%E5%BE%AE%E4%BF%A1%E6%8E%A8%E9%80%81-arXiv-Glenn/v2-d51e4e96dc5885d4f2d2e394cb1675a6_r.jpg">
+<meta property="og:image" content="http://glennchen.cn/2023/05/12/%E4%BB%A3%E7%A0%81/%E4%BB%A3%E7%A0%81-%E6%AF%8F%E5%A4%A9%E5%AE%9A%E7%82%B9%E5%90%91%E5%BE%AE%E4%BF%A1%E6%8E%A8%E9%80%81-arXiv-Glenn/v2-ad94fb14cb81dbef2f72d82be64023e1_r.jpg">
+<meta property="og:image" content="http://glennchen.cn/2023/05/12/%E4%BB%A3%E7%A0%81/%E4%BB%A3%E7%A0%81-%E6%AF%8F%E5%A4%A9%E5%AE%9A%E7%82%B9%E5%90%91%E5%BE%AE%E4%BF%A1%E6%8E%A8%E9%80%81-arXiv-Glenn/v2-593f9a4a1830615262969bb27a6d66bb_r.jpg">
+<meta property="og:image" content="http://glennchen.cn/2023/05/12/%E4%BB%A3%E7%A0%81/%E4%BB%A3%E7%A0%81-%E6%AF%8F%E5%A4%A9%E5%AE%9A%E7%82%B9%E5%90%91%E5%BE%AE%E4%BF%A1%E6%8E%A8%E9%80%81-arXiv-Glenn/v2-ff793f98d6f349351a99ac45a7af8bd4_r.jpg">
+<meta property="og:image" content="http://glennchen.cn/2023/05/12/%E4%BB%A3%E7%A0%81/%E4%BB%A3%E7%A0%81-%E6%AF%8F%E5%A4%A9%E5%AE%9A%E7%82%B9%E5%90%91%E5%BE%AE%E4%BF%A1%E6%8E%A8%E9%80%81-arXiv-Glenn/v2-0de2466902c47e7490775e61749d2af2_r.jpg">
+<meta property="article:published_time" content="2023-05-12T10:52:34.000Z">
+<meta property="article:modified_time" content="2023-05-12T12:22:24.345Z">
+<meta property="article:author" content="Glenn">
+<meta property="article:tag" content="arXiv">
+<meta property="article:tag" content="WeChat">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://glennchen.cn/2023/05/12/%E4%BB%A3%E7%A0%81/%E4%BB%A3%E7%A0%81-%E6%AF%8F%E5%A4%A9%E5%AE%9A%E7%82%B9%E5%90%91%E5%BE%AE%E4%BF%A1%E6%8E%A8%E9%80%81-arXiv-Glenn/v2-355b149e84e6c2fd2187ac4ed0367a9e_r.jpg">
+  <!-- Canonical links -->
+  <link rel="canonical" href="http://glennchen.cn/2023/05/12/%E4%BB%A3%E7%A0%81/%E4%BB%A3%E7%A0%81-%E6%AF%8F%E5%A4%A9%E5%AE%9A%E7%82%B9%E5%90%91%E5%BE%AE%E4%BF%A1%E6%8E%A8%E9%80%81-arXiv-Glenn/index.html">
+  
+    <link rel="alternate" href="/atom.xml" title="Glenn" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="/favicon.png" type="image/x-icon">
+  
+  
+<link rel="stylesheet" href="/css/style.css">
+
+  
+  
+  
+  
+<!-- hexo injector head_end start -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/katex.min.css">
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/hexo-math@4.0.0/dist/style.css">
+<!-- hexo injector head_end end --><meta name="generator" content="Hexo 6.3.0"></head>
+
+
+<body class="main-center theme-black" itemscope itemtype="http://schema.org/WebPage">
+  <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+  <div class="slimContent">
+    <div class="navbar-header">
+      
+      
+      <div class="profile-block text-center">
+        <a id="avatar" href="https://github.com/chenluda" target="_blank">
+          <img class="img-circle img-rotate" src="/images/avatar.png" width="200" height="200">
+        </a>
+        <h2 id="name" class="hidden-xs hidden-sm">Glenn</h2>
+        <h3 id="title" class="hidden-xs hidden-sm hidden-md">Stay hungry, stay foolish.</h3>
+        <small id="location" class="text-muted hidden-xs hidden-sm"><i class="icon icon-map-marker"></i> Yunnan, China</small>
+      </div>
+      
+      <div class="search" id="search-form-wrap">
+
+    <form class="search-form sidebar-form">
+        <div class="input-group">
+            <input type="text" class="search-form-input form-control" placeholder="搜索" />
+            <span class="input-group-btn">
+                <button type="submit" class="search-form-submit btn btn-flat" onclick="return false;"><i class="icon icon-search"></i></button>
+            </span>
+        </div>
+    </form>
+    <div class="ins-search">
+  <div class="ins-search-mask"></div>
+  <div class="ins-search-container">
+    <div class="ins-input-wrapper">
+      <input type="text" class="ins-search-input" placeholder="想要查找什么..." x-webkit-speech />
+      <button type="button" class="close ins-close ins-selectable" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span></button>
+    </div>
+    <div class="ins-section-wrapper">
+      <div class="ins-section-container"></div>
+    </div>
+  </div>
+</div>
+
+
+</div>
+      <button class="navbar-toggle collapsed" type="button" data-toggle="collapse" data-target="#main-navbar" aria-controls="main-navbar" aria-expanded="false">
+        <span class="sr-only">Toggle navigation</span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+    </div>
+    <nav id="main-navbar" class="collapse navbar-collapse" itemscope itemtype="http://schema.org/SiteNavigationElement" role="navigation">
+      <ul class="nav navbar-nav main-nav ">
+        
+        
+        <li class="menu-item menu-item-home">
+          <a href="/.">
+            
+            <i class="icon icon-home-fill"></i>
+            
+            <span class="menu-title">首页</span>
+          </a>
+        </li>
+        
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives">
+            
+            <i class="icon icon-archives-fill"></i>
+            
+            <span class="menu-title">归档</span>
+          </a>
+        </li>
+        
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories">
+            
+            <i class="icon icon-folder"></i>
+            
+            <span class="menu-title">分类</span>
+          </a>
+        </li>
+        
+      </ul>
+      
+	
+    <ul class="social-links">
+    	
+        <li><a href="https://github.com/chenluda" target="_blank" title="Github" data-toggle=tooltip data-placement=top><i class="icon icon-github"></i></a></li>
+        
+        <li><a href="https://www.zhihu.com/people/Glenn" target="_blank" title="Zhihu" data-toggle=tooltip data-placement=top><i class="icon icon-zhihu"></i></a></li>
+        
+    </ul>
+
+    </nav>
+  </div>
+</header>
+
+  
+    <aside class="sidebar" itemscope itemtype="http://schema.org/WPSideBar">
+  <div class="slimContent">
+    
+      <div class="widget">
+    <h3 class="widget-title">公告</h3>
+    <div class="widget-body">
+        <div id="board">
+            <div class="content">
+                <p>欢迎交流与分享经验!</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+    
+      
+  <div class="widget">
+    <h3 class="widget-title">分类</h3>
+    <div class="widget-body">
+      <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/%E4%BB%A3%E7%A0%81/">代码</a><span class="category-list-count">4</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/%E8%AE%BA%E6%96%87%E9%80%9F%E8%A7%88/">论文速览</a><span class="category-list-count">12</span></li></ul>
+    </div>
+  </div>
+
+
+    
+      
+  <div class="widget">
+    <h3 class="widget-title">标签</h3>
+    <div class="widget-body">
+      <ul class="tag-list" itemprop="keywords"><li class="tag-list-item"><a class="tag-list-link" href="/tags/Conference-paper/" rel="tag">Conference paper</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/DataBase/" rel="tag">DataBase</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Markdown/" rel="tag">Markdown</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Masked-Image-Modeling/" rel="tag">Masked Image Modeling</a><span class="tag-list-count">12</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/OpenReview/" rel="tag">OpenReview</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Organization/" rel="tag">Organization</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/WeChat/" rel="tag">WeChat</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Zhihu/" rel="tag">Zhihu</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/arXiv/" rel="tag">arXiv</a><span class="tag-list-count">2</span></li></ul>
+    </div>
+  </div>
+
+
+    
+      
+  <div class="widget">
+    <h3 class="widget-title">标签云</h3>
+    <div class="widget-body tagcloud">
+      <a href="/tags/Conference-paper/" style="font-size: 13px;">Conference paper</a> <a href="/tags/DataBase/" style="font-size: 13.5px;">DataBase</a> <a href="/tags/Markdown/" style="font-size: 13px;">Markdown</a> <a href="/tags/Masked-Image-Modeling/" style="font-size: 14px;">Masked Image Modeling</a> <a href="/tags/OpenReview/" style="font-size: 13px;">OpenReview</a> <a href="/tags/Organization/" style="font-size: 13px;">Organization</a> <a href="/tags/WeChat/" style="font-size: 13px;">WeChat</a> <a href="/tags/Zhihu/" style="font-size: 13px;">Zhihu</a> <a href="/tags/arXiv/" style="font-size: 13.5px;">arXiv</a>
+    </div>
+  </div>
+
+    
+      
+  <div class="widget">
+    <h3 class="widget-title">归档</h3>
+    <div class="widget-body">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2023/05/">五月 2023</a><span class="archive-list-count">16</span></li></ul>
+    </div>
+  </div>
+
+
+    
+      
+  <div class="widget">
+    <h3 class="widget-title">最新文章</h3>
+    <div class="widget-body">
+      <ul class="recent-post-list list-unstyled no-thumbnail">
+        
+          <li>
+            
+            <div class="item-inner">
+              <p class="item-category">
+                <a class="category-link" href="/categories/%E4%BB%A3%E7%A0%81/">代码</a>
+              </p>
+              <p class="item-title">
+                <a href="/2023/05/12/%E4%BB%A3%E7%A0%81/%E4%BB%A3%E7%A0%81-%E8%8E%B7%E5%8F%96-arXiv-%E8%AE%BA%E6%96%87%E4%BD%9C%E8%80%85%E5%8D%95%E4%BD%8D-Glenn/" class="title">代码 | 获取 arXiv 论文作者单位</a>
+              </p>
+              <p class="item-date">
+                <time datetime="2023-05-12T10:52:40.000Z" itemprop="datePublished">2023-05-12</time>
+              </p>
+            </div>
+          </li>
+          
+          <li>
+            
+            <div class="item-inner">
+              <p class="item-category">
+                <a class="category-link" href="/categories/%E4%BB%A3%E7%A0%81/">代码</a>
+              </p>
+              <p class="item-title">
+                <a href="/2023/05/12/%E4%BB%A3%E7%A0%81/%E4%BB%A3%E7%A0%81-%E6%AF%8F%E5%A4%A9%E5%AE%9A%E7%82%B9%E5%90%91%E5%BE%AE%E4%BF%A1%E6%8E%A8%E9%80%81-arXiv-Glenn/" class="title">代码 | 每天定点向微信推送 arXiv 最新文章</a>
+              </p>
+              <p class="item-date">
+                <time datetime="2023-05-12T10:52:34.000Z" itemprop="datePublished">2023-05-12</time>
+              </p>
+            </div>
+          </li>
+          
+          <li>
+            
+            <div class="item-inner">
+              <p class="item-category">
+                <a class="category-link" href="/categories/%E4%BB%A3%E7%A0%81/">代码</a>
+              </p>
+              <p class="item-title">
+                <a href="/2023/05/12/%E4%BB%A3%E7%A0%81/%E4%BB%A3%E7%A0%81-%E5%B0%86%E7%9F%A5%E4%B9%8E%E4%B8%93%E6%A0%8F%E6%96%87%E7%AB%A0%E8%BD%AC%E6%8D%A2%E4%B8%BA-Markd-Glenn/" class="title">代码 | 将知乎专栏文章转换为 Markdown 文件保存到本地</a>
+              </p>
+              <p class="item-date">
+                <time datetime="2023-05-12T10:52:25.000Z" itemprop="datePublished">2023-05-12</time>
+              </p>
+            </div>
+          </li>
+          
+          <li>
+            
+            <div class="item-inner">
+              <p class="item-category">
+                <a class="category-link" href="/categories/%E4%BB%A3%E7%A0%81/">代码</a>
+              </p>
+              <p class="item-title">
+                <a href="/2023/05/12/%E4%BB%A3%E7%A0%81/%E4%BB%A3%E7%A0%81-%E4%BB%8E-OpenReview-%E8%8E%B7%E5%8F%96%E9%A1%B6-Glenn/" class="title">代码 | 从 OpenReview 获取顶会接收论文集并保存至本地数据库</a>
+              </p>
+              <p class="item-date">
+                <time datetime="2023-05-12T10:52:15.000Z" itemprop="datePublished">2023-05-12</time>
+              </p>
+            </div>
+          </li>
+          
+          <li>
+            
+            <div class="item-inner">
+              <p class="item-category">
+                <a class="category-link" href="/categories/%E8%AE%BA%E6%96%87%E9%80%9F%E8%A7%88/">论文速览</a>
+              </p>
+              <p class="item-title">
+                <a href="/2023/05/12/Masked_Image_Model/MIM-%E7%90%86%E8%AE%BA%E6%8E%A9%E8%94%BD%E5%9B%BE%E5%83%8F%E5%BB%BA%E6%A8%A1%E6%9C%AC%E8%B4%A8%E4%B8%8A%E5%9C%A8%E5%AD%A6%E4%B9%A0%E9%81%AE-Glenn/" class="title">MIM | 理论：掩蔽图像建模本质上在学习遮挡不变特征</a>
+              </p>
+              <p class="item-date">
+                <time datetime="2023-05-12T10:44:48.000Z" itemprop="datePublished">2023-05-12</time>
+              </p>
+            </div>
+          </li>
+          
+      </ul>
+    </div>
+  </div>
+  
+
+    
+  </div>
+</aside>
+
+  
+  
+<main class="main" role="main">
+  <div class="content">
+  <article id="post-代码/代码-每天定点向微信推送-arXiv-Glenn" class="article article-type-post" itemscope itemtype="http://schema.org/BlogPosting">
+    
+    <div class="article-header">
+      
+        
+  
+    <h1 class="article-title" itemprop="name">
+      代码 | 每天定点向微信推送 arXiv 最新文章
+    </h1>
+  
+
+      
+      <div class="article-meta">
+        <span class="article-date">
+    <i class="icon icon-calendar-check"></i>
+	<a href="/2023/05/12/%E4%BB%A3%E7%A0%81/%E4%BB%A3%E7%A0%81-%E6%AF%8F%E5%A4%A9%E5%AE%9A%E7%82%B9%E5%90%91%E5%BE%AE%E4%BF%A1%E6%8E%A8%E9%80%81-arXiv-Glenn/" class="article-date">
+	  <time datetime="2023-05-12T10:52:34.000Z" itemprop="datePublished">2023-05-12</time>
+	</a>
+</span>
+        
+  <span class="article-category">
+    <i class="icon icon-folder"></i>
+    <a class="article-category-link" href="/categories/%E4%BB%A3%E7%A0%81/">代码</a>
+  </span>
+
+        
+  <span class="article-tag">
+    <i class="icon icon-tags"></i>
+	<a class="article-tag-link-link" href="/tags/WeChat/" rel="tag">WeChat</a>, <a class="article-tag-link-link" href="/tags/arXiv/" rel="tag">arXiv</a>
+  </span>
+
+
+        
+
+        <span class="post-comment"><i class="icon icon-comment"></i> <a href="/2023/05/12/%E4%BB%A3%E7%A0%81/%E4%BB%A3%E7%A0%81-%E6%AF%8F%E5%A4%A9%E5%AE%9A%E7%82%B9%E5%90%91%E5%BE%AE%E4%BF%A1%E6%8E%A8%E9%80%81-arXiv-Glenn/#comments" class="article-comment-link">评论</a></span>
+        
+      </div>
+    </div>
+    <div class="article-entry marked-body" itemprop="articleBody">
+      
+        <p>作为科研人，每天早起的第一件事，</p>
+<p>就是打开 arXiv 查找自己 follow 的领域有没有最新的文章。</p>
+<p>现在我想把这件事自动化：</p>
+<p>类似部署自动打卡函数，在阿里云函数计算 FC 中设置一个带有定时触发器的云函数，</p>
+<p>再将每天定点向微信推送 arXiv 最新文章的脚本程序部署上去，</p>
+<p><strong>实现：</strong></p>
+<ul>
+<li>根据关键词搜索在 arXiv 发布的文章；</li>
+<li>判断文章的发布日期是否是前一天（或指定日期），如果是，则保留；</li>
+<li>使用 Server 酱将前一天文章的标题、网址、摘要推送至微信。</li>
+</ul>
+<p><strong>效果展示：</strong></p>
+<p><img src="/2023/05/12/%E4%BB%A3%E7%A0%81/%E4%BB%A3%E7%A0%81-%E6%AF%8F%E5%A4%A9%E5%AE%9A%E7%82%B9%E5%90%91%E5%BE%AE%E4%BF%A1%E6%8E%A8%E9%80%81-arXiv-Glenn/v2-355b149e84e6c2fd2187ac4ed0367a9e_r.jpg"><br>这里我为了展示效果，将条件“前一天发布”改为了特定条件“2023 年 4 月 12 日发布”。</p>
+<p><img src="/2023/05/12/%E4%BB%A3%E7%A0%81/%E4%BB%A3%E7%A0%81-%E6%AF%8F%E5%A4%A9%E5%AE%9A%E7%82%B9%E5%90%91%E5%BE%AE%E4%BF%A1%E6%8E%A8%E9%80%81-arXiv-Glenn/v2-4d23cff0002f5e93877024bc5a6edd9e_r.jpg"></p>
+<hr>
+<p>完整代码如下：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br><span class="line">129</span><br><span class="line">130</span><br><span class="line">131</span><br><span class="line">132</span><br><span class="line">133</span><br><span class="line">134</span><br><span class="line">135</span><br><span class="line">136</span><br><span class="line">137</span><br><span class="line">138</span><br><span class="line">139</span><br><span class="line">140</span><br><span class="line">141</span><br><span class="line">142</span><br><span class="line">143</span><br><span class="line">144</span><br><span class="line">145</span><br><span class="line">146</span><br><span class="line">147</span><br><span class="line">148</span><br><span class="line">149</span><br><span class="line">150</span><br><span class="line">151</span><br><span class="line">152</span><br><span class="line">153</span><br></pre></td><td class="code"><pre><span class="line">&#x27;&#x27;&#x27;</span><br><span class="line">Description: 每天定点向微信推送 arXiv 最新文章</span><br><span class="line">Version: 1.0</span><br><span class="line">Author: Glenn</span><br><span class="line">Email: chenluda01@outlook.com</span><br><span class="line">Date: 2023-04-19 08:35:13</span><br><span class="line">FilePath: \12-arxivdownload\index.py</span><br><span class="line">Copyright (c) 2023 by Kust-BME, All Rights Reserved. </span><br><span class="line">&#x27;&#x27;&#x27;</span><br><span class="line"></span><br><span class="line">import datetime</span><br><span class="line">import os</span><br><span class="line">import time</span><br><span class="line">from io import BytesIO</span><br><span class="line"></span><br><span class="line">import openai</span><br><span class="line">import pdfplumber</span><br><span class="line">import requests</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">def get\_author\_affiliation(pdf\_url):</span><br><span class="line">    &quot;&quot;&quot;</span><br><span class="line"> 从 PDF 文件中提取作者单位信息</span><br><span class="line"> &quot;&quot;&quot;</span><br><span class="line">    response = requests.get(pdf\_url)</span><br><span class="line">    pdf\_content = BytesIO(response.content)</span><br><span class="line">    author\_affiliation = []</span><br><span class="line"></span><br><span class="line">    with pdfplumber.open(pdf\_content) as pdf:</span><br><span class="line">        first\_page = pdf.pages[0]</span><br><span class="line">        text = first\_page.extract\_text()</span><br><span class="line"></span><br><span class="line">        # 设置提示词</span><br><span class="line">        prompt = &#x27;Extract the organization names from the given text: &#x27; + text</span><br><span class="line"></span><br><span class="line">        # 调用 GPT-3.5 的接口</span><br><span class="line">        response = openai.ChatCompletion.create(</span><br><span class="line">            model=&quot;gpt-3.5-turbo&quot;,</span><br><span class="line">            messages=[</span><br><span class="line">                &#123;&quot;role&quot;: &quot;system&quot;, &quot;content&quot;: &quot;You are a very powerful named entity recognition model.&quot;&#125;,</span><br><span class="line">                &#123;&quot;role&quot;: &quot;user&quot;, &quot;content&quot;: prompt&#125;</span><br><span class="line">            ],</span><br><span class="line">        )</span><br><span class="line"></span><br><span class="line">        output = response.choices[0].message.content.strip()</span><br><span class="line">        institutions = [o.strip() for o in output.split(&quot;\n&quot;)]</span><br><span class="line"></span><br><span class="line">        author\_affiliation = list(set(institutions))</span><br><span class="line"></span><br><span class="line">    return author\_affiliation</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">def get\_yesterday():</span><br><span class="line">    &quot;&quot;&quot;</span><br><span class="line"> 获取前一天的日期</span><br><span class="line"> &quot;&quot;&quot;</span><br><span class="line">    today = datetime.datetime.now()</span><br><span class="line">    yesterday = today - datetime.timedelta(days=1)</span><br><span class="line">    return yesterday.strftime(&#x27;%Y-%m-%d&#x27;)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">def search\_arxiv\_papers(search\_term, yester\_date, max\_results=10):</span><br><span class="line">    &quot;&quot;&quot;</span><br><span class="line"> 在 arxiv 按照关键词查找前一天的论文</span><br><span class="line"> &quot;&quot;&quot;</span><br><span class="line">    papers = []</span><br><span class="line"></span><br><span class="line">    base\_url = &#x27;http://export.arxiv.org/api/query?&#x27;</span><br><span class="line">    search\_query = f&#x27;search\_query=all:&#123;search\_term&#125;&amp;start=0&amp;max\_results=&#123;max\_results&#125;&amp;sortBy=submittedDate&amp;sortOrder=descending&#x27;</span><br><span class="line">    response = requests.get(base\_url + search\_query)</span><br><span class="line">    </span><br><span class="line">    if response.status\_code != 200:</span><br><span class="line">        print(&quot;请求失败，请检查你的查询参数。&quot;)</span><br><span class="line">        return</span><br><span class="line"></span><br><span class="line">    feed = response.text</span><br><span class="line">    entries = feed.split(&#x27;&lt;entry&gt;&#x27;)[1:]</span><br><span class="line">    </span><br><span class="line">    if not entries:</span><br><span class="line">        print(&quot;没有找到与搜索词匹配的论文。&quot;)</span><br><span class="line">        return</span><br><span class="line">    </span><br><span class="line">    for entry in entries:</span><br><span class="line">        # 获取标题、摘要、链接、首次发布日期</span><br><span class="line">        title = entry.split(&#x27;&lt;title&gt;&#x27;)[1].split(&#x27;&lt;/title&gt;&#x27;)[0].strip()</span><br><span class="line">        summary = entry.split(&#x27;&lt;summary&gt;&#x27;)[1].split(&#x27;&lt;/summary&gt;&#x27;)[0].strip()</span><br><span class="line">        url = entry.split(&#x27;&lt;id&gt;&#x27;)[1].split(&#x27;&lt;/id&gt;&#x27;)[0].strip()</span><br><span class="line">        pub\_date = entry.split(&#x27;&lt;published&gt;&#x27;)[1].split(&#x27;&lt;/published&gt;&#x27;)[0]</span><br><span class="line">        pub\_date = datetime.datetime.strptime(pub\_date, &quot;%Y-%m-%dT%H:%M:%SZ&quot;).strftime(&quot;%Y-%m-%d&quot;)</span><br><span class="line"></span><br><span class="line">        # 获取 PDF 链接</span><br><span class="line">        pdf\_url = entry.split(&#x27;&lt;link href=&quot;&#x27;)[1].split(&#x27;&quot; rel=&quot;alternate&#x27;)[0].strip()</span><br><span class="line">        pdf\_url = pdf\_url.replace(&quot;abs&quot;, &quot;pdf&quot;)</span><br><span class="line"></span><br><span class="line">        # 获取作者单位</span><br><span class="line">        author\_affiliation = get\_author\_affiliation(pdf\_url)</span><br><span class="line"></span><br><span class="line">        if pub\_date == yester\_date:</span><br><span class="line">            papers.append(&#123;</span><br><span class="line">                &#x27;title&#x27;: title,</span><br><span class="line">                &#x27;url&#x27;: url,</span><br><span class="line">                &#x27;pub\_date&#x27;: pub\_date,</span><br><span class="line">                &#x27;summary&#x27;: summary,</span><br><span class="line">                &#x27;author\_affiliation&#x27;: author\_affiliation</span><br><span class="line">            &#125;)</span><br><span class="line">        </span><br><span class="line">    return papers</span><br><span class="line"></span><br><span class="line">def send\_wechat\_message(title, content, SERVERCHAN\_API\_KEY):</span><br><span class="line">    &quot;&quot;&quot;</span><br><span class="line"> 使用 Serve 酱向微信推送论文信息</span><br><span class="line"> &quot;&quot;&quot;</span><br><span class="line">    url = f&#x27;https://sctapi.ftqq.com/&#123;SERVERCHAN\_API\_KEY&#125;.send&#x27;</span><br><span class="line">    params = &#123;</span><br><span class="line">        &#x27;title&#x27;: title,</span><br><span class="line">        &#x27;desp&#x27;: content,</span><br><span class="line">    &#125;</span><br><span class="line">    requests.post(url, params=params)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"># def handler(event, context):</span><br><span class="line">if \_\_name\_\_ == &#x27;\_\_main\_\_&#x27;:</span><br><span class="line">    # 设置 OPENAI 的 API\_KEY</span><br><span class="line">    os.environ[&#x27;OPENAI\_API\_KEY&#x27;] = &#x27;your\_openai\_api\_key&#x27;</span><br><span class="line">    openai.api\_key = os.getenv(&#x27;OPENAI\_API\_KEY&#x27;)</span><br><span class="line">    # 修改为自己 Serve 酱 API</span><br><span class="line">    SERVERCHAN\_API\_KEY = &#x27;SCT206421TeQFPxkyqpZQFegFELJaKCW6d&#x27;</span><br><span class="line">    # 关键词</span><br><span class="line">    search\_term = &#x27;&quot;masked image model&quot;&#x27;</span><br><span class="line">    # 获取的最大论文数</span><br><span class="line">    max\_results = 10</span><br><span class="line">    # 获取前一天的日期</span><br><span class="line">    yester\_date = get\_yesterday()</span><br><span class="line">    # 在 arxiv 按照关键词查找前一天的论文</span><br><span class="line">    papers = search\_arxiv\_papers(search\_term, yester\_date, max\_results)</span><br><span class="line"></span><br><span class="line">    for paper in papers:</span><br><span class="line">        title = paper[&#x27;title&#x27;]</span><br><span class="line">        url = paper[&#x27;url&#x27;]</span><br><span class="line">        pub\_date = paper[&#x27;pub\_date&#x27;]</span><br><span class="line">        summary = paper[&#x27;summary&#x27;]</span><br><span class="line"></span><br><span class="line">        msg\_title = f&#x27;标题：&#123;title&#125;&#x27;</span><br><span class="line">        msg\_url = f&#x27;论文网址：&#123;url&#125;&#x27;</span><br><span class="line">        msg\_pub\_date = f&#x27;首次发布时间：&#123;pub\_date&#125;&#x27;</span><br><span class="line">        msg\_summary = f&#x27;摘要：&#123;summary&#125;&#x27;</span><br><span class="line"></span><br><span class="line">        msg\_content = f&#x27;&#123;msg\_title&#125;\n\n&#123;msg\_url&#125;\n\n&#123;msg\_pub\_date&#125;\n\n&#123;msg\_summary&#125;&#x27;</span><br><span class="line">        </span><br><span class="line">        send\_wechat\_message(title, msg\_content, SERVERCHAN\_API\_KEY)</span><br><span class="line"></span><br><span class="line">        # 为避免触发微信推送服务的限制，等待一段时间后再发送下一篇论文的信息</span><br><span class="line">        time.sleep(5)</span><br></pre></td></tr></table></figure>
+<p>使用 gpt3.5 识别论文的作者单位，如果不需要的话，可以注释掉相关代码。</p>
+<p>其中，handler 函数中的 <strong>SERVERCHAN_API_KEY</strong>、<strong>search_term</strong> 、<strong>max_results</strong> 是根据需求修改的变量。</p>
+<ul>
+<li><strong>SERVERCHAN_API_KEY：</strong>自己 Serve 酱的 API（下方会解释）。</li>
+<li><strong>search_term：</strong>搜索论文的关键词，如果使用双引号将词包裹起来，表明论文中必须出现这个词，例如，’Masked Image Model’ 和 ‘“Masked Image Model”‘ 搜索结果不同，具体请查看 arxiv 的文献检索说明。</li>
+<li><strong>max_results：</strong>检索论文的最大数量。</li>
+</ul>
+<p>如果想直接本地运行，则可以将 def handler(event, context): 改为 if __name__ &#x3D;&#x3D; ‘__main__‘: 。</p>
+<hr>
+<h3 id="1-Server-酱"><a href="#1-Server-酱" class="headerlink" title="1. Server 酱"></a>1. Server 酱</h3><p>我们需要使用到Server 酱，这是一款从服务器、路由器等设备上推消息到手机的工具。我们需要使用她实现向微信推送消息的功能。</p>
+<ul>
+<li>打开官网网址：<a href="https://link.zhihu.com/?target=https://sct.ftqq.com/">https://sct.ftqq.com/</a>；</li>
+<li>微信扫码登陆后，进入 Key&amp;API 模块；</li>
+<li>将 SendKey 复制替换代码中的 Your-Server-API。</li>
+</ul>
+<p><img src="/2023/05/12/%E4%BB%A3%E7%A0%81/%E4%BB%A3%E7%A0%81-%E6%AF%8F%E5%A4%A9%E5%AE%9A%E7%82%B9%E5%90%91%E5%BE%AE%E4%BF%A1%E6%8E%A8%E9%80%81-arXiv-Glenn/v2-587eb4ca5ceea2b737b4684cff55d7f5_r.jpg"></p>
+<h3 id="2-阿里云函数计算-FC"><a href="#2-阿里云函数计算-FC" class="headerlink" title="2. 阿里云函数计算 FC"></a>2. 阿里云函数计算 FC</h3><p>函数计算（Function Compute）是一个事件驱动的全托管 Serverless 计算服务，无需管理服务器等基础设施，只需编写代码并上传，函数计算会准备好计算资源，并以弹性、可靠的方式运行代码。</p>
+<ul>
+<li>打开官网网址：<a href="https://link.zhihu.com/?target=https://www.aliyun.com/product/fc?spm=5176.28055625.J_3207526240.99.4d9c154a5PXJtz&scm=20140722.S_function@@product@@90871._.ID_function@@product@@90871-RL_%25E5%2587%25BD%25E6%2595%25B0%25E8%25AE%25A1%25E7%25AE%2597-LOC_bar-OR_ser-V_2-P0_0">国内唯一入选Forrester领导者象限</a>，登陆后，进入管理控制台；</li>
+<li>进入服务及函数模块，点击创建服务按钮；</li>
+</ul>
+<p><img src="/2023/05/12/%E4%BB%A3%E7%A0%81/%E4%BB%A3%E7%A0%81-%E6%AF%8F%E5%A4%A9%E5%AE%9A%E7%82%B9%E5%90%91%E5%BE%AE%E4%BF%A1%E6%8E%A8%E9%80%81-arXiv-Glenn/v2-c4a167c2ec104c813ddf0dbb0f397b40_r.jpg"><br>登陆后，进入管理控制台，再进入服务及函数模块，点击创建服务按钮</p>
+<ul>
+<li>将弹窗中的名称和描述填完后，点击左下角确定按钮；</li>
+</ul>
+<p><img src="/2023/05/12/%E4%BB%A3%E7%A0%81/%E4%BB%A3%E7%A0%81-%E6%AF%8F%E5%A4%A9%E5%AE%9A%E7%82%B9%E5%90%91%E5%BE%AE%E4%BF%A1%E6%8E%A8%E9%80%81-arXiv-Glenn/v2-377dd3392a35bc7edb25dc26aaa02f2c_r.jpg"><br>将弹窗中的名称和描述填完后，点击左下角确定按钮</p>
+<ul>
+<li>进入函数管理模块，点击创建函数按钮；</li>
+</ul>
+<p><img src="/2023/05/12/%E4%BB%A3%E7%A0%81/%E4%BB%A3%E7%A0%81-%E6%AF%8F%E5%A4%A9%E5%AE%9A%E7%82%B9%E5%90%91%E5%BE%AE%E4%BF%A1%E6%8E%A8%E9%80%81-arXiv-Glenn/v2-8d5671a3180dd4dfa8fde17aba69fbc8_r.jpg"><br>进入函数管理模块，点击创建函数按钮</p>
+<ul>
+<li>填写函数名称；</li>
+<li>将上面给出的脚本代码保存为 <a href="https://link.zhihu.com/?target=http://index.py/">index.py</a> 放入一个名为 arxiv_push_code 的空文件夹中；</li>
+<li>压缩该文件夹，将压缩包拖至代码包处；</li>
+<li>点击页面下方创建按钮；</li>
+</ul>
+<p><img src="/2023/05/12/%E4%BB%A3%E7%A0%81/%E4%BB%A3%E7%A0%81-%E6%AF%8F%E5%A4%A9%E5%AE%9A%E7%82%B9%E5%90%91%E5%BE%AE%E4%BF%A1%E6%8E%A8%E9%80%81-arXiv-Glenn/v2-d51e4e96dc5885d4f2d2e394cb1675a6_r.jpg"></p>
+<ul>
+<li>将 arxiv_push_code 文件夹中的 <a href="https://link.zhihu.com/?target=http://index.py/">index.py</a> 拖至上级文件夹 CODE 处；</li>
+<li>将 arxiv_push_code 文件夹删除；</li>
+</ul>
+<p><img src="/2023/05/12/%E4%BB%A3%E7%A0%81/%E4%BB%A3%E7%A0%81-%E6%AF%8F%E5%A4%A9%E5%AE%9A%E7%82%B9%E5%90%91%E5%BE%AE%E4%BF%A1%E6%8E%A8%E9%80%81-arXiv-Glenn/v2-ad94fb14cb81dbef2f72d82be64023e1_r.jpg"></p>
+<ul>
+<li>进入触发器管理模块，点击创建触发器按钮；</li>
+</ul>
+<p><img src="/2023/05/12/%E4%BB%A3%E7%A0%81/%E4%BB%A3%E7%A0%81-%E6%AF%8F%E5%A4%A9%E5%AE%9A%E7%82%B9%E5%90%91%E5%BE%AE%E4%BF%A1%E6%8E%A8%E9%80%81-arXiv-Glenn/v2-593f9a4a1830615262969bb27a6d66bb_r.jpg"><br>进入触发器管理模块，点击创建触发器按钮</p>
+<ul>
+<li>在弹窗中填写相关内容，其中“指定时间”就是在设置每天几点向微信推送文章；</li>
+<li>填写完后点击左下方确定按钮，完成触发器创建；</li>
+</ul>
+<p><img src="/2023/05/12/%E4%BB%A3%E7%A0%81/%E4%BB%A3%E7%A0%81-%E6%AF%8F%E5%A4%A9%E5%AE%9A%E7%82%B9%E5%90%91%E5%BE%AE%E4%BF%A1%E6%8E%A8%E9%80%81-arXiv-Glenn/v2-ff793f98d6f349351a99ac45a7af8bd4_r.jpg"></p>
+<ul>
+<li>回到函数代码页面，点击部署代码按钮，出现部署成功提示后，表示部署成功；</li>
+</ul>
+<p><img src="/2023/05/12/%E4%BB%A3%E7%A0%81/%E4%BB%A3%E7%A0%81-%E6%AF%8F%E5%A4%A9%E5%AE%9A%E7%82%B9%E5%90%91%E5%BE%AE%E4%BF%A1%E6%8E%A8%E9%80%81-arXiv-Glenn/v2-0de2466902c47e7490775e61749d2af2_r.jpg"></p>
+<ul>
+<li>点击测试函数，可以直接运行。</li>
+</ul>
+
+      
+    </div>
+    <div class="article-footer">
+      <blockquote class="mt-2x">
+  <ul class="post-copyright list-unstyled">
+    
+    <li class="post-copyright-link hidden-xs">
+      <strong>本文链接：</strong>
+      <a href="http://glennchen.cn/2023/05/12/%E4%BB%A3%E7%A0%81/%E4%BB%A3%E7%A0%81-%E6%AF%8F%E5%A4%A9%E5%AE%9A%E7%82%B9%E5%90%91%E5%BE%AE%E4%BF%A1%E6%8E%A8%E9%80%81-arXiv-Glenn/" title="代码 | 每天定点向微信推送 arXiv 最新文章" target="_blank" rel="external">http://glennchen.cn/2023/05/12/代码/代码-每天定点向微信推送-arXiv-Glenn/</a>
+    </li>
+    
+    <li class="post-copyright-license">
+      <strong>版权声明： </strong> 本博客所有文章除特别声明外，均采用 <a href="http://creativecommons.org/licenses/by/4.0/deed.zh" target="_blank" rel="external">CC BY 4.0 CN协议</a> 许可协议。转载请注明出处！
+    </li>
+  </ul>
+</blockquote>
+
+
+<div class="panel panel-default panel-badger">
+  <div class="panel-body">
+    <figure class="media">
+      <div class="media-left">
+        <a href="https://github.com/chenluda" target="_blank" class="img-burn thumb-sm visible-lg">
+          <img src="/images/avatar.png" class="img-rounded w-full" alt="">
+        </a>
+      </div>
+      <div class="media-body">
+        <h3 class="media-heading"><a href="https://github.com/chenluda" target="_blank"><span class="text-dark">Glenn</span><small class="ml-1x">Stay hungry, stay foolish.</small></a></h3>
+        <div>咖啡，健身，热爱生活。</div>
+      </div>
+    </figure>
+  </div>
+</div>
+
+
+    </div>
+  </article>
+  
+    
+  <section id="comments">
+  	
+      <div id="vcomments"></div>
+    
+  </section>
+
+
+  
+</div>
+
+  <nav class="bar bar-footer clearfix" data-stick-bottom>
+  <div class="bar-inner">
+  
+  <ul class="pager pull-left">
+    
+    <li class="prev">
+      <a href="/2023/05/12/%E4%BB%A3%E7%A0%81/%E4%BB%A3%E7%A0%81-%E8%8E%B7%E5%8F%96-arXiv-%E8%AE%BA%E6%96%87%E4%BD%9C%E8%80%85%E5%8D%95%E4%BD%8D-Glenn/" title="代码 | 获取 arXiv 论文作者单位"><i class="icon icon-angle-left" aria-hidden="true"></i><span>&nbsp;&nbsp;上一篇</span></a>
+    </li>
+    
+    
+    <li class="next">
+      <a href="/2023/05/12/%E4%BB%A3%E7%A0%81/%E4%BB%A3%E7%A0%81-%E5%B0%86%E7%9F%A5%E4%B9%8E%E4%B8%93%E6%A0%8F%E6%96%87%E7%AB%A0%E8%BD%AC%E6%8D%A2%E4%B8%BA-Markd-Glenn/" title="代码 | 将知乎专栏文章转换为 Markdown 文件保存到本地"><span>下一篇&nbsp;&nbsp;</span><i class="icon icon-angle-right" aria-hidden="true"></i></a>
+    </li>
+    
+    
+  </ul>
+  
+  
+  
+  <div class="bar-right">
+    
+    <div class="share-component" data-sites="weibo,qq,wechat,facebook,twitter" data-mobile-sites="weibo,qq,qzone"></div>
+    
+  </div>
+  </div>
+</nav>
+  
+
+
+</main>
+
+  <footer class="footer" itemscope itemtype="http://schema.org/WPFooter">
+	
+	
+    <ul class="social-links">
+    	
+        <li><a href="https://github.com/chenluda" target="_blank" title="Github" data-toggle=tooltip data-placement=top><i class="icon icon-github"></i></a></li>
+        
+        <li><a href="https://www.zhihu.com/people/Glenn" target="_blank" title="Zhihu" data-toggle=tooltip data-placement=top><i class="icon icon-zhihu"></i></a></li>
+        
+    </ul>
+
+    <div class="copyright">
+    	
+        <div class="publishby">
+        	Theme by <a href="https://github.com/cofess" target="_blank"> cofess </a>base on <a href="https://github.com/cofess/hexo-theme-pure" target="_blank">pure</a>.
+        </div>
+    </div>
+</footer>
+  <script src="//cdn.jsdelivr.net/npm/jquery@1.12.4/dist/jquery.min.js"></script>
+<script>
+window.jQuery || document.write('<script src="js/jquery.min.js"><\/script>')
+</script>
+
+<script src="/js/plugin.min.js"></script>
+
+
+<script src="/js/application.js"></script>
+
+
+    <script>
+(function (window) {
+    var INSIGHT_CONFIG = {
+        TRANSLATION: {
+            POSTS: '文章',
+            PAGES: '页面',
+            CATEGORIES: '分类',
+            TAGS: '标签',
+            UNTITLED: '(未命名)',
+        },
+        ROOT_URL: '/',
+        CONTENT_URL: '/content.json',
+    };
+    window.INSIGHT_CONFIG = INSIGHT_CONFIG;
+})(window);
+</script>
+
+<script src="/js/insight.js"></script>
+
+
+
+
+
+
+   
+
+
+
+
+   
+    
+  <script src="//cdn1.lncld.net/static/js/3.0.4/av-min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/valine"></script>
+  <script type="text/javascript">
+  var GUEST = ['nick', 'mail', 'link'];
+  var meta = 'nick,mail,link';
+  meta = meta.split(',').filter(function(item) {
+    return GUEST.indexOf(item) > -1;
+  });
+  new Valine({
+    el: '#vcomments',
+    verify: false,
+    notify: false,
+    appId: '',
+    appKey: '',
+    placeholder: 'Just go go',
+    avatar: 'mm',
+    meta: meta,
+    pageSize: '10' || 10,
+    visitor: false
+  });
+  </script>
+
+     
+
+
+
+
+
+
+
+</body>
+</html>

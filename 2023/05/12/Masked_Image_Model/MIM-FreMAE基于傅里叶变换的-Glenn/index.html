@@ -1,0 +1,598 @@
+<!DOCTYPE html>
+<html lang=zh>
+<head>
+  <meta charset="utf-8">
+  
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=no, minimal-ui">
+  <meta name="renderer" content="webkit">
+  <meta http-equiv="Cache-Control" content="no-transform" />
+  <meta http-equiv="Cache-Control" content="no-siteapp" />
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black">
+  <meta name="format-detection" content="telephone=no,email=no,adress=no">
+  <!-- Color theme for statusbar -->
+  <meta name="theme-color" content="#000000" />
+  <!-- 强制页面在当前窗口以独立页面显示,防止别人在框架里调用页面 -->
+  <meta http-equiv="window-target" content="_top" />
+  
+  
+  <title>MIM | FreMAE：基于傅里叶变换的 MIM 用于医学图像分割 | Hexo</title>
+  <meta name="description" content="题目： FreMAE: Fourier Transform Meets Masked Autoencoders for Medical Image Segmentation单位：北京科技大学、中佛罗里达大学、伯明翰大学、理海大学论文网址：https:&#x2F;&#x2F;arxiv.org&#x2F;abs&#x2F;2304.10864论文代码：未公开首次发布时间：2023 年 4 月 21 日  123456@article&amp;">
+<meta property="og:type" content="article">
+<meta property="og:title" content="MIM | FreMAE：基于傅里叶变换的 MIM 用于医学图像分割">
+<meta property="og:url" content="http://glennchen.cn/2023/05/12/Masked_Image_Model/MIM-FreMAE%E5%9F%BA%E4%BA%8E%E5%82%85%E9%87%8C%E5%8F%B6%E5%8F%98%E6%8D%A2%E7%9A%84-Glenn/index.html">
+<meta property="og:site_name" content="Glenn">
+<meta property="og:description" content="题目： FreMAE: Fourier Transform Meets Masked Autoencoders for Medical Image Segmentation单位：北京科技大学、中佛罗里达大学、伯明翰大学、理海大学论文网址：https:&#x2F;&#x2F;arxiv.org&#x2F;abs&#x2F;2304.10864论文代码：未公开首次发布时间：2023 年 4 月 21 日  123456@article&amp;">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://glennchen.cn/2023/05/12/Masked_Image_Model/MIM-FreMAE%E5%9F%BA%E4%BA%8E%E5%82%85%E9%87%8C%E5%8F%B6%E5%8F%98%E6%8D%A2%E7%9A%84-Glenn/v2-a339e598049e59ac4272d58044af6582_r.jpg">
+<meta property="og:image" content="http://glennchen.cn/2023/05/12/Masked_Image_Model/MIM-FreMAE%E5%9F%BA%E4%BA%8E%E5%82%85%E9%87%8C%E5%8F%B6%E5%8F%98%E6%8D%A2%E7%9A%84-Glenn/v2-58fece3fb1fcb9112f1e10d03e03d852_r.jpg">
+<meta property="og:image" content="http://glennchen.cn/2023/05/12/Masked_Image_Model/MIM-FreMAE%E5%9F%BA%E4%BA%8E%E5%82%85%E9%87%8C%E5%8F%B6%E5%8F%98%E6%8D%A2%E7%9A%84-Glenn/v2-4aad1f0bb722cc61cf33e7f7ce52d9c5_r.jpg">
+<meta property="og:image" content="http://glennchen.cn/2023/05/12/Masked_Image_Model/MIM-FreMAE%E5%9F%BA%E4%BA%8E%E5%82%85%E9%87%8C%E5%8F%B6%E5%8F%98%E6%8D%A2%E7%9A%84-Glenn/v2-3f56bf3aa594ec3764086a552b13a39a_r.jpg">
+<meta property="og:image" content="http://glennchen.cn/2023/05/12/Masked_Image_Model/MIM-FreMAE%E5%9F%BA%E4%BA%8E%E5%82%85%E9%87%8C%E5%8F%B6%E5%8F%98%E6%8D%A2%E7%9A%84-Glenn/v2-45cc72607c1a1e14e9242e4228e30f79_r.jpg">
+<meta property="og:image" content="http://glennchen.cn/2023/05/12/Masked_Image_Model/MIM-FreMAE%E5%9F%BA%E4%BA%8E%E5%82%85%E9%87%8C%E5%8F%B6%E5%8F%98%E6%8D%A2%E7%9A%84-Glenn/v2-2733a5978596297b722bfcc0549e238d_r.jpg">
+<meta property="og:image" content="http://glennchen.cn/2023/05/12/Masked_Image_Model/MIM-FreMAE%E5%9F%BA%E4%BA%8E%E5%82%85%E9%87%8C%E5%8F%B6%E5%8F%98%E6%8D%A2%E7%9A%84-Glenn/v2-8b4c948e662398d4905bb5d9c0aa3505_r.jpg">
+<meta property="og:image" content="http://glennchen.cn/2023/05/12/Masked_Image_Model/MIM-FreMAE%E5%9F%BA%E4%BA%8E%E5%82%85%E9%87%8C%E5%8F%B6%E5%8F%98%E6%8D%A2%E7%9A%84-Glenn/v2-e6fef503353dabefcfc301fd98419bc0_r.jpg">
+<meta property="og:image" content="http://glennchen.cn/2023/05/12/Masked_Image_Model/MIM-FreMAE%E5%9F%BA%E4%BA%8E%E5%82%85%E9%87%8C%E5%8F%B6%E5%8F%98%E6%8D%A2%E7%9A%84-Glenn/v2-4324530cd9f2366b857596cca58298c2_r.jpg">
+<meta property="og:image" content="http://glennchen.cn/2023/05/12/Masked_Image_Model/MIM-FreMAE%E5%9F%BA%E4%BA%8E%E5%82%85%E9%87%8C%E5%8F%B6%E5%8F%98%E6%8D%A2%E7%9A%84-Glenn/v2-df1c9bc908417bb800fd8c96189da55d_r.jpg">
+<meta property="article:published_time" content="2023-05-12T10:44:06.000Z">
+<meta property="article:modified_time" content="2023-05-12T12:16:59.933Z">
+<meta property="article:author" content="Glenn">
+<meta property="article:tag" content="Masked Image Modeling">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://glennchen.cn/2023/05/12/Masked_Image_Model/MIM-FreMAE%E5%9F%BA%E4%BA%8E%E5%82%85%E9%87%8C%E5%8F%B6%E5%8F%98%E6%8D%A2%E7%9A%84-Glenn/v2-a339e598049e59ac4272d58044af6582_r.jpg">
+  <!-- Canonical links -->
+  <link rel="canonical" href="http://glennchen.cn/2023/05/12/Masked_Image_Model/MIM-FreMAE%E5%9F%BA%E4%BA%8E%E5%82%85%E9%87%8C%E5%8F%B6%E5%8F%98%E6%8D%A2%E7%9A%84-Glenn/index.html">
+  
+    <link rel="alternate" href="/atom.xml" title="Glenn" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="/favicon.png" type="image/x-icon">
+  
+  
+<link rel="stylesheet" href="/css/style.css">
+
+  
+  
+  
+  
+<!-- hexo injector head_end start -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/katex.min.css">
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/hexo-math@4.0.0/dist/style.css">
+<!-- hexo injector head_end end --><meta name="generator" content="Hexo 6.3.0"></head>
+
+
+<body class="main-center theme-black" itemscope itemtype="http://schema.org/WebPage">
+  <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+  <div class="slimContent">
+    <div class="navbar-header">
+      
+      
+      <div class="profile-block text-center">
+        <a id="avatar" href="https://github.com/chenluda" target="_blank">
+          <img class="img-circle img-rotate" src="/images/avatar.png" width="200" height="200">
+        </a>
+        <h2 id="name" class="hidden-xs hidden-sm">Glenn</h2>
+        <h3 id="title" class="hidden-xs hidden-sm hidden-md">Stay hungry, stay foolish.</h3>
+        <small id="location" class="text-muted hidden-xs hidden-sm"><i class="icon icon-map-marker"></i> Yunnan, China</small>
+      </div>
+      
+      <div class="search" id="search-form-wrap">
+
+    <form class="search-form sidebar-form">
+        <div class="input-group">
+            <input type="text" class="search-form-input form-control" placeholder="搜索" />
+            <span class="input-group-btn">
+                <button type="submit" class="search-form-submit btn btn-flat" onclick="return false;"><i class="icon icon-search"></i></button>
+            </span>
+        </div>
+    </form>
+    <div class="ins-search">
+  <div class="ins-search-mask"></div>
+  <div class="ins-search-container">
+    <div class="ins-input-wrapper">
+      <input type="text" class="ins-search-input" placeholder="想要查找什么..." x-webkit-speech />
+      <button type="button" class="close ins-close ins-selectable" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span></button>
+    </div>
+    <div class="ins-section-wrapper">
+      <div class="ins-section-container"></div>
+    </div>
+  </div>
+</div>
+
+
+</div>
+      <button class="navbar-toggle collapsed" type="button" data-toggle="collapse" data-target="#main-navbar" aria-controls="main-navbar" aria-expanded="false">
+        <span class="sr-only">Toggle navigation</span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+    </div>
+    <nav id="main-navbar" class="collapse navbar-collapse" itemscope itemtype="http://schema.org/SiteNavigationElement" role="navigation">
+      <ul class="nav navbar-nav main-nav ">
+        
+        
+        <li class="menu-item menu-item-home">
+          <a href="/.">
+            
+            <i class="icon icon-home-fill"></i>
+            
+            <span class="menu-title">首页</span>
+          </a>
+        </li>
+        
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives">
+            
+            <i class="icon icon-archives-fill"></i>
+            
+            <span class="menu-title">归档</span>
+          </a>
+        </li>
+        
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories">
+            
+            <i class="icon icon-folder"></i>
+            
+            <span class="menu-title">分类</span>
+          </a>
+        </li>
+        
+      </ul>
+      
+	
+    <ul class="social-links">
+    	
+        <li><a href="https://github.com/chenluda" target="_blank" title="Github" data-toggle=tooltip data-placement=top><i class="icon icon-github"></i></a></li>
+        
+        <li><a href="https://www.zhihu.com/people/Glenn" target="_blank" title="Zhihu" data-toggle=tooltip data-placement=top><i class="icon icon-zhihu"></i></a></li>
+        
+    </ul>
+
+    </nav>
+  </div>
+</header>
+
+  
+    <aside class="sidebar" itemscope itemtype="http://schema.org/WPSideBar">
+  <div class="slimContent">
+    
+      <div class="widget">
+    <h3 class="widget-title">公告</h3>
+    <div class="widget-body">
+        <div id="board">
+            <div class="content">
+                <p>欢迎交流与分享经验!</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+    
+      
+  <div class="widget">
+    <h3 class="widget-title">分类</h3>
+    <div class="widget-body">
+      <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/%E4%BB%A3%E7%A0%81/">代码</a><span class="category-list-count">4</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/%E8%AE%BA%E6%96%87%E9%80%9F%E8%A7%88/">论文速览</a><span class="category-list-count">12</span></li></ul>
+    </div>
+  </div>
+
+
+    
+      
+  <div class="widget">
+    <h3 class="widget-title">标签</h3>
+    <div class="widget-body">
+      <ul class="tag-list" itemprop="keywords"><li class="tag-list-item"><a class="tag-list-link" href="/tags/Conference-paper/" rel="tag">Conference paper</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/DataBase/" rel="tag">DataBase</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Markdown/" rel="tag">Markdown</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Masked-Image-Modeling/" rel="tag">Masked Image Modeling</a><span class="tag-list-count">12</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/OpenReview/" rel="tag">OpenReview</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Organization/" rel="tag">Organization</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/WeChat/" rel="tag">WeChat</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Zhihu/" rel="tag">Zhihu</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/arXiv/" rel="tag">arXiv</a><span class="tag-list-count">2</span></li></ul>
+    </div>
+  </div>
+
+
+    
+      
+  <div class="widget">
+    <h3 class="widget-title">标签云</h3>
+    <div class="widget-body tagcloud">
+      <a href="/tags/Conference-paper/" style="font-size: 13px;">Conference paper</a> <a href="/tags/DataBase/" style="font-size: 13.5px;">DataBase</a> <a href="/tags/Markdown/" style="font-size: 13px;">Markdown</a> <a href="/tags/Masked-Image-Modeling/" style="font-size: 14px;">Masked Image Modeling</a> <a href="/tags/OpenReview/" style="font-size: 13px;">OpenReview</a> <a href="/tags/Organization/" style="font-size: 13px;">Organization</a> <a href="/tags/WeChat/" style="font-size: 13px;">WeChat</a> <a href="/tags/Zhihu/" style="font-size: 13px;">Zhihu</a> <a href="/tags/arXiv/" style="font-size: 13.5px;">arXiv</a>
+    </div>
+  </div>
+
+    
+      
+  <div class="widget">
+    <h3 class="widget-title">归档</h3>
+    <div class="widget-body">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2023/05/">五月 2023</a><span class="archive-list-count">16</span></li></ul>
+    </div>
+  </div>
+
+
+    
+      
+  <div class="widget">
+    <h3 class="widget-title">最新文章</h3>
+    <div class="widget-body">
+      <ul class="recent-post-list list-unstyled no-thumbnail">
+        
+          <li>
+            
+            <div class="item-inner">
+              <p class="item-category">
+                <a class="category-link" href="/categories/%E4%BB%A3%E7%A0%81/">代码</a>
+              </p>
+              <p class="item-title">
+                <a href="/2023/05/12/%E4%BB%A3%E7%A0%81/%E4%BB%A3%E7%A0%81-%E8%8E%B7%E5%8F%96-arXiv-%E8%AE%BA%E6%96%87%E4%BD%9C%E8%80%85%E5%8D%95%E4%BD%8D-Glenn/" class="title">代码 | 获取 arXiv 论文作者单位</a>
+              </p>
+              <p class="item-date">
+                <time datetime="2023-05-12T10:52:40.000Z" itemprop="datePublished">2023-05-12</time>
+              </p>
+            </div>
+          </li>
+          
+          <li>
+            
+            <div class="item-inner">
+              <p class="item-category">
+                <a class="category-link" href="/categories/%E4%BB%A3%E7%A0%81/">代码</a>
+              </p>
+              <p class="item-title">
+                <a href="/2023/05/12/%E4%BB%A3%E7%A0%81/%E4%BB%A3%E7%A0%81-%E6%AF%8F%E5%A4%A9%E5%AE%9A%E7%82%B9%E5%90%91%E5%BE%AE%E4%BF%A1%E6%8E%A8%E9%80%81-arXiv-Glenn/" class="title">代码 | 每天定点向微信推送 arXiv 最新文章</a>
+              </p>
+              <p class="item-date">
+                <time datetime="2023-05-12T10:52:34.000Z" itemprop="datePublished">2023-05-12</time>
+              </p>
+            </div>
+          </li>
+          
+          <li>
+            
+            <div class="item-inner">
+              <p class="item-category">
+                <a class="category-link" href="/categories/%E4%BB%A3%E7%A0%81/">代码</a>
+              </p>
+              <p class="item-title">
+                <a href="/2023/05/12/%E4%BB%A3%E7%A0%81/%E4%BB%A3%E7%A0%81-%E5%B0%86%E7%9F%A5%E4%B9%8E%E4%B8%93%E6%A0%8F%E6%96%87%E7%AB%A0%E8%BD%AC%E6%8D%A2%E4%B8%BA-Markd-Glenn/" class="title">代码 | 将知乎专栏文章转换为 Markdown 文件保存到本地</a>
+              </p>
+              <p class="item-date">
+                <time datetime="2023-05-12T10:52:25.000Z" itemprop="datePublished">2023-05-12</time>
+              </p>
+            </div>
+          </li>
+          
+          <li>
+            
+            <div class="item-inner">
+              <p class="item-category">
+                <a class="category-link" href="/categories/%E4%BB%A3%E7%A0%81/">代码</a>
+              </p>
+              <p class="item-title">
+                <a href="/2023/05/12/%E4%BB%A3%E7%A0%81/%E4%BB%A3%E7%A0%81-%E4%BB%8E-OpenReview-%E8%8E%B7%E5%8F%96%E9%A1%B6-Glenn/" class="title">代码 | 从 OpenReview 获取顶会接收论文集并保存至本地数据库</a>
+              </p>
+              <p class="item-date">
+                <time datetime="2023-05-12T10:52:15.000Z" itemprop="datePublished">2023-05-12</time>
+              </p>
+            </div>
+          </li>
+          
+          <li>
+            
+            <div class="item-inner">
+              <p class="item-category">
+                <a class="category-link" href="/categories/%E8%AE%BA%E6%96%87%E9%80%9F%E8%A7%88/">论文速览</a>
+              </p>
+              <p class="item-title">
+                <a href="/2023/05/12/Masked_Image_Model/MIM-%E7%90%86%E8%AE%BA%E6%8E%A9%E8%94%BD%E5%9B%BE%E5%83%8F%E5%BB%BA%E6%A8%A1%E6%9C%AC%E8%B4%A8%E4%B8%8A%E5%9C%A8%E5%AD%A6%E4%B9%A0%E9%81%AE-Glenn/" class="title">MIM | 理论：掩蔽图像建模本质上在学习遮挡不变特征</a>
+              </p>
+              <p class="item-date">
+                <time datetime="2023-05-12T10:44:48.000Z" itemprop="datePublished">2023-05-12</time>
+              </p>
+            </div>
+          </li>
+          
+      </ul>
+    </div>
+  </div>
+  
+
+    
+  </div>
+</aside>
+
+  
+  
+<main class="main" role="main">
+  <div class="content">
+  <article id="post-Masked_Image_Model/MIM-FreMAE基于傅里叶变换的-Glenn" class="article article-type-post" itemscope itemtype="http://schema.org/BlogPosting">
+    
+    <div class="article-header">
+      
+        
+  
+    <h1 class="article-title" itemprop="name">
+      MIM | FreMAE：基于傅里叶变换的 MIM 用于医学图像分割
+    </h1>
+  
+
+      
+      <div class="article-meta">
+        <span class="article-date">
+    <i class="icon icon-calendar-check"></i>
+	<a href="/2023/05/12/Masked_Image_Model/MIM-FreMAE%E5%9F%BA%E4%BA%8E%E5%82%85%E9%87%8C%E5%8F%B6%E5%8F%98%E6%8D%A2%E7%9A%84-Glenn/" class="article-date">
+	  <time datetime="2023-05-12T10:44:06.000Z" itemprop="datePublished">2023-05-12</time>
+	</a>
+</span>
+        
+  <span class="article-category">
+    <i class="icon icon-folder"></i>
+    <a class="article-category-link" href="/categories/%E8%AE%BA%E6%96%87%E9%80%9F%E8%A7%88/">论文速览</a>
+  </span>
+
+        
+  <span class="article-tag">
+    <i class="icon icon-tags"></i>
+	<a class="article-tag-link-link" href="/tags/Masked-Image-Modeling/" rel="tag">Masked Image Modeling</a>
+  </span>
+
+
+        
+
+        <span class="post-comment"><i class="icon icon-comment"></i> <a href="/2023/05/12/Masked_Image_Model/MIM-FreMAE%E5%9F%BA%E4%BA%8E%E5%82%85%E9%87%8C%E5%8F%B6%E5%8F%98%E6%8D%A2%E7%9A%84-Glenn/#comments" class="article-comment-link">评论</a></span>
+        
+      </div>
+    </div>
+    <div class="article-entry marked-body" itemprop="articleBody">
+      
+        <p><img src="/2023/05/12/Masked_Image_Model/MIM-FreMAE%E5%9F%BA%E4%BA%8E%E5%82%85%E9%87%8C%E5%8F%B6%E5%8F%98%E6%8D%A2%E7%9A%84-Glenn/v2-a339e598049e59ac4272d58044af6582_r.jpg"></p>
+<blockquote>
+<p><em><strong>题目：</strong></em> <em>FreMAE: Fourier Transform Meets Masked Autoencoders for Medical Image Segmentation</em><br><em><strong>单位：</strong></em><em>北京科技大学、中佛罗里达大学、伯明翰大学、理海大学</em><br><em><strong>论文网址：</strong></em><a href="https://link.zhihu.com/?target=https://arxiv.org/abs/2304.10864">https://arxiv.org/abs/2304.10864</a><br><em><strong>论文代码：</strong></em><em>未公开</em><br><em><strong>首次发布时间：</strong></em><em>2023 年 4 月 21 日</em></p>
+</blockquote>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">@article&#123;wang2023fremae,</span><br><span class="line">  title=&#123;FreMAE: Fourier Transform Meets Masked Autoencoders for Medical Image Segmentation&#125;,</span><br><span class="line">  author=&#123;Wang, Wenxuan and Wang, Jing and Chen, Chen and Jiao, Jianbo and Sun, Lichao and Cai, Yuanxiu and Song, Shanshan and Li, Jiangyun&#125;,</span><br><span class="line">  journal=&#123;arXiv preprint arXiv:2304.10864&#125;,</span><br><span class="line">  year=&#123;2023&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+<hr>
+<ol>
+<li>主要内容</li>
+</ol>
+<hr>
+<p>目前 MIM 在医学领域应用的缺陷：</p>
+<ul>
+<li>在某种程度上，MAE 仅将原始像素作为重建目标，主要依赖于局部特征表示，而没有充分利用全局信息。</li>
+<li>由于该模型只有最后一个 block 的输出被送到解码器中用于重建任务，缺乏来自其他阶段的监督来提供多尺度信息。</li>
+<li>由于高采集成本和患者隐私，通常小规模医学图像数据集的训练样本相对有限，需要行量身定制的设计。</li>
+</ul>
+<p>如何解决？</p>
+<p>在自然图像中，详细的纹理信息主要存在于高频分量中，低频分量携带丰富的全局信息，如图 1 所示，该原则同样也可以应用于医学领域。</p>
+<p><img src="/2023/05/12/Masked_Image_Model/MIM-FreMAE%E5%9F%BA%E4%BA%8E%E5%82%85%E9%87%8C%E5%8F%B6%E5%8F%98%E6%8D%A2%E7%9A%84-Glenn/v2-58fece3fb1fcb9112f1e10d03e03d852_r.jpg"><br>图1. 将相应的高&#x2F;低通滤波器应用于傅里叶频谱，分别获得傅里叶频谱、高频分量和低频分量的可视化<br>基于此原则，作者提出了一种新的基于 MIM 框架，即FreMAE，用于解决上述问题。</p>
+<ul>
+<li>FreMAE 首先屏蔽掉一部分随机选择的图像像素，然后在傅立叶域中预测输入图像的相应缺失频谱。由于同一器官的医学图像本质上对应于相似的特征，因此 FreMAE 使用困难的跨域重建任务，以避免使用捷径进行模型学习。</li>
+<li>利用所提出的双边聚合解码器对原始图像依次应用傅立叶变换，并对转换后的傅立叶频谱依次应用低&#x2F;高通滤波器，以获得预期的重建目标。这种多阶段监督方法可以更好地指导模型预训练，从而产生更好的分割表示。</li>
+<li>提出了一种有效的前景掩蔽策略作为原始随机掩蔽的替代方案，该策略被证明更适合于医学图像分割的纹理和细节建模。</li>
+</ul>
+<hr>
+<ol start="2">
+<li>方法</li>
+</ol>
+<hr>
+<p><strong>前景掩蔽策略</strong> </p>
+<p>与自然图像不同，医学图像中前景和背景分布极不平衡。因此，随机掩蔽策略将不可避免地导致生成的掩模主要覆盖医学图像的背景像素，并且保留了太多对象的前景像素。为此，需要提出一种简单而有效的前景掩蔽策略来解决这一不均匀分布问题。</p>
+<p>由于医学图像通常包含不同的通道（医学图像通常是灰度图像，这里的意思应该是不同的切片数&#x2F;深度），每个通道拥有不同的前景区域，因此取这些通道的重叠部分作为最终的遮罩区域。总体的前景遮罩策略可以定义为：</p>
+<ol>
+<li>对于每个通道，像素值为 0 的表示背景，不为 0 的表示前景；</li>
+<li>将所有通道的二值遮罩进行逐像素的逻辑或操作，得到最终的前景遮罩。</li>
+</ol>
+<p>这种方法能够在多通道医学图像中有效地识别前景区域，帮助进行自监督预训练。</p>
+<p><strong>通用编码器</strong> </p>
+<p>正如在第一节中强调的，图像的高层次和低层次信息分布在傅立叶谱的不同频率带中。因此，建议分别利用低通和高通傅立叶谱作为监督信号（即重建目标）。最直观的方法是使用相同的高通傅立叶谱直接监督多个低级阶段，反之亦然。然而，这种直观的方式主要存在两个缺点：</p>
+<ol>
+<li>不合理性：这种方法违反了模型在不同低级阶段学习的原始意图，因为在不同低级阶段学到的特征表示应该是不同的，而不是相同的。</li>
+<li>过于简单：这种监督方法过于直接且简单，并没有充分利用分层结构捕获的多阶段特征之间的相关性来帮助模型更好地执行 MIM 务。</li>
+</ol>
+<p>为了克服这些缺点，可以采用以下方法：</p>
+<ol>
+<li>对于低级和高级阶段，分别设计不同的监督信号，以便在不同阶段学习不同的特征表示。例如，在低级阶段，可以关注低通傅立叶谱中的结构信息；而在高级阶段，可以关注高通傅立叶谱中的纹理和细节信息。</li>
+<li>利用分层结构捕获的多阶段特征之间的相关性来设计更复杂的监督方法。例如，可以通过在不同阶段之间共享信息或融合多阶段特征来帮助模型更好地执行 MIM 任务。这将充分利用嵌套结构在各层之间捕获的信息，有助于提高模型性能。</li>
+</ol>
+<p>具体来说，在所提出的双向聚合解码器（bilateral aggregation decoder, BAD）内部，不同阶段的编码特征分别以自底向上和自顶向下的方式汇聚到最低阶段（即具有最大空间分辨率）和最高阶段（即具有最小空间分辨率）。换句话说，双向聚合解码器将不同阶段的特征图分别聚合到最低和最高分辨率。</p>
+<p>对于 ViT，第 4、8、12 层的特征图采用类似 UNETR 中的反卷积模块分别上采样 8、4、2 倍，然后输入到 BAD。每个相邻阶段捕获的特征将输入到卷积块中，以实现空间分辨率和通道维度的严格对齐。</p>
+<p>接下来，高阶和低阶的聚合特征表示将通过引入的频率映射块（FMB）映射到频域，然后通过低通和高通滤波器得到相应的高通和低通预测频谱，用于计算重建损失。</p>
+<p>具体来说，FMB 由二维离散傅立叶变换（2D-DFT）、频域感知器（Frequency Domain Perceptron, FDP）和二维离散傅立叶逆变换（2D-IDFT）组成，可以表示为：</p>
+<ol>
+<li>计算高阶和低阶聚合特征表示的 2D-DFT，将其映射到频域。</li>
+<li>将映射到频域的特征表示输入到 FDP 中，进一步处理和提取有用信息。FDP 是一个包含多个卷积层和激活函数的神经网络模块，用于在频域中学习特征。</li>
+<li>计算 FDP 输出的 2D-IDFT，将其映射回空域。</li>
+</ol>
+<p>经过这个过程，得到了低阶和高阶的聚合特征表示的频率谱。</p>
+<p><img src="/2023/05/12/Masked_Image_Model/MIM-FreMAE%E5%9F%BA%E4%BA%8E%E5%82%85%E9%87%8C%E5%8F%B6%E5%8F%98%E6%8D%A2%E7%9A%84-Glenn/v2-4aad1f0bb722cc61cf33e7f7ce52d9c5_r.jpg"><br>图2. FreMAE 架构<br><strong>频率损失</strong></p>
+<p>为了缓解不同频段频谱之间的权重不平衡，便于困难频段的重建，采用聚焦 focal frequency loss 作为损耗函数 \mathcal L_{freq} ，实现低频映射和高频映射权重的梯度更新，定义为：</p>
+<p>\mathcal{L}_{freq}&#x3D;\frac{1}{HW}\sum^{H-1}_{u&#x3D;0}\sum^{W-1}_{v&#x3D;0}w(u,v)\odot\gamma(f(u,v),\hat{f}(u,v))^2 </p>
+<p>其中， f(u,v) 表示在空间频率坐标  (u, v)  上经过 2D-DFT 后的预测值， \hat{f}(u,v) 表示对应的金标准， γ(f, \hat{f}) 计算实际值和预测值之间的欧几里得距离的平方，作为它们的频率距离。 ω  是给定位置的频谱权重矩阵，用于抑制容易频率的权重。具体计算公式如下：</p>
+<p>ω(u, v) &#x3D; γ(f(u, v), \hat{f}(u, v))^β </p>
+<p>γ(f, \hat{f}) &#x3D; \sqrt{ (R − \tilde R)^2 + (I − \tilde I)^2} </p>
+<p>β 是缩放因子（默认为 β&#x3D;1 ）。</p>
+<p><strong>总损失</strong></p>
+<p>\mathcal L&#x3D;\mathcal L_{freq}(F_H(P_{low}), F_H(T))+\alpha\mathcal L_{freq}(F_L(P_{high}),F_L(T)) </p>
+<p>其中 F_H 和 F_L 分别表示高通和低通频率滤波器。 T 表示原始图像。 P_{low} 是通过最高阶段获得的， P_{high} 是相反的。 α 是高级语义信息分支的权重（默认情况下为 α&#x3D;3 ）。</p>
+<hr>
+<ol start="3">
+<li>结果</li>
+</ol>
+<hr>
+<p><img src="/2023/05/12/Masked_Image_Model/MIM-FreMAE%E5%9F%BA%E4%BA%8E%E5%82%85%E9%87%8C%E5%8F%B6%E5%8F%98%E6%8D%A2%E7%9A%84-Glenn/v2-3f56bf3aa594ec3764086a552b13a39a_r.jpg"><br>图3. 通过 FreMAE 在频域内的重建结果的可视化。<br><img src="/2023/05/12/Masked_Image_Model/MIM-FreMAE%E5%9F%BA%E4%BA%8E%E5%82%85%E9%87%8C%E5%8F%B6%E5%8F%98%E6%8D%A2%E7%9A%84-Glenn/v2-45cc72607c1a1e14e9242e4228e30f79_r.jpg"><br>表1. 自监督学习框架比较。‘-’代表从头开始的训练。<br><img src="/2023/05/12/Masked_Image_Model/MIM-FreMAE%E5%9F%BA%E4%BA%8E%E5%82%85%E9%87%8C%E5%8F%B6%E5%8F%98%E6%8D%A2%E7%9A%84-Glenn/v2-2733a5978596297b722bfcc0549e238d_r.jpg"><br>表2. 在 BraTS 2019、ISIC 2018 和 ACDC 2017 数据集的性能比较。<br><img src="/2023/05/12/Masked_Image_Model/MIM-FreMAE%E5%9F%BA%E4%BA%8E%E5%82%85%E9%87%8C%E5%8F%B6%E5%8F%98%E6%8D%A2%E7%9A%84-Glenn/v2-8b4c948e662398d4905bb5d9c0aa3505_r.jpg"><br>表3. 关于重建目标和监督方案的消融研究。<br><img src="/2023/05/12/Masked_Image_Model/MIM-FreMAE%E5%9F%BA%E4%BA%8E%E5%82%85%E9%87%8C%E5%8F%B6%E5%8F%98%E6%8D%A2%E7%9A%84-Glenn/v2-e6fef503353dabefcfc301fd98419bc0_r.jpg"><br>表4. 关于掩蔽策略的消融研究。<br><img src="/2023/05/12/Masked_Image_Model/MIM-FreMAE%E5%9F%BA%E4%BA%8E%E5%82%85%E9%87%8C%E5%8F%B6%E5%8F%98%E6%8D%A2%E7%9A%84-Glenn/v2-4324530cd9f2366b857596cca58298c2_r.jpg"><br>表5. 关于掩蔽比的消融研究。<br><img src="/2023/05/12/Masked_Image_Model/MIM-FreMAE%E5%9F%BA%E4%BA%8E%E5%82%85%E9%87%8C%E5%8F%B6%E5%8F%98%E6%8D%A2%E7%9A%84-Glenn/v2-df1c9bc908417bb800fd8c96189da55d_r.jpg"><br>表6. 自监督预训练样本数量的消融研究。</p>
+
+      
+    </div>
+    <div class="article-footer">
+      <blockquote class="mt-2x">
+  <ul class="post-copyright list-unstyled">
+    
+    <li class="post-copyright-link hidden-xs">
+      <strong>本文链接：</strong>
+      <a href="http://glennchen.cn/2023/05/12/Masked_Image_Model/MIM-FreMAE%E5%9F%BA%E4%BA%8E%E5%82%85%E9%87%8C%E5%8F%B6%E5%8F%98%E6%8D%A2%E7%9A%84-Glenn/" title="MIM | FreMAE：基于傅里叶变换的 MIM 用于医学图像分割" target="_blank" rel="external">http://glennchen.cn/2023/05/12/Masked_Image_Model/MIM-FreMAE基于傅里叶变换的-Glenn/</a>
+    </li>
+    
+    <li class="post-copyright-license">
+      <strong>版权声明： </strong> 本博客所有文章除特别声明外，均采用 <a href="http://creativecommons.org/licenses/by/4.0/deed.zh" target="_blank" rel="external">CC BY 4.0 CN协议</a> 许可协议。转载请注明出处！
+    </li>
+  </ul>
+</blockquote>
+
+
+<div class="panel panel-default panel-badger">
+  <div class="panel-body">
+    <figure class="media">
+      <div class="media-left">
+        <a href="https://github.com/chenluda" target="_blank" class="img-burn thumb-sm visible-lg">
+          <img src="/images/avatar.png" class="img-rounded w-full" alt="">
+        </a>
+      </div>
+      <div class="media-body">
+        <h3 class="media-heading"><a href="https://github.com/chenluda" target="_blank"><span class="text-dark">Glenn</span><small class="ml-1x">Stay hungry, stay foolish.</small></a></h3>
+        <div>咖啡，健身，热爱生活。</div>
+      </div>
+    </figure>
+  </div>
+</div>
+
+
+    </div>
+  </article>
+  
+    
+  <section id="comments">
+  	
+      <div id="vcomments"></div>
+    
+  </section>
+
+
+  
+</div>
+
+  <nav class="bar bar-footer clearfix" data-stick-bottom>
+  <div class="bar-inner">
+  
+  <ul class="pager pull-left">
+    
+    <li class="prev">
+      <a href="/2023/05/12/Masked_Image_Model/MIM-HPM%E5%BC%95%E5%85%A5%E8%92%B8%E9%A6%8F%E6%A6%82%E5%BF%B5%E8%87%AA%E5%8A%A8%E7%94%9F%E6%88%90%E6%8E%A9%E8%94%BD-Glenn/" title="MIM | HPM：引入蒸馏概念自动生成掩蔽策略"><i class="icon icon-angle-left" aria-hidden="true"></i><span>&nbsp;&nbsp;上一篇</span></a>
+    </li>
+    
+    
+    <li class="next">
+      <a href="/2023/05/12/Masked_Image_Model/MIM-EMAE%E8%A7%A3%E5%86%B3-MIM-%E6%95%B0%E6%8D%AE%E5%88%A9%E7%94%A8-Glenn/" title="MIM | EMAE：解决 MIM 数据利用率低和预测结果不一致性问题"><span>下一篇&nbsp;&nbsp;</span><i class="icon icon-angle-right" aria-hidden="true"></i></a>
+    </li>
+    
+    
+  </ul>
+  
+  
+  
+  <div class="bar-right">
+    
+    <div class="share-component" data-sites="weibo,qq,wechat,facebook,twitter" data-mobile-sites="weibo,qq,qzone"></div>
+    
+  </div>
+  </div>
+</nav>
+  
+
+
+</main>
+
+  <footer class="footer" itemscope itemtype="http://schema.org/WPFooter">
+	
+	
+    <ul class="social-links">
+    	
+        <li><a href="https://github.com/chenluda" target="_blank" title="Github" data-toggle=tooltip data-placement=top><i class="icon icon-github"></i></a></li>
+        
+        <li><a href="https://www.zhihu.com/people/Glenn" target="_blank" title="Zhihu" data-toggle=tooltip data-placement=top><i class="icon icon-zhihu"></i></a></li>
+        
+    </ul>
+
+    <div class="copyright">
+    	
+        <div class="publishby">
+        	Theme by <a href="https://github.com/cofess" target="_blank"> cofess </a>base on <a href="https://github.com/cofess/hexo-theme-pure" target="_blank">pure</a>.
+        </div>
+    </div>
+</footer>
+  <script src="//cdn.jsdelivr.net/npm/jquery@1.12.4/dist/jquery.min.js"></script>
+<script>
+window.jQuery || document.write('<script src="js/jquery.min.js"><\/script>')
+</script>
+
+<script src="/js/plugin.min.js"></script>
+
+
+<script src="/js/application.js"></script>
+
+
+    <script>
+(function (window) {
+    var INSIGHT_CONFIG = {
+        TRANSLATION: {
+            POSTS: '文章',
+            PAGES: '页面',
+            CATEGORIES: '分类',
+            TAGS: '标签',
+            UNTITLED: '(未命名)',
+        },
+        ROOT_URL: '/',
+        CONTENT_URL: '/content.json',
+    };
+    window.INSIGHT_CONFIG = INSIGHT_CONFIG;
+})(window);
+</script>
+
+<script src="/js/insight.js"></script>
+
+
+
+
+
+
+   
+
+
+
+
+   
+    
+  <script src="//cdn1.lncld.net/static/js/3.0.4/av-min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/valine"></script>
+  <script type="text/javascript">
+  var GUEST = ['nick', 'mail', 'link'];
+  var meta = 'nick,mail,link';
+  meta = meta.split(',').filter(function(item) {
+    return GUEST.indexOf(item) > -1;
+  });
+  new Valine({
+    el: '#vcomments',
+    verify: false,
+    notify: false,
+    appId: '',
+    appKey: '',
+    placeholder: 'Just go go',
+    avatar: 'mm',
+    meta: meta,
+    pageSize: '10' || 10,
+    visitor: false
+  });
+  </script>
+
+     
+
+
+
+
+
+
+
+</body>
+</html>

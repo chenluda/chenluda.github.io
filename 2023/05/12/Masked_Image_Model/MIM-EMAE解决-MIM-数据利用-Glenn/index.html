@@ -1,0 +1,596 @@
+<!DOCTYPE html>
+<html lang=zh>
+<head>
+  <meta charset="utf-8">
+  
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=no, minimal-ui">
+  <meta name="renderer" content="webkit">
+  <meta http-equiv="Cache-Control" content="no-transform" />
+  <meta http-equiv="Cache-Control" content="no-siteapp" />
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black">
+  <meta name="format-detection" content="telephone=no,email=no,adress=no">
+  <!-- Color theme for statusbar -->
+  <meta name="theme-color" content="#000000" />
+  <!-- 强制页面在当前窗口以独立页面显示,防止别人在框架里调用页面 -->
+  <meta http-equiv="window-target" content="_top" />
+  
+  
+  <title>MIM | EMAE：解决 MIM 数据利用率低和预测结果不一致性问题 | Hexo</title>
+  <meta name="description" content="题目：Effificient Masked Autoencoders with Self-Consistency单位：中国科学院、中国科学院大学、商汤、鹏城实验室论文网址：https:&#x2F;&#x2F;arxiv.org&#x2F;abs&#x2F;2302.14431论文代码：未公开首次发布时间：2023 年 2 月 28 日    主要内容   MIM 的高随机掩蔽比将导致两个严重问题：  数据未被有效利用，导致预训练效率">
+<meta property="og:type" content="article">
+<meta property="og:title" content="MIM | EMAE：解决 MIM 数据利用率低和预测结果不一致性问题">
+<meta property="og:url" content="http://glennchen.cn/2023/05/12/Masked_Image_Model/MIM-EMAE%E8%A7%A3%E5%86%B3-MIM-%E6%95%B0%E6%8D%AE%E5%88%A9%E7%94%A8-Glenn/index.html">
+<meta property="og:site_name" content="Glenn">
+<meta property="og:description" content="题目：Effificient Masked Autoencoders with Self-Consistency单位：中国科学院、中国科学院大学、商汤、鹏城实验室论文网址：https:&#x2F;&#x2F;arxiv.org&#x2F;abs&#x2F;2302.14431论文代码：未公开首次发布时间：2023 年 2 月 28 日    主要内容   MIM 的高随机掩蔽比将导致两个严重问题：  数据未被有效利用，导致预训练效率">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://glennchen.cn/2023/05/12/Masked_Image_Model/MIM-EMAE%E8%A7%A3%E5%86%B3-MIM-%E6%95%B0%E6%8D%AE%E5%88%A9%E7%94%A8-Glenn/v2-c05f7a9e48b33166d40c24edc530c0ba_r.jpg">
+<meta property="og:image" content="http://glennchen.cn/2023/05/12/Masked_Image_Model/MIM-EMAE%E8%A7%A3%E5%86%B3-MIM-%E6%95%B0%E6%8D%AE%E5%88%A9%E7%94%A8-Glenn/v2-d694205f3c2de30289badd9804ada337_r.jpg">
+<meta property="og:image" content="http://glennchen.cn/2023/05/12/Masked_Image_Model/MIM-EMAE%E8%A7%A3%E5%86%B3-MIM-%E6%95%B0%E6%8D%AE%E5%88%A9%E7%94%A8-Glenn/v2-c0a39661ff3e2179b96b27c4b65095ae_r.jpg">
+<meta property="og:image" content="http://glennchen.cn/2023/05/12/Masked_Image_Model/MIM-EMAE%E8%A7%A3%E5%86%B3-MIM-%E6%95%B0%E6%8D%AE%E5%88%A9%E7%94%A8-Glenn/v2-d63956cefdb733e72fd7f026ae134dcc_r.jpg">
+<meta property="og:image" content="http://glennchen.cn/2023/05/12/Masked_Image_Model/MIM-EMAE%E8%A7%A3%E5%86%B3-MIM-%E6%95%B0%E6%8D%AE%E5%88%A9%E7%94%A8-Glenn/v2-d989c8ee66efc9bcc8a3a73891e0b17d_r.jpg">
+<meta property="og:image" content="http://glennchen.cn/2023/05/12/Masked_Image_Model/MIM-EMAE%E8%A7%A3%E5%86%B3-MIM-%E6%95%B0%E6%8D%AE%E5%88%A9%E7%94%A8-Glenn/v2-922d30323c1a7d25cd7ff362cd914265_r.jpg">
+<meta property="og:image" content="http://glennchen.cn/2023/05/12/Masked_Image_Model/MIM-EMAE%E8%A7%A3%E5%86%B3-MIM-%E6%95%B0%E6%8D%AE%E5%88%A9%E7%94%A8-Glenn/v2-5fb25986bfbd333df97958b5f177c0f4_r.jpg">
+<meta property="og:image" content="http://glennchen.cn/2023/05/12/Masked_Image_Model/MIM-EMAE%E8%A7%A3%E5%86%B3-MIM-%E6%95%B0%E6%8D%AE%E5%88%A9%E7%94%A8-Glenn/v2-0854a91f24bd2d3cdd74f6b5e8cd1be1_r.jpg">
+<meta property="og:image" content="http://glennchen.cn/2023/05/12/Masked_Image_Model/MIM-EMAE%E8%A7%A3%E5%86%B3-MIM-%E6%95%B0%E6%8D%AE%E5%88%A9%E7%94%A8-Glenn/v2-89e40b8bfa1bc81dc11876304a040e1f_r.jpg">
+<meta property="og:image" content="http://glennchen.cn/2023/05/12/Masked_Image_Model/MIM-EMAE%E8%A7%A3%E5%86%B3-MIM-%E6%95%B0%E6%8D%AE%E5%88%A9%E7%94%A8-Glenn/v2-ec2df02d24767af4346b012ae979be38_r.jpg">
+<meta property="og:image" content="http://glennchen.cn/2023/05/12/Masked_Image_Model/MIM-EMAE%E8%A7%A3%E5%86%B3-MIM-%E6%95%B0%E6%8D%AE%E5%88%A9%E7%94%A8-Glenn/v2-9317015821decd101a2812d22b9188a7_r.jpg">
+<meta property="article:published_time" content="2023-05-12T10:44:00.000Z">
+<meta property="article:modified_time" content="2023-05-12T12:16:56.418Z">
+<meta property="article:author" content="Glenn">
+<meta property="article:tag" content="Masked Image Modeling">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://glennchen.cn/2023/05/12/Masked_Image_Model/MIM-EMAE%E8%A7%A3%E5%86%B3-MIM-%E6%95%B0%E6%8D%AE%E5%88%A9%E7%94%A8-Glenn/v2-c05f7a9e48b33166d40c24edc530c0ba_r.jpg">
+  <!-- Canonical links -->
+  <link rel="canonical" href="http://glennchen.cn/2023/05/12/Masked_Image_Model/MIM-EMAE%E8%A7%A3%E5%86%B3-MIM-%E6%95%B0%E6%8D%AE%E5%88%A9%E7%94%A8-Glenn/index.html">
+  
+    <link rel="alternate" href="/atom.xml" title="Glenn" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="/favicon.png" type="image/x-icon">
+  
+  
+<link rel="stylesheet" href="/css/style.css">
+
+  
+  
+  
+  
+<!-- hexo injector head_end start -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/katex.min.css">
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/hexo-math@4.0.0/dist/style.css">
+<!-- hexo injector head_end end --><meta name="generator" content="Hexo 6.3.0"></head>
+
+
+<body class="main-center theme-black" itemscope itemtype="http://schema.org/WebPage">
+  <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+  <div class="slimContent">
+    <div class="navbar-header">
+      
+      
+      <div class="profile-block text-center">
+        <a id="avatar" href="https://github.com/chenluda" target="_blank">
+          <img class="img-circle img-rotate" src="/images/avatar.png" width="200" height="200">
+        </a>
+        <h2 id="name" class="hidden-xs hidden-sm">Glenn</h2>
+        <h3 id="title" class="hidden-xs hidden-sm hidden-md">Stay hungry, stay foolish.</h3>
+        <small id="location" class="text-muted hidden-xs hidden-sm"><i class="icon icon-map-marker"></i> Yunnan, China</small>
+      </div>
+      
+      <div class="search" id="search-form-wrap">
+
+    <form class="search-form sidebar-form">
+        <div class="input-group">
+            <input type="text" class="search-form-input form-control" placeholder="搜索" />
+            <span class="input-group-btn">
+                <button type="submit" class="search-form-submit btn btn-flat" onclick="return false;"><i class="icon icon-search"></i></button>
+            </span>
+        </div>
+    </form>
+    <div class="ins-search">
+  <div class="ins-search-mask"></div>
+  <div class="ins-search-container">
+    <div class="ins-input-wrapper">
+      <input type="text" class="ins-search-input" placeholder="想要查找什么..." x-webkit-speech />
+      <button type="button" class="close ins-close ins-selectable" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span></button>
+    </div>
+    <div class="ins-section-wrapper">
+      <div class="ins-section-container"></div>
+    </div>
+  </div>
+</div>
+
+
+</div>
+      <button class="navbar-toggle collapsed" type="button" data-toggle="collapse" data-target="#main-navbar" aria-controls="main-navbar" aria-expanded="false">
+        <span class="sr-only">Toggle navigation</span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+    </div>
+    <nav id="main-navbar" class="collapse navbar-collapse" itemscope itemtype="http://schema.org/SiteNavigationElement" role="navigation">
+      <ul class="nav navbar-nav main-nav ">
+        
+        
+        <li class="menu-item menu-item-home">
+          <a href="/.">
+            
+            <i class="icon icon-home-fill"></i>
+            
+            <span class="menu-title">首页</span>
+          </a>
+        </li>
+        
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives">
+            
+            <i class="icon icon-archives-fill"></i>
+            
+            <span class="menu-title">归档</span>
+          </a>
+        </li>
+        
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories">
+            
+            <i class="icon icon-folder"></i>
+            
+            <span class="menu-title">分类</span>
+          </a>
+        </li>
+        
+      </ul>
+      
+	
+    <ul class="social-links">
+    	
+        <li><a href="https://github.com/chenluda" target="_blank" title="Github" data-toggle=tooltip data-placement=top><i class="icon icon-github"></i></a></li>
+        
+        <li><a href="https://www.zhihu.com/people/Glenn" target="_blank" title="Zhihu" data-toggle=tooltip data-placement=top><i class="icon icon-zhihu"></i></a></li>
+        
+    </ul>
+
+    </nav>
+  </div>
+</header>
+
+  
+    <aside class="sidebar" itemscope itemtype="http://schema.org/WPSideBar">
+  <div class="slimContent">
+    
+      <div class="widget">
+    <h3 class="widget-title">公告</h3>
+    <div class="widget-body">
+        <div id="board">
+            <div class="content">
+                <p>欢迎交流与分享经验!</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+    
+      
+  <div class="widget">
+    <h3 class="widget-title">分类</h3>
+    <div class="widget-body">
+      <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/%E4%BB%A3%E7%A0%81/">代码</a><span class="category-list-count">4</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/%E8%AE%BA%E6%96%87%E9%80%9F%E8%A7%88/">论文速览</a><span class="category-list-count">12</span></li></ul>
+    </div>
+  </div>
+
+
+    
+      
+  <div class="widget">
+    <h3 class="widget-title">标签</h3>
+    <div class="widget-body">
+      <ul class="tag-list" itemprop="keywords"><li class="tag-list-item"><a class="tag-list-link" href="/tags/Conference-paper/" rel="tag">Conference paper</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/DataBase/" rel="tag">DataBase</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Markdown/" rel="tag">Markdown</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Masked-Image-Modeling/" rel="tag">Masked Image Modeling</a><span class="tag-list-count">12</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/OpenReview/" rel="tag">OpenReview</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Organization/" rel="tag">Organization</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/WeChat/" rel="tag">WeChat</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Zhihu/" rel="tag">Zhihu</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/arXiv/" rel="tag">arXiv</a><span class="tag-list-count">2</span></li></ul>
+    </div>
+  </div>
+
+
+    
+      
+  <div class="widget">
+    <h3 class="widget-title">标签云</h3>
+    <div class="widget-body tagcloud">
+      <a href="/tags/Conference-paper/" style="font-size: 13px;">Conference paper</a> <a href="/tags/DataBase/" style="font-size: 13.5px;">DataBase</a> <a href="/tags/Markdown/" style="font-size: 13px;">Markdown</a> <a href="/tags/Masked-Image-Modeling/" style="font-size: 14px;">Masked Image Modeling</a> <a href="/tags/OpenReview/" style="font-size: 13px;">OpenReview</a> <a href="/tags/Organization/" style="font-size: 13px;">Organization</a> <a href="/tags/WeChat/" style="font-size: 13px;">WeChat</a> <a href="/tags/Zhihu/" style="font-size: 13px;">Zhihu</a> <a href="/tags/arXiv/" style="font-size: 13.5px;">arXiv</a>
+    </div>
+  </div>
+
+    
+      
+  <div class="widget">
+    <h3 class="widget-title">归档</h3>
+    <div class="widget-body">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2023/05/">五月 2023</a><span class="archive-list-count">16</span></li></ul>
+    </div>
+  </div>
+
+
+    
+      
+  <div class="widget">
+    <h3 class="widget-title">最新文章</h3>
+    <div class="widget-body">
+      <ul class="recent-post-list list-unstyled no-thumbnail">
+        
+          <li>
+            
+            <div class="item-inner">
+              <p class="item-category">
+                <a class="category-link" href="/categories/%E4%BB%A3%E7%A0%81/">代码</a>
+              </p>
+              <p class="item-title">
+                <a href="/2023/05/12/%E4%BB%A3%E7%A0%81/%E4%BB%A3%E7%A0%81-%E8%8E%B7%E5%8F%96-arXiv-%E8%AE%BA%E6%96%87%E4%BD%9C%E8%80%85%E5%8D%95%E4%BD%8D-Glenn/" class="title">代码 | 获取 arXiv 论文作者单位</a>
+              </p>
+              <p class="item-date">
+                <time datetime="2023-05-12T10:52:40.000Z" itemprop="datePublished">2023-05-12</time>
+              </p>
+            </div>
+          </li>
+          
+          <li>
+            
+            <div class="item-inner">
+              <p class="item-category">
+                <a class="category-link" href="/categories/%E4%BB%A3%E7%A0%81/">代码</a>
+              </p>
+              <p class="item-title">
+                <a href="/2023/05/12/%E4%BB%A3%E7%A0%81/%E4%BB%A3%E7%A0%81-%E6%AF%8F%E5%A4%A9%E5%AE%9A%E7%82%B9%E5%90%91%E5%BE%AE%E4%BF%A1%E6%8E%A8%E9%80%81-arXiv-Glenn/" class="title">代码 | 每天定点向微信推送 arXiv 最新文章</a>
+              </p>
+              <p class="item-date">
+                <time datetime="2023-05-12T10:52:34.000Z" itemprop="datePublished">2023-05-12</time>
+              </p>
+            </div>
+          </li>
+          
+          <li>
+            
+            <div class="item-inner">
+              <p class="item-category">
+                <a class="category-link" href="/categories/%E4%BB%A3%E7%A0%81/">代码</a>
+              </p>
+              <p class="item-title">
+                <a href="/2023/05/12/%E4%BB%A3%E7%A0%81/%E4%BB%A3%E7%A0%81-%E5%B0%86%E7%9F%A5%E4%B9%8E%E4%B8%93%E6%A0%8F%E6%96%87%E7%AB%A0%E8%BD%AC%E6%8D%A2%E4%B8%BA-Markd-Glenn/" class="title">代码 | 将知乎专栏文章转换为 Markdown 文件保存到本地</a>
+              </p>
+              <p class="item-date">
+                <time datetime="2023-05-12T10:52:25.000Z" itemprop="datePublished">2023-05-12</time>
+              </p>
+            </div>
+          </li>
+          
+          <li>
+            
+            <div class="item-inner">
+              <p class="item-category">
+                <a class="category-link" href="/categories/%E4%BB%A3%E7%A0%81/">代码</a>
+              </p>
+              <p class="item-title">
+                <a href="/2023/05/12/%E4%BB%A3%E7%A0%81/%E4%BB%A3%E7%A0%81-%E4%BB%8E-OpenReview-%E8%8E%B7%E5%8F%96%E9%A1%B6-Glenn/" class="title">代码 | 从 OpenReview 获取顶会接收论文集并保存至本地数据库</a>
+              </p>
+              <p class="item-date">
+                <time datetime="2023-05-12T10:52:15.000Z" itemprop="datePublished">2023-05-12</time>
+              </p>
+            </div>
+          </li>
+          
+          <li>
+            
+            <div class="item-inner">
+              <p class="item-category">
+                <a class="category-link" href="/categories/%E8%AE%BA%E6%96%87%E9%80%9F%E8%A7%88/">论文速览</a>
+              </p>
+              <p class="item-title">
+                <a href="/2023/05/12/Masked_Image_Model/MIM-%E7%90%86%E8%AE%BA%E6%8E%A9%E8%94%BD%E5%9B%BE%E5%83%8F%E5%BB%BA%E6%A8%A1%E6%9C%AC%E8%B4%A8%E4%B8%8A%E5%9C%A8%E5%AD%A6%E4%B9%A0%E9%81%AE-Glenn/" class="title">MIM | 理论：掩蔽图像建模本质上在学习遮挡不变特征</a>
+              </p>
+              <p class="item-date">
+                <time datetime="2023-05-12T10:44:48.000Z" itemprop="datePublished">2023-05-12</time>
+              </p>
+            </div>
+          </li>
+          
+      </ul>
+    </div>
+  </div>
+  
+
+    
+  </div>
+</aside>
+
+  
+  
+<main class="main" role="main">
+  <div class="content">
+  <article id="post-Masked_Image_Model/MIM-EMAE解决-MIM-数据利用-Glenn" class="article article-type-post" itemscope itemtype="http://schema.org/BlogPosting">
+    
+    <div class="article-header">
+      
+        
+  
+    <h1 class="article-title" itemprop="name">
+      MIM | EMAE：解决 MIM 数据利用率低和预测结果不一致性问题
+    </h1>
+  
+
+      
+      <div class="article-meta">
+        <span class="article-date">
+    <i class="icon icon-calendar-check"></i>
+	<a href="/2023/05/12/Masked_Image_Model/MIM-EMAE%E8%A7%A3%E5%86%B3-MIM-%E6%95%B0%E6%8D%AE%E5%88%A9%E7%94%A8-Glenn/" class="article-date">
+	  <time datetime="2023-05-12T10:44:00.000Z" itemprop="datePublished">2023-05-12</time>
+	</a>
+</span>
+        
+  <span class="article-category">
+    <i class="icon icon-folder"></i>
+    <a class="article-category-link" href="/categories/%E8%AE%BA%E6%96%87%E9%80%9F%E8%A7%88/">论文速览</a>
+  </span>
+
+        
+  <span class="article-tag">
+    <i class="icon icon-tags"></i>
+	<a class="article-tag-link-link" href="/tags/Masked-Image-Modeling/" rel="tag">Masked Image Modeling</a>
+  </span>
+
+
+        
+
+        <span class="post-comment"><i class="icon icon-comment"></i> <a href="/2023/05/12/Masked_Image_Model/MIM-EMAE%E8%A7%A3%E5%86%B3-MIM-%E6%95%B0%E6%8D%AE%E5%88%A9%E7%94%A8-Glenn/#comments" class="article-comment-link">评论</a></span>
+        
+      </div>
+    </div>
+    <div class="article-entry marked-body" itemprop="articleBody">
+      
+        <p><img src="/2023/05/12/Masked_Image_Model/MIM-EMAE%E8%A7%A3%E5%86%B3-MIM-%E6%95%B0%E6%8D%AE%E5%88%A9%E7%94%A8-Glenn/v2-c05f7a9e48b33166d40c24edc530c0ba_r.jpg"></p>
+<blockquote>
+<p><em><strong>题目：</strong>Effificient Masked Autoencoders with Self-Consistency</em><br><em><strong>单位：</strong>中国科学院、中国科学院大学、商汤、鹏城实验室</em><br><em><strong>论文网址：</strong><a href="https://link.zhihu.com/?target=https://arxiv.org/abs/2302.14431">https://arxiv.org/abs/2302.14431</a></em><br><em><strong>论文代码：</strong>未公开</em><br><em><strong>首次发布时间：</strong>2023 年 2 月 28 日</em></p>
+</blockquote>
+<hr>
+<ol>
+<li>主要内容</li>
+</ol>
+<hr>
+<p>MIM 的高随机掩蔽比将导致两个严重问题：</p>
+<ul>
+<li><strong>数据未被有效利用</strong>，导致预训练效率低；</li>
+</ul>
+<p>例如，在每个 epoch 中 MAE 仅利用整个图像的 25% 训练模型。相比之下，BERT 使用了 85% 的文本语料库。由于 MIM 的数据利用率不足，预训练 epoch 通常高于 MLM（masked language modeling），MAE 的 1600 个 epoch 相当于 MLM 的 40 个 epoch。此外，对于 MAE 需要 1600 个 epoch，而对于有监督学习只需要 300 个epoch。</p>
+<ul>
+<li><strong>预训练模型的不确定性和不一致性高</strong>，即同一块区域在不同 epoch 的随机掩蔽策略下，产生的预测可能不一致，如图 1 所示。</li>
+</ul>
+<p><img src="/2023/05/12/Masked_Image_Model/MIM-EMAE%E8%A7%A3%E5%86%B3-MIM-%E6%95%B0%E6%8D%AE%E5%88%A9%E7%94%A8-Glenn/v2-d694205f3c2de30289badd9804ada337_r.jpg"><br>图1. 不同的随机掩蔽策略对应不同的 MAE 重建结果。(a) 由不同的随机掩蔽策略采样的掩蔽图像。(b) 对应的 MAE 重建结果。对于 (b) 的三个重建，只有第一个代表一只正常的牛，第三个甚至重建了一只狗。可见 MAE 重建的语义是不一致的。<br>为了解决这些问题，作者提出了一种具有自一致性的高效掩码自动编码器（EMAE），主要从两方面进行改进：</p>
+<p>1）将图像逐步分成 K 个不重叠的部分，每个部分由掩蔽策略随机生成，具有相同的掩蔽比。然后，在每个 epoch 中，所有部分并行进行 MIM 任务并生成预测。</p>
+<p>2）设计自一致性模块，以进一步维护部分之间重叠掩码块的预测一致性。</p>
+<p>ImageNet 上的实验表明，与 MAE（1600 个 epoch）相比，EMAE 在 ViT Base 下仅用 300 个预训练epoch 就获得了更高的结果。EMAE 在各种下游任务（如对象检测和语义分割）上也始终获得最先进的传输性能。</p>
+<hr>
+<ol start="2">
+<li>方法</li>
+</ol>
+<hr>
+<p><img src="/2023/05/12/Masked_Image_Model/MIM-EMAE%E8%A7%A3%E5%86%B3-MIM-%E6%95%B0%E6%8D%AE%E5%88%A9%E7%94%A8-Glenn/v2-c0a39661ff3e2179b96b27c4b65095ae_r.jpg"><br>图2. EMAE 模型结构。整个图像首先被逐渐划分为 K 个不重叠的部分，并且每个部分具有相同数量的可见 patches。然后，每个部分被送入编码器-解码器架构，并行执行 MIM 任务。此外，自一致性模块指导预测部分之间的重叠的 patches 被拉在一起。</p>
+<h3 id="2-1-有效利用全部数据"><a href="#2-1-有效利用全部数据" class="headerlink" title="2.1 有效利用全部数据"></a>2.1 有效利用全部数据</h3><p>为了提高数据的利用率，EMAE 将使用全部数据训练模型。</p>
+<p>具体来说，就是要将输入图像 x 划分为 K 个具有相同数量且不重叠的可见 patches 的部分，然后所有部分并行执行 MIM 任务。</p>
+<p>首先将整个图像分成 N 个图像 patches。然后，设置一个长度为 N 的随机张量 t ，其值在 [0,1] 上均匀分布。张量按值按升序排序，排序后的索引 ids 用如下表示：</p>
+<p>ids&#x3D;s(t) </p>
+<p>其中 s(\cdot) 表示按值按升序排序。</p>
+<p>将长度为 N 的排序索引等分划分为 K 个部分 ids_1，ids_2，…， 和 ids_K ：</p>
+<p>ids_i&#x3D;ids[(i-1)×\frac{N}{K}: i×\frac{N}{K}] </p>
+<p>其中 i\in\left{1,2，…，K\right} 。</p>
+<p>因此， N 个图像 patches 可以根据索引 ids_i 等分为 K 个部分 x_{1}，x_{2}，…， 和 x_{K} ，且每个部分具有相同数量且不重叠的可见 patches x_{v_i} ：</p>
+<p>x_{v_i}&#x3D;d(x_i, ids_i) </p>
+<p>其中 d(\cdot) 表示根据索引 ids_i 从输入 x_i 中查找可见 patches。</p>
+<p>对应的，掩蔽 patches 为：</p>
+<p>x_{m_i}&#x3D;d(x_i, ids-ids_i) </p>
+<p>此时，任一部分 x_{i} 都有 \frac{N}{K} 个可见 patches， N-\frac{N}{K} 个掩蔽 patches x_{m_i}。</p>
+<p>则任一部分的掩蔽比都为 (N−\frac{N}{K})&#x2F;N &#x3D;(K−1)&#x2F;K ，算法伪代码如图 3 所示。</p>
+<p><img src="/2023/05/12/Masked_Image_Model/MIM-EMAE%E8%A7%A3%E5%86%B3-MIM-%E6%95%B0%E6%8D%AE%E5%88%A9%E7%94%A8-Glenn/v2-d63956cefdb733e72fd7f026ae134dcc_r.jpg"><br>图3. 算法伪代码<br>根据上述描述，当 K 设置为 4 时，各部分的掩蔽比为 75%（与 MAE 的掩蔽比相同）。</p>
+<p>该设计保证了迭代中图像的每个 patches 都可以采样一次，使得整个图像都可以应用于模型的训练，从而提高了数据的利用率。</p>
+<p>损失函数定义如下：</p>
+<p>\mathcal{L}_{whole}(x)&#x3D;\mathbb E_{i\in[1,K]}\mathcal{L}(x_{v_i},x_{m_i})&#x3D;\mathbb E_{i\in[1,K]}||g(f(x_{v_i})) − x_{m_i}||^2 </p>
+<p>其中，  g(\cdot)  表示解码器。</p>
+<h3 id="2-2-自一致性模块"><a href="#2-2-自一致性模块" class="headerlink" title="2.2 自一致性模块"></a>2.2 自一致性模块</h3><p>进一步地，需要鼓励预训练模型的预测在来自同一图像的不同输入可见 patches 下是一致的。</p>
+<p>根据 2.1 节介绍的内容，每个部分 x_{i} 具有 N-\frac{N}{K} 个掩蔽 patches x_{m_i} ，对应的，都会生成 N-\frac{N}{K} 个预测 x_{p_i} 。</p>
+<p>显然，任何两个部分的预测之间都存在一定的重叠 patches，比例为 \frac{K-2}{K-1} 。</p>
+<p>重叠位置 s_{ij} 可以通过掩蔽 patches x_{m_i} 和 x_{m_j} 得到，其中 i, j \in \left{1,2,3,…,K\right} 且 i \neq j ：</p>
+<p>s_{ij}&#x3D;x_{m_i}\cap x_{m_j} </p>
+<p>EMAE 的自一致性模块用来指导每个重叠位置的预测保持一致。如图 2 所示，自一致性模块将任意两个预测 x_{p_i} 和 x_{p_j} 之间的重叠预测拉到一起，这使重叠重建结果之间的平均绝对误差最小化，以提高一致性。</p>
+<p>损失函数定义如下：</p>
+<p>\mathcal{L}_{consistency}(x)&#x3D;\mathbb{E}_{i\in [1,K],j\in[i+1,K]}\mathcal{L}_{sc}(x_{v_i}, x_{v_j})&#x3D;\mathbb{E}_{i\in [1,K],j\in[i+1,K]}(||sg[x_{p_i}]-x_{p_j}||+||x_{p_i}-sg[x_{p_j}]||)\odot s_{ij} </p>
+<p>其中 sg[·] 表示停止梯度。对于任一部分的每次预测，将与其他部分的预测进行 K−2 次计算。</p>
+<p>总损失为：</p>
+<p>\mathcal{L}_{total}(x)&#x3D;\mathcal{L}_{whole}(x) + \mathcal{L}_{consistency}(x) </p>
+<hr>
+<ol start="3">
+<li>结果</li>
+</ol>
+<hr>
+<p>由表 1 可以得出：</p>
+<ul>
+<li>在线性探测中，相同的预训练 epoch（300 和 800）下，ViT-base 的 EMAE 比 MAE 的精度高 6.0%～6.7%。</li>
+<li>ViT-base 的 EMAE epoch 300 的分类结果与 MAE 2400 epoch 的分类结果相当。（GPU-days？）</li>
+<li>ViT-large 的 EMAE epoch 800 的分类结果与 ViT-huge 的 MAE 1600 epoch 的分类结果相当。</li>
+<li>由于基于对比学习的方法具有图像语义一致性的假设，并且该假设与线性探测任务的先验一致，因此 EMAE 的线性结果略低于基于对比学习的算法。</li>
+</ul>
+<p><img src="/2023/05/12/Masked_Image_Model/MIM-EMAE%E8%A7%A3%E5%86%B3-MIM-%E6%95%B0%E6%8D%AE%E5%88%A9%E7%94%A8-Glenn/v2-d989c8ee66efc9bcc8a3a73891e0b17d_r.jpg"><br>表1. SOTA 自监督学习方法在 ImageNet top-1 精度比较。LP：线性探测；FT：端到端微调。<br>表 2 、3 、4 可以得出，EMAE 的性能优于之前的 SOTA 自监督学习方法。</p>
+<p><img src="/2023/05/12/Masked_Image_Model/MIM-EMAE%E8%A7%A3%E5%86%B3-MIM-%E6%95%B0%E6%8D%AE%E5%88%A9%E7%94%A8-Glenn/v2-922d30323c1a7d25cd7ff362cd914265_r.jpg"><br>表2. 使用带 FPNs 的 Mask R-CNN 对 COCO 上的目标检测和实例分割结果进行微调。<br><img src="/2023/05/12/Masked_Image_Model/MIM-EMAE%E8%A7%A3%E5%86%B3-MIM-%E6%95%B0%E6%8D%AE%E5%88%A9%E7%94%A8-Glenn/v2-5fb25986bfbd333df97958b5f177c0f4_r.jpg"><br>表3. 使用 ViTDet 对 COCO 上的目标检测和实例分割结果进行微调。<br><img src="/2023/05/12/Masked_Image_Model/MIM-EMAE%E8%A7%A3%E5%86%B3-MIM-%E6%95%B0%E6%8D%AE%E5%88%A9%E7%94%A8-Glenn/v2-0854a91f24bd2d3cdd74f6b5e8cd1be1_r.jpg"><br>表4. 使用 UperNet 对 ADE20K 上的语义分割结果进行微调。<br>表 5、6 反映了 EMAE 中全数据利用、自一致性模块以及 K 值取值的影响。图 4 是自一致性模块有效性的可视化证明。</p>
+<p><img src="/2023/05/12/Masked_Image_Model/MIM-EMAE%E8%A7%A3%E5%86%B3-MIM-%E6%95%B0%E6%8D%AE%E5%88%A9%E7%94%A8-Glenn/v2-89e40b8bfa1bc81dc11876304a040e1f_r.jpg"><br>表5. 消融实验。全数据利用和自一致性模块的影响。<br><img src="/2023/05/12/Masked_Image_Model/MIM-EMAE%E8%A7%A3%E5%86%B3-MIM-%E6%95%B0%E6%8D%AE%E5%88%A9%E7%94%A8-Glenn/v2-ec2df02d24767af4346b012ae979be38_r.jpg"><br>表6. 消融实验。K 值取值的影响。<br><img src="/2023/05/12/Masked_Image_Model/MIM-EMAE%E8%A7%A3%E5%86%B3-MIM-%E6%95%B0%E6%8D%AE%E5%88%A9%E7%94%A8-Glenn/v2-9317015821decd101a2812d22b9188a7_r.jpg"><br>图4. 不同的随机掩蔽策略对应不同的 EMAE 重建结果。</p>
+
+      
+    </div>
+    <div class="article-footer">
+      <blockquote class="mt-2x">
+  <ul class="post-copyright list-unstyled">
+    
+    <li class="post-copyright-link hidden-xs">
+      <strong>本文链接：</strong>
+      <a href="http://glennchen.cn/2023/05/12/Masked_Image_Model/MIM-EMAE%E8%A7%A3%E5%86%B3-MIM-%E6%95%B0%E6%8D%AE%E5%88%A9%E7%94%A8-Glenn/" title="MIM | EMAE：解决 MIM 数据利用率低和预测结果不一致性问题" target="_blank" rel="external">http://glennchen.cn/2023/05/12/Masked_Image_Model/MIM-EMAE解决-MIM-数据利用-Glenn/</a>
+    </li>
+    
+    <li class="post-copyright-license">
+      <strong>版权声明： </strong> 本博客所有文章除特别声明外，均采用 <a href="http://creativecommons.org/licenses/by/4.0/deed.zh" target="_blank" rel="external">CC BY 4.0 CN协议</a> 许可协议。转载请注明出处！
+    </li>
+  </ul>
+</blockquote>
+
+
+<div class="panel panel-default panel-badger">
+  <div class="panel-body">
+    <figure class="media">
+      <div class="media-left">
+        <a href="https://github.com/chenluda" target="_blank" class="img-burn thumb-sm visible-lg">
+          <img src="/images/avatar.png" class="img-rounded w-full" alt="">
+        </a>
+      </div>
+      <div class="media-body">
+        <h3 class="media-heading"><a href="https://github.com/chenluda" target="_blank"><span class="text-dark">Glenn</span><small class="ml-1x">Stay hungry, stay foolish.</small></a></h3>
+        <div>咖啡，健身，热爱生活。</div>
+      </div>
+    </figure>
+  </div>
+</div>
+
+
+    </div>
+  </article>
+  
+    
+  <section id="comments">
+  	
+      <div id="vcomments"></div>
+    
+  </section>
+
+
+  
+</div>
+
+  <nav class="bar bar-footer clearfix" data-stick-bottom>
+  <div class="bar-inner">
+  
+  <ul class="pager pull-left">
+    
+    <li class="prev">
+      <a href="/2023/05/12/Masked_Image_Model/MIM-FreMAE%E5%9F%BA%E4%BA%8E%E5%82%85%E9%87%8C%E5%8F%B6%E5%8F%98%E6%8D%A2%E7%9A%84-Glenn/" title="MIM | FreMAE：基于傅里叶变换的 MIM 用于医学图像分割"><i class="icon icon-angle-left" aria-hidden="true"></i><span>&nbsp;&nbsp;上一篇</span></a>
+    </li>
+    
+    
+    <li class="next">
+      <a href="/2023/05/12/Masked_Image_Model/MIM-DPPMask%E5%8F%AF%E4%BB%A5%E4%BF%9D%E7%95%99%E5%85%B7%E6%9C%89%E4%BB%A3%E8%A1%A8-Glenn/" title="MIM | DPPMask：可以保留具有代表性 patches 的掩蔽策略"><span>下一篇&nbsp;&nbsp;</span><i class="icon icon-angle-right" aria-hidden="true"></i></a>
+    </li>
+    
+    
+  </ul>
+  
+  
+  
+  <div class="bar-right">
+    
+    <div class="share-component" data-sites="weibo,qq,wechat,facebook,twitter" data-mobile-sites="weibo,qq,qzone"></div>
+    
+  </div>
+  </div>
+</nav>
+  
+
+
+</main>
+
+  <footer class="footer" itemscope itemtype="http://schema.org/WPFooter">
+	
+	
+    <ul class="social-links">
+    	
+        <li><a href="https://github.com/chenluda" target="_blank" title="Github" data-toggle=tooltip data-placement=top><i class="icon icon-github"></i></a></li>
+        
+        <li><a href="https://www.zhihu.com/people/Glenn" target="_blank" title="Zhihu" data-toggle=tooltip data-placement=top><i class="icon icon-zhihu"></i></a></li>
+        
+    </ul>
+
+    <div class="copyright">
+    	
+        <div class="publishby">
+        	Theme by <a href="https://github.com/cofess" target="_blank"> cofess </a>base on <a href="https://github.com/cofess/hexo-theme-pure" target="_blank">pure</a>.
+        </div>
+    </div>
+</footer>
+  <script src="//cdn.jsdelivr.net/npm/jquery@1.12.4/dist/jquery.min.js"></script>
+<script>
+window.jQuery || document.write('<script src="js/jquery.min.js"><\/script>')
+</script>
+
+<script src="/js/plugin.min.js"></script>
+
+
+<script src="/js/application.js"></script>
+
+
+    <script>
+(function (window) {
+    var INSIGHT_CONFIG = {
+        TRANSLATION: {
+            POSTS: '文章',
+            PAGES: '页面',
+            CATEGORIES: '分类',
+            TAGS: '标签',
+            UNTITLED: '(未命名)',
+        },
+        ROOT_URL: '/',
+        CONTENT_URL: '/content.json',
+    };
+    window.INSIGHT_CONFIG = INSIGHT_CONFIG;
+})(window);
+</script>
+
+<script src="/js/insight.js"></script>
+
+
+
+
+
+
+   
+
+
+
+
+   
+    
+  <script src="//cdn1.lncld.net/static/js/3.0.4/av-min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/valine"></script>
+  <script type="text/javascript">
+  var GUEST = ['nick', 'mail', 'link'];
+  var meta = 'nick,mail,link';
+  meta = meta.split(',').filter(function(item) {
+    return GUEST.indexOf(item) > -1;
+  });
+  new Valine({
+    el: '#vcomments',
+    verify: false,
+    notify: false,
+    appId: '',
+    appKey: '',
+    placeholder: 'Just go go',
+    avatar: 'mm',
+    meta: meta,
+    pageSize: '10' || 10,
+    visitor: false
+  });
+  </script>
+
+     
+
+
+
+
+
+
+
+</body>
+</html>

@@ -1,0 +1,552 @@
+<!DOCTYPE html>
+<html lang=zh>
+<head>
+  <meta charset="utf-8">
+  
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=no, minimal-ui">
+  <meta name="renderer" content="webkit">
+  <meta http-equiv="Cache-Control" content="no-transform" />
+  <meta http-equiv="Cache-Control" content="no-siteapp" />
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black">
+  <meta name="format-detection" content="telephone=no,email=no,adress=no">
+  <!-- Color theme for statusbar -->
+  <meta name="theme-color" content="#000000" />
+  <!-- 强制页面在当前窗口以独立页面显示,防止别人在框架里调用页面 -->
+  <meta http-equiv="window-target" content="_top" />
+  
+  
+  <title>代码 | 获取 arXiv 论文作者单位 | Hexo</title>
+  <meta name="description" content="前几天写了些代码，实现了每天定点向微信推送 arXiv 的最新文章，推送内容包括论文标题、论文网址、首次发布时间、摘要。现在需要提供作者单位，代码已集成在上一篇文章的代码中。 论文标题、论文网址、首次发布时间、摘要等内容都可以通过 arXiv 的接口直接获取。但它没有提供作者单位。 作者单位在论文中的位置随期刊或会议格式而变动，但通常都在第一页。 所以我们需要先将论文 pdf 的第一页解析为可识别">
+<meta property="og:type" content="article">
+<meta property="og:title" content="代码 | 获取 arXiv 论文作者单位">
+<meta property="og:url" content="http://glennchen.cn/2023/05/12/%E4%BB%A3%E7%A0%81/%E4%BB%A3%E7%A0%81-%E8%8E%B7%E5%8F%96-arXiv-%E8%AE%BA%E6%96%87%E4%BD%9C%E8%80%85%E5%8D%95%E4%BD%8D-Glenn/index.html">
+<meta property="og:site_name" content="Glenn">
+<meta property="og:description" content="前几天写了些代码，实现了每天定点向微信推送 arXiv 的最新文章，推送内容包括论文标题、论文网址、首次发布时间、摘要。现在需要提供作者单位，代码已集成在上一篇文章的代码中。 论文标题、论文网址、首次发布时间、摘要等内容都可以通过 arXiv 的接口直接获取。但它没有提供作者单位。 作者单位在论文中的位置随期刊或会议格式而变动，但通常都在第一页。 所以我们需要先将论文 pdf 的第一页解析为可识别">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://glennchen.cn/2023/05/12/%E4%BB%A3%E7%A0%81/%E4%BB%A3%E7%A0%81-%E8%8E%B7%E5%8F%96-arXiv-%E8%AE%BA%E6%96%87%E4%BD%9C%E8%80%85%E5%8D%95%E4%BD%8D-Glenn/v2-9a0900099d877206d2438937313032b5_r.jpg">
+<meta property="article:published_time" content="2023-05-12T10:52:40.000Z">
+<meta property="article:modified_time" content="2023-05-13T03:50:17.813Z">
+<meta property="article:author" content="Glenn">
+<meta property="article:tag" content="arXiv">
+<meta property="article:tag" content="Organization">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://glennchen.cn/2023/05/12/%E4%BB%A3%E7%A0%81/%E4%BB%A3%E7%A0%81-%E8%8E%B7%E5%8F%96-arXiv-%E8%AE%BA%E6%96%87%E4%BD%9C%E8%80%85%E5%8D%95%E4%BD%8D-Glenn/v2-9a0900099d877206d2438937313032b5_r.jpg">
+  <!-- Canonical links -->
+  <link rel="canonical" href="http://glennchen.cn/2023/05/12/%E4%BB%A3%E7%A0%81/%E4%BB%A3%E7%A0%81-%E8%8E%B7%E5%8F%96-arXiv-%E8%AE%BA%E6%96%87%E4%BD%9C%E8%80%85%E5%8D%95%E4%BD%8D-Glenn/index.html">
+  
+    <link rel="alternate" href="/atom.xml" title="Glenn" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="/favicon.png" type="image/x-icon">
+  
+  
+<link rel="stylesheet" href="/css/style.css">
+
+  
+  
+  
+  
+<!-- hexo injector head_end start -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/katex.min.css">
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/hexo-math@4.0.0/dist/style.css">
+<!-- hexo injector head_end end --><meta name="generator" content="Hexo 6.3.0"></head>
+
+
+<body class="main-center theme-black" itemscope itemtype="http://schema.org/WebPage">
+  <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+  <div class="slimContent">
+    <div class="navbar-header">
+      
+      
+      <div class="profile-block text-center">
+        <a id="avatar" href="https://github.com/chenluda" target="_blank">
+          <img class="img-circle img-rotate" src="/images/avatar.png" width="200" height="200">
+        </a>
+        <h2 id="name" class="hidden-xs hidden-sm">Glenn</h2>
+        <h3 id="title" class="hidden-xs hidden-sm hidden-md">Stay hungry, stay foolish.</h3>
+        <small id="location" class="text-muted hidden-xs hidden-sm"><i class="icon icon-map-marker"></i> Yunnan, China</small>
+      </div>
+      
+      <div class="search" id="search-form-wrap">
+
+    <form class="search-form sidebar-form">
+        <div class="input-group">
+            <input type="text" class="search-form-input form-control" placeholder="搜索" />
+            <span class="input-group-btn">
+                <button type="submit" class="search-form-submit btn btn-flat" onclick="return false;"><i class="icon icon-search"></i></button>
+            </span>
+        </div>
+    </form>
+    <div class="ins-search">
+  <div class="ins-search-mask"></div>
+  <div class="ins-search-container">
+    <div class="ins-input-wrapper">
+      <input type="text" class="ins-search-input" placeholder="想要查找什么..." x-webkit-speech />
+      <button type="button" class="close ins-close ins-selectable" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span></button>
+    </div>
+    <div class="ins-section-wrapper">
+      <div class="ins-section-container"></div>
+    </div>
+  </div>
+</div>
+
+
+</div>
+      <button class="navbar-toggle collapsed" type="button" data-toggle="collapse" data-target="#main-navbar" aria-controls="main-navbar" aria-expanded="false">
+        <span class="sr-only">Toggle navigation</span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+    </div>
+    <nav id="main-navbar" class="collapse navbar-collapse" itemscope itemtype="http://schema.org/SiteNavigationElement" role="navigation">
+      <ul class="nav navbar-nav main-nav ">
+        
+        
+        <li class="menu-item menu-item-home">
+          <a href="/.">
+            
+            <i class="icon icon-home-fill"></i>
+            
+            <span class="menu-title">首页</span>
+          </a>
+        </li>
+        
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives">
+            
+            <i class="icon icon-archives-fill"></i>
+            
+            <span class="menu-title">归档</span>
+          </a>
+        </li>
+        
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories">
+            
+            <i class="icon icon-folder"></i>
+            
+            <span class="menu-title">分类</span>
+          </a>
+        </li>
+        
+      </ul>
+      
+	
+    <ul class="social-links">
+    	
+        <li><a href="https://github.com/chenluda" target="_blank" title="Github" data-toggle=tooltip data-placement=top><i class="icon icon-github"></i></a></li>
+        
+        <li><a href="https://www.zhihu.com/people/Glenn" target="_blank" title="Zhihu" data-toggle=tooltip data-placement=top><i class="icon icon-zhihu"></i></a></li>
+        
+    </ul>
+
+    </nav>
+  </div>
+</header>
+
+  
+    <aside class="sidebar" itemscope itemtype="http://schema.org/WPSideBar">
+  <div class="slimContent">
+    
+      <div class="widget">
+    <h3 class="widget-title">公告</h3>
+    <div class="widget-body">
+        <div id="board">
+            <div class="content">
+                <p>欢迎交流与分享经验!</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+    
+      
+  <div class="widget">
+    <h3 class="widget-title">分类</h3>
+    <div class="widget-body">
+      <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/%E4%BB%A3%E7%A0%81/">代码</a><span class="category-list-count">4</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/%E8%AE%BA%E6%96%87%E9%80%9F%E8%A7%88/">论文速览</a><span class="category-list-count">12</span></li></ul>
+    </div>
+  </div>
+
+
+    
+      
+  <div class="widget">
+    <h3 class="widget-title">标签</h3>
+    <div class="widget-body">
+      <ul class="tag-list" itemprop="keywords"><li class="tag-list-item"><a class="tag-list-link" href="/tags/Conference-paper/" rel="tag">Conference paper</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/DataBase/" rel="tag">DataBase</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Markdown/" rel="tag">Markdown</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Masked-Image-Modeling/" rel="tag">Masked Image Modeling</a><span class="tag-list-count">12</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/OpenReview/" rel="tag">OpenReview</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Organization/" rel="tag">Organization</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/WeChat/" rel="tag">WeChat</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Zhihu/" rel="tag">Zhihu</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/arXiv/" rel="tag">arXiv</a><span class="tag-list-count">2</span></li></ul>
+    </div>
+  </div>
+
+
+    
+      
+  <div class="widget">
+    <h3 class="widget-title">标签云</h3>
+    <div class="widget-body tagcloud">
+      <a href="/tags/Conference-paper/" style="font-size: 13px;">Conference paper</a> <a href="/tags/DataBase/" style="font-size: 13.5px;">DataBase</a> <a href="/tags/Markdown/" style="font-size: 13px;">Markdown</a> <a href="/tags/Masked-Image-Modeling/" style="font-size: 14px;">Masked Image Modeling</a> <a href="/tags/OpenReview/" style="font-size: 13px;">OpenReview</a> <a href="/tags/Organization/" style="font-size: 13px;">Organization</a> <a href="/tags/WeChat/" style="font-size: 13px;">WeChat</a> <a href="/tags/Zhihu/" style="font-size: 13px;">Zhihu</a> <a href="/tags/arXiv/" style="font-size: 13.5px;">arXiv</a>
+    </div>
+  </div>
+
+    
+      
+  <div class="widget">
+    <h3 class="widget-title">归档</h3>
+    <div class="widget-body">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2023/05/">五月 2023</a><span class="archive-list-count">16</span></li></ul>
+    </div>
+  </div>
+
+
+    
+      
+  <div class="widget">
+    <h3 class="widget-title">最新文章</h3>
+    <div class="widget-body">
+      <ul class="recent-post-list list-unstyled no-thumbnail">
+        
+          <li>
+            
+            <div class="item-inner">
+              <p class="item-category">
+                <a class="category-link" href="/categories/%E4%BB%A3%E7%A0%81/">代码</a>
+              </p>
+              <p class="item-title">
+                <a href="/2023/05/12/%E4%BB%A3%E7%A0%81/%E4%BB%A3%E7%A0%81-%E8%8E%B7%E5%8F%96-arXiv-%E8%AE%BA%E6%96%87%E4%BD%9C%E8%80%85%E5%8D%95%E4%BD%8D-Glenn/" class="title">代码 | 获取 arXiv 论文作者单位</a>
+              </p>
+              <p class="item-date">
+                <time datetime="2023-05-12T10:52:40.000Z" itemprop="datePublished">2023-05-12</time>
+              </p>
+            </div>
+          </li>
+          
+          <li>
+            
+            <div class="item-inner">
+              <p class="item-category">
+                <a class="category-link" href="/categories/%E4%BB%A3%E7%A0%81/">代码</a>
+              </p>
+              <p class="item-title">
+                <a href="/2023/05/12/%E4%BB%A3%E7%A0%81/%E4%BB%A3%E7%A0%81-%E6%AF%8F%E5%A4%A9%E5%AE%9A%E7%82%B9%E5%90%91%E5%BE%AE%E4%BF%A1%E6%8E%A8%E9%80%81-arXiv-Glenn/" class="title">代码 | 每天定点向微信推送 arXiv 最新文章</a>
+              </p>
+              <p class="item-date">
+                <time datetime="2023-05-12T10:52:34.000Z" itemprop="datePublished">2023-05-12</time>
+              </p>
+            </div>
+          </li>
+          
+          <li>
+            
+            <div class="item-inner">
+              <p class="item-category">
+                <a class="category-link" href="/categories/%E4%BB%A3%E7%A0%81/">代码</a>
+              </p>
+              <p class="item-title">
+                <a href="/2023/05/12/%E4%BB%A3%E7%A0%81/%E4%BB%A3%E7%A0%81-%E5%B0%86%E7%9F%A5%E4%B9%8E%E4%B8%93%E6%A0%8F%E6%96%87%E7%AB%A0%E8%BD%AC%E6%8D%A2%E4%B8%BA-Markd-Glenn/" class="title">代码 | 将知乎专栏文章转换为 Markdown 文件保存到本地</a>
+              </p>
+              <p class="item-date">
+                <time datetime="2023-05-12T10:52:25.000Z" itemprop="datePublished">2023-05-12</time>
+              </p>
+            </div>
+          </li>
+          
+          <li>
+            
+            <div class="item-inner">
+              <p class="item-category">
+                <a class="category-link" href="/categories/%E4%BB%A3%E7%A0%81/">代码</a>
+              </p>
+              <p class="item-title">
+                <a href="/2023/05/12/%E4%BB%A3%E7%A0%81/%E4%BB%A3%E7%A0%81-%E4%BB%8E-OpenReview-%E8%8E%B7%E5%8F%96%E9%A1%B6-Glenn/" class="title">代码 | 从 OpenReview 获取顶会接收论文集并保存至本地数据库</a>
+              </p>
+              <p class="item-date">
+                <time datetime="2023-05-12T10:52:15.000Z" itemprop="datePublished">2023-05-12</time>
+              </p>
+            </div>
+          </li>
+          
+          <li>
+            
+            <div class="item-inner">
+              <p class="item-category">
+                <a class="category-link" href="/categories/%E8%AE%BA%E6%96%87%E9%80%9F%E8%A7%88/">论文速览</a>
+              </p>
+              <p class="item-title">
+                <a href="/2023/05/12/Masked_Image_Model/MIM-%E7%90%86%E8%AE%BA%E6%8E%A9%E8%94%BD%E5%9B%BE%E5%83%8F%E5%BB%BA%E6%A8%A1%E6%9C%AC%E8%B4%A8%E4%B8%8A%E5%9C%A8%E5%AD%A6%E4%B9%A0%E9%81%AE-Glenn/" class="title">MIM | 理论：掩蔽图像建模本质上在学习遮挡不变特征</a>
+              </p>
+              <p class="item-date">
+                <time datetime="2023-05-12T10:44:48.000Z" itemprop="datePublished">2023-05-12</time>
+              </p>
+            </div>
+          </li>
+          
+      </ul>
+    </div>
+  </div>
+  
+
+    
+  </div>
+</aside>
+
+  
+  
+<main class="main" role="main">
+  <div class="content">
+  <article id="post-代码/代码-获取-arXiv-论文作者单位-Glenn" class="article article-type-post" itemscope itemtype="http://schema.org/BlogPosting">
+    
+    <div class="article-header">
+      
+        
+  
+    <h1 class="article-title" itemprop="name">
+      代码 | 获取 arXiv 论文作者单位
+    </h1>
+  
+
+      
+      <div class="article-meta">
+        <span class="article-date">
+    <i class="icon icon-calendar-check"></i>
+	<a href="/2023/05/12/%E4%BB%A3%E7%A0%81/%E4%BB%A3%E7%A0%81-%E8%8E%B7%E5%8F%96-arXiv-%E8%AE%BA%E6%96%87%E4%BD%9C%E8%80%85%E5%8D%95%E4%BD%8D-Glenn/" class="article-date">
+	  <time datetime="2023-05-12T10:52:40.000Z" itemprop="datePublished">2023-05-12</time>
+	</a>
+</span>
+        
+  <span class="article-category">
+    <i class="icon icon-folder"></i>
+    <a class="article-category-link" href="/categories/%E4%BB%A3%E7%A0%81/">代码</a>
+  </span>
+
+        
+  <span class="article-tag">
+    <i class="icon icon-tags"></i>
+	<a class="article-tag-link-link" href="/tags/Organization/" rel="tag">Organization</a>, <a class="article-tag-link-link" href="/tags/arXiv/" rel="tag">arXiv</a>
+  </span>
+
+
+        
+
+        <span class="post-comment"><i class="icon icon-comment"></i> <a href="/2023/05/12/%E4%BB%A3%E7%A0%81/%E4%BB%A3%E7%A0%81-%E8%8E%B7%E5%8F%96-arXiv-%E8%AE%BA%E6%96%87%E4%BD%9C%E8%80%85%E5%8D%95%E4%BD%8D-Glenn/#comments" class="article-comment-link">评论</a></span>
+        
+      </div>
+    </div>
+    <div class="article-entry marked-body" itemprop="articleBody">
+      
+        <p>前几天写了些代码，实现了每天定点向微信推送 arXiv 的最新文章，推送内容包括论文标题、论文网址、首次发布时间、摘要。现在需要提供作者单位，代码已集成在上一篇文章的代码中。</p>
+<p>论文标题、论文网址、首次发布时间、摘要等内容都可以通过 arXiv 的接口直接获取。但它没有提供作者单位。</p>
+<p>作者单位在论文中的位置随期刊或会议格式而变动，但通常都在第一页。</p>
+<p>所以我们需要先将论文 pdf 的第一页解析为可识别的文本格式。</p>
+<p>这里可以使用 pdfplumber 库。它可以按页处理 pdf ，获取页面文字，提取表格等操作。</p>
+<p>获取到第一页的文本后，就可以识别机构名称了。</p>
+<p>这里有三种思路：</p>
+<ul>
+<li>一是设置正则化规则去匹配机构名称，这种方式运算量太大，程序很容易卡死，所以直接被淘汰；</li>
+<li>二是使用命名实体识别的模型，我这里只使用了两个，一个是 spacy 的 en_core_web_sm，另一个是 huggingface spaces 的 dslim&#x2F;bert-base-NER。效果都不太好，大家可以尝试使用更具有针对性的 NER 模型。</li>
+<li>三是使用 chatgpt，因为需要 api key，这种方式本来是不想用的，但无奈效果太好了。</li>
+</ul>
+<hr>
+<p>完整代码如下：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br></pre></td><td class="code"><pre><span class="line">&#x27;&#x27;&#x27;</span><br><span class="line">Description: 获取 arXiv 论文作者单位</span><br><span class="line">Version: 1.0</span><br><span class="line">Author: Glenn</span><br><span class="line">Email: chenluda01@outlook.com</span><br><span class="line">Date: 2023-04-24 15:32:39</span><br><span class="line">FilePath: \12-arxivdownload\getAffiliation.py</span><br><span class="line">Copyright (c) 2023 by Kust-BME, All Rights Reserved. </span><br><span class="line">&#x27;&#x27;&#x27;</span><br><span class="line">import os</span><br><span class="line">import re</span><br><span class="line">from io import BytesIO</span><br><span class="line"></span><br><span class="line">import openai</span><br><span class="line">import pdfplumber</span><br><span class="line">import requests</span><br><span class="line">import spacy</span><br><span class="line">from transformers import pipeline</span><br><span class="line"></span><br><span class="line"># 设置 OpenAI 的 API key</span><br><span class="line">os.environ[&#x27;OPENAI\_API\_KEY&#x27;] = &#x27;your\_openai\_api\_key&#x27;</span><br><span class="line">openai.api\_key = os.getenv(&#x27;OPENAI\_API\_KEY&#x27;)</span><br><span class="line"></span><br><span class="line">def get\_affiliation\_by\_bert(text):</span><br><span class="line">    &quot;&quot;&quot;</span><br><span class="line"> 使用 bert 模型获取作者单位</span><br><span class="line"> &quot;&quot;&quot;</span><br><span class="line">    # 初始化 BERT NER</span><br><span class="line">    nlp = pipeline(&quot;ner&quot;, model=&quot;dslim/bert-base-NER&quot;, tokenizer=&quot;dslim/bert-base-NER&quot;)</span><br><span class="line">    entities = nlp(text)</span><br><span class="line"></span><br><span class="line">    institutions = set()</span><br><span class="line">    # 提取组织实体</span><br><span class="line">    for i, entity in enumerate(entities):</span><br><span class="line">        if entity[&#x27;entity&#x27;].startswith(&#x27;B-ORG&#x27;):</span><br><span class="line">            org\_name = entity[&#x27;word&#x27;]</span><br><span class="line">            j = i + 1</span><br><span class="line">            while j &lt; len(entities) and entities[j][&#x27;entity&#x27;].startswith(&#x27;I-ORG&#x27;):</span><br><span class="line">                org\_name += &#x27;&#x27; + entities[j][&#x27;word&#x27;][2:]</span><br><span class="line">                j += 1</span><br><span class="line">            institutions.add(org\_name)</span><br><span class="line"></span><br><span class="line">    author\_affiliation = list(institutions)</span><br><span class="line">    return author\_affiliation</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">def get\_affiliation\_by\_spacy(text):</span><br><span class="line">    &quot;&quot;&quot;</span><br><span class="line"> 使用 spacy 模型获取作者单位</span><br><span class="line"> &quot;&quot;&quot;</span><br><span class="line">    # 加载预训练模型</span><br><span class="line">    nlp = spacy.load(&#x27;en\_core\_web\_sm&#x27;)</span><br><span class="line">    doc = nlp(text)</span><br><span class="line"></span><br><span class="line">    institutions = set()</span><br><span class="line">    # 提取组织实体</span><br><span class="line">    for ent in doc.ents:</span><br><span class="line">        if ent.label\_ == &quot;ORG&quot;:</span><br><span class="line">            institutions.add(ent.text)</span><br><span class="line"></span><br><span class="line">    author\_affiliation = list(institutions)</span><br><span class="line"></span><br><span class="line">    return author\_affiliation</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">def get\_affiliation\_by\_openai(text):</span><br><span class="line">    &quot;&quot;&quot;</span><br><span class="line"> 使用 OpenAI API 模型获取作者单位</span><br><span class="line"> &quot;&quot;&quot;</span><br><span class="line">    prompt = &#x27;Extract the organization names from the given text: &#x27; + text</span><br><span class="line"></span><br><span class="line">    # 调用 GPT-3.5 的接口</span><br><span class="line">    response = openai.ChatCompletion.create(</span><br><span class="line">        model=&quot;gpt-3.5-turbo&quot;,</span><br><span class="line">        messages=[</span><br><span class="line">            &#123;&quot;role&quot;: &quot;system&quot;, &quot;content&quot;: &quot;You are a very powerful named entity recognition model.&quot;&#125;,</span><br><span class="line">            &#123;&quot;role&quot;: &quot;user&quot;, &quot;content&quot;: prompt&#125;</span><br><span class="line">        ],</span><br><span class="line">    )</span><br><span class="line"></span><br><span class="line">    output = response.choices[0].message.content.strip()</span><br><span class="line">    institutions = [o.strip() for o in output.split(&quot;\n&quot;)]</span><br><span class="line"></span><br><span class="line">    author\_affiliation = list(set(institutions))</span><br><span class="line"></span><br><span class="line">    return author\_affiliation</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">def get\_text\_by\_pdfplumber(pdf\_url, methodType=&quot;openai&quot;):</span><br><span class="line">    &quot;&quot;&quot;</span><br><span class="line"> 使用 pdfplumber 提取 PDF 文本并获取作者单位</span><br><span class="line"> &quot;&quot;&quot;</span><br><span class="line">    # 从 URL 获取 PDF 文件内容</span><br><span class="line">    response = requests.get(pdf\_url)</span><br><span class="line">    pdf\_content = BytesIO(response.content)</span><br><span class="line">    # 使用 pdfplumber 提取 PDF 文本</span><br><span class="line">    with pdfplumber.open(pdf\_content) as pdf:</span><br><span class="line">        first\_page = pdf.pages[0]</span><br><span class="line">        text = first\_page.extract\_text()</span><br><span class="line">        # 根据方法类型选择实体识别方法</span><br><span class="line">        if methodType == &#x27;openai&#x27;:</span><br><span class="line">            author\_affiliation = get\_affiliation\_by\_openai(text)</span><br><span class="line"></span><br><span class="line">        if methodType == &#x27;spacy\_model&#x27;:</span><br><span class="line">            author\_affiliation = get\_affiliation\_by\_spacy(text)</span><br><span class="line"></span><br><span class="line">        if methodType == &#x27;bert\_model&#x27;:</span><br><span class="line">            author\_affiliation = get\_affiliation\_by\_bert(text)</span><br><span class="line"></span><br><span class="line">    return author\_affiliation</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">if \_\_name\_\_==&quot;\_\_main\_\_&quot;:</span><br><span class="line"></span><br><span class="line">    pdf\_url = &#x27;https://arxiv.org/pdf/2304.10864.pdf&#x27;</span><br><span class="line"></span><br><span class="line">    methodType = &quot;bert\_model&quot;</span><br><span class="line"></span><br><span class="line">    author\_affiliation = get\_text\_by\_pdfplumber(pdf\_url, methodType)</span><br><span class="line"></span><br><span class="line">    print(&#x27;Author affiliation are: &#x27;, author\_affiliation)</span><br></pre></td></tr></table></figure>
+
+
+<hr>
+<p>以这篇文章<a href="#ref_1">[1]</a>为例：</p>
+<p><img src="/2023/05/12/%E4%BB%A3%E7%A0%81/%E4%BB%A3%E7%A0%81-%E8%8E%B7%E5%8F%96-arXiv-%E8%AE%BA%E6%96%87%E4%BD%9C%E8%80%85%E5%8D%95%E4%BD%8D-Glenn/v2-9a0900099d877206d2438937313032b5_r.jpg"></p>
+<blockquote>
+<p><em><strong>题目：</strong></em><em>FreMAE: Fourier Transform Meets Masked Autoencoders for Medical Image Segmentation</em><br><em><strong>单位：</strong></em><em>北京科技大学、中佛罗里达大学、伯明翰大学、理海大学</em><br><em><strong>论文网址：</strong></em><a href="https://link.zhihu.com/?target=https://arxiv.org/abs/2304.10864">https://arxiv.org/abs/2304.10864</a><br><em><strong>论文代码：</strong></em><em>未公开</em><br><em><strong>首次发布时间：</strong></em><em>2023 年 4 月 21 日</em></p>
+</blockquote>
+<ul>
+<li>金标准：</li>
+</ul>
+<p>Author affiliation are: [‘<strong>School of Automation and Electrical Engineering, University of Science and Technology Beijing</strong>‘, ‘<strong>Center for Research in Computer Vision, University of Central Florida’, ‘University of Birmingham</strong>‘, ‘<strong>Lehigh University</strong>‘]</p>
+<ul>
+<li>使用 bert 模型获取作者单位：</li>
+</ul>
+<p>Author affiliation are: [‘<strong>Shan</strong>‘, ‘<strong>Originalage</strong>‘, ‘<strong>LichaS</strong>‘, ‘<strong>Jiang</strong>‘, ‘<strong>UniversityofCentralFida</strong>‘, ‘<strong>UniversityofScienceT</strong>‘]</p>
+<ul>
+<li>使用 spacy 模型获取作者单位：</li>
+</ul>
+<p>Author affiliation are: [‘<strong>MIM</strong>‘, ‘<strong>Masked Image Modeling</strong>‘, ‘<strong>Original Image</strong>‘, ‘<strong>NLP</strong>‘, ‘<strong>MLM</strong>‘, ‘<strong>Fourier Spectrum</strong>‘, ‘<strong>Medical Image Segmentation</strong>‘, ‘<strong>MAE</strong>‘]</p>
+<ul>
+<li>使用 OpenAI API 模型获取作者单位：</li>
+</ul>
+<p>Author affiliation are: [‘<strong>- University of Science and Technology Beijing</strong>‘, ‘<strong>- University of Birmingham</strong>‘, ‘<strong>- Center for Research in Computer Vision, University of Central Florida</strong>‘, ‘<strong>- FreMAE</strong>‘, ‘<strong>- Lehigh University</strong>‘]</p>
+<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><ol>
+<li><a href="#ref_1_0">^</a>Wang, W. et al. FreMAE: Fourier Transform Meets Masked Autoencoders for Medical Image Segmentation. arXiv preprint arXiv:2304.10864 (2023).</li>
+</ol>
+
+      
+    </div>
+    <div class="article-footer">
+      <blockquote class="mt-2x">
+  <ul class="post-copyright list-unstyled">
+    
+    <li class="post-copyright-link hidden-xs">
+      <strong>本文链接：</strong>
+      <a href="http://glennchen.cn/2023/05/12/%E4%BB%A3%E7%A0%81/%E4%BB%A3%E7%A0%81-%E8%8E%B7%E5%8F%96-arXiv-%E8%AE%BA%E6%96%87%E4%BD%9C%E8%80%85%E5%8D%95%E4%BD%8D-Glenn/" title="代码 | 获取 arXiv 论文作者单位" target="_blank" rel="external">http://glennchen.cn/2023/05/12/代码/代码-获取-arXiv-论文作者单位-Glenn/</a>
+    </li>
+    
+    <li class="post-copyright-license">
+      <strong>版权声明： </strong> 本博客所有文章除特别声明外，均采用 <a href="http://creativecommons.org/licenses/by/4.0/deed.zh" target="_blank" rel="external">CC BY 4.0 CN协议</a> 许可协议。转载请注明出处！
+    </li>
+  </ul>
+</blockquote>
+
+
+<div class="panel panel-default panel-badger">
+  <div class="panel-body">
+    <figure class="media">
+      <div class="media-left">
+        <a href="https://github.com/chenluda" target="_blank" class="img-burn thumb-sm visible-lg">
+          <img src="/images/avatar.png" class="img-rounded w-full" alt="">
+        </a>
+      </div>
+      <div class="media-body">
+        <h3 class="media-heading"><a href="https://github.com/chenluda" target="_blank"><span class="text-dark">Glenn</span><small class="ml-1x">Stay hungry, stay foolish.</small></a></h3>
+        <div>咖啡，健身，热爱生活。</div>
+      </div>
+    </figure>
+  </div>
+</div>
+
+
+    </div>
+  </article>
+  
+    
+  <section id="comments">
+  	
+      <div id="vcomments"></div>
+    
+  </section>
+
+
+  
+</div>
+
+  <nav class="bar bar-footer clearfix" data-stick-bottom>
+  <div class="bar-inner">
+  
+  <ul class="pager pull-left">
+    
+    
+    <li class="next">
+      <a href="/2023/05/12/%E4%BB%A3%E7%A0%81/%E4%BB%A3%E7%A0%81-%E6%AF%8F%E5%A4%A9%E5%AE%9A%E7%82%B9%E5%90%91%E5%BE%AE%E4%BF%A1%E6%8E%A8%E9%80%81-arXiv-Glenn/" title="代码 | 每天定点向微信推送 arXiv 最新文章"><span>下一篇&nbsp;&nbsp;</span><i class="icon icon-angle-right" aria-hidden="true"></i></a>
+    </li>
+    
+    
+  </ul>
+  
+  
+  
+  <div class="bar-right">
+    
+    <div class="share-component" data-sites="weibo,qq,wechat,facebook,twitter" data-mobile-sites="weibo,qq,qzone"></div>
+    
+  </div>
+  </div>
+</nav>
+  
+
+
+</main>
+
+  <footer class="footer" itemscope itemtype="http://schema.org/WPFooter">
+	
+	
+    <ul class="social-links">
+    	
+        <li><a href="https://github.com/chenluda" target="_blank" title="Github" data-toggle=tooltip data-placement=top><i class="icon icon-github"></i></a></li>
+        
+        <li><a href="https://www.zhihu.com/people/Glenn" target="_blank" title="Zhihu" data-toggle=tooltip data-placement=top><i class="icon icon-zhihu"></i></a></li>
+        
+    </ul>
+
+    <div class="copyright">
+    	
+        <div class="publishby">
+        	Theme by <a href="https://github.com/cofess" target="_blank"> cofess </a>base on <a href="https://github.com/cofess/hexo-theme-pure" target="_blank">pure</a>.
+        </div>
+    </div>
+</footer>
+  <script src="//cdn.jsdelivr.net/npm/jquery@1.12.4/dist/jquery.min.js"></script>
+<script>
+window.jQuery || document.write('<script src="js/jquery.min.js"><\/script>')
+</script>
+
+<script src="/js/plugin.min.js"></script>
+
+
+<script src="/js/application.js"></script>
+
+
+    <script>
+(function (window) {
+    var INSIGHT_CONFIG = {
+        TRANSLATION: {
+            POSTS: '文章',
+            PAGES: '页面',
+            CATEGORIES: '分类',
+            TAGS: '标签',
+            UNTITLED: '(未命名)',
+        },
+        ROOT_URL: '/',
+        CONTENT_URL: '/content.json',
+    };
+    window.INSIGHT_CONFIG = INSIGHT_CONFIG;
+})(window);
+</script>
+
+<script src="/js/insight.js"></script>
+
+
+
+
+
+
+   
+
+
+
+
+   
+    
+  <script src="//cdn1.lncld.net/static/js/3.0.4/av-min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/valine"></script>
+  <script type="text/javascript">
+  var GUEST = ['nick', 'mail', 'link'];
+  var meta = 'nick,mail,link';
+  meta = meta.split(',').filter(function(item) {
+    return GUEST.indexOf(item) > -1;
+  });
+  new Valine({
+    el: '#vcomments',
+    verify: false,
+    notify: false,
+    appId: '',
+    appKey: '',
+    placeholder: 'Just go go',
+    avatar: 'mm',
+    meta: meta,
+    pageSize: '10' || 10,
+    visitor: false
+  });
+  </script>
+
+     
+
+
+
+
+
+
+
+</body>
+</html>

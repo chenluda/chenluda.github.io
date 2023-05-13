@@ -1,0 +1,594 @@
+<!DOCTYPE html>
+<html lang=zh>
+<head>
+  <meta charset="utf-8">
+  
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=no, minimal-ui">
+  <meta name="renderer" content="webkit">
+  <meta http-equiv="Cache-Control" content="no-transform" />
+  <meta http-equiv="Cache-Control" content="no-siteapp" />
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black">
+  <meta name="format-detection" content="telephone=no,email=no,adress=no">
+  <!-- Color theme for statusbar -->
+  <meta name="theme-color" content="#000000" />
+  <!-- 强制页面在当前窗口以独立页面显示,防止别人在框架里调用页面 -->
+  <meta http-equiv="window-target" content="_top" />
+  
+  
+  <title>MIM | HPM：引入蒸馏概念自动生成掩蔽策略 | Hexo</title>
+  <meta name="description" content="题目：Hard Patches Mining for Masked Image Modeling单位：中国科学院、旷视、中国科学院大学论文网址：https:&#x2F;&#x2F;arxiv.org&#x2F;abs&#x2F;2304.05919论文代码： https:&#x2F;&#x2F;github.com&#x2F;Haochen-Wang409&#x2F;HPM首次发布时间：2023 年 4 月 12 日（收录于 CVPR 2023）  123456@arti">
+<meta property="og:type" content="article">
+<meta property="og:title" content="MIM | HPM：引入蒸馏概念自动生成掩蔽策略">
+<meta property="og:url" content="http://glennchen.cn/2023/05/12/Masked_Image_Model/MIM-HPM%E5%BC%95%E5%85%A5%E8%92%B8%E9%A6%8F%E6%A6%82%E5%BF%B5%E8%87%AA%E5%8A%A8%E7%94%9F%E6%88%90%E6%8E%A9%E8%94%BD-Glenn/index.html">
+<meta property="og:site_name" content="Glenn">
+<meta property="og:description" content="题目：Hard Patches Mining for Masked Image Modeling单位：中国科学院、旷视、中国科学院大学论文网址：https:&#x2F;&#x2F;arxiv.org&#x2F;abs&#x2F;2304.05919论文代码： https:&#x2F;&#x2F;github.com&#x2F;Haochen-Wang409&#x2F;HPM首次发布时间：2023 年 4 月 12 日（收录于 CVPR 2023）  123456@arti">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://glennchen.cn/2023/05/12/Masked_Image_Model/MIM-HPM%E5%BC%95%E5%85%A5%E8%92%B8%E9%A6%8F%E6%A6%82%E5%BF%B5%E8%87%AA%E5%8A%A8%E7%94%9F%E6%88%90%E6%8E%A9%E8%94%BD-Glenn/v2-0deff8109c694394c9df324f9153ac73_r.jpg">
+<meta property="og:image" content="http://glennchen.cn/2023/05/12/Masked_Image_Model/MIM-HPM%E5%BC%95%E5%85%A5%E8%92%B8%E9%A6%8F%E6%A6%82%E5%BF%B5%E8%87%AA%E5%8A%A8%E7%94%9F%E6%88%90%E6%8E%A9%E8%94%BD-Glenn/v2-2f45314ac507b4bfe0997f74d7463918_r.jpg">
+<meta property="og:image" content="http://glennchen.cn/2023/05/12/Masked_Image_Model/MIM-HPM%E5%BC%95%E5%85%A5%E8%92%B8%E9%A6%8F%E6%A6%82%E5%BF%B5%E8%87%AA%E5%8A%A8%E7%94%9F%E6%88%90%E6%8E%A9%E8%94%BD-Glenn/v2-f15927aa53bb967c63e39d4dbf54e2e7_r.jpg">
+<meta property="og:image" content="http://glennchen.cn/2023/05/12/Masked_Image_Model/MIM-HPM%E5%BC%95%E5%85%A5%E8%92%B8%E9%A6%8F%E6%A6%82%E5%BF%B5%E8%87%AA%E5%8A%A8%E7%94%9F%E6%88%90%E6%8E%A9%E8%94%BD-Glenn/v2-3f542d018bc6c669b6ea0c48e6436f38_r.jpg">
+<meta property="og:image" content="http://glennchen.cn/2023/05/12/Masked_Image_Model/MIM-HPM%E5%BC%95%E5%85%A5%E8%92%B8%E9%A6%8F%E6%A6%82%E5%BF%B5%E8%87%AA%E5%8A%A8%E7%94%9F%E6%88%90%E6%8E%A9%E8%94%BD-Glenn/v2-23fa5129f836f507581b4818124fb3c2_r.jpg">
+<meta property="og:image" content="http://glennchen.cn/2023/05/12/Masked_Image_Model/MIM-HPM%E5%BC%95%E5%85%A5%E8%92%B8%E9%A6%8F%E6%A6%82%E5%BF%B5%E8%87%AA%E5%8A%A8%E7%94%9F%E6%88%90%E6%8E%A9%E8%94%BD-Glenn/v2-d67f596bef993a6afabf102037fdeadb_r.jpg">
+<meta property="og:image" content="http://glennchen.cn/2023/05/12/Masked_Image_Model/MIM-HPM%E5%BC%95%E5%85%A5%E8%92%B8%E9%A6%8F%E6%A6%82%E5%BF%B5%E8%87%AA%E5%8A%A8%E7%94%9F%E6%88%90%E6%8E%A9%E8%94%BD-Glenn/v2-863c1b2ad2e2e6d2e90e507387ad6ef7_r.jpg">
+<meta property="og:image" content="http://glennchen.cn/2023/05/12/Masked_Image_Model/MIM-HPM%E5%BC%95%E5%85%A5%E8%92%B8%E9%A6%8F%E6%A6%82%E5%BF%B5%E8%87%AA%E5%8A%A8%E7%94%9F%E6%88%90%E6%8E%A9%E8%94%BD-Glenn/v2-43e69cbf631a8198b22098c1b3ba534f_r.jpg">
+<meta property="og:image" content="http://glennchen.cn/2023/05/12/Masked_Image_Model/MIM-HPM%E5%BC%95%E5%85%A5%E8%92%B8%E9%A6%8F%E6%A6%82%E5%BF%B5%E8%87%AA%E5%8A%A8%E7%94%9F%E6%88%90%E6%8E%A9%E8%94%BD-Glenn/v2-35bc1af65c2ff76a0786bfa7117db56e_r.jpg">
+<meta property="og:image" content="http://glennchen.cn/2023/05/12/Masked_Image_Model/MIM-HPM%E5%BC%95%E5%85%A5%E8%92%B8%E9%A6%8F%E6%A6%82%E5%BF%B5%E8%87%AA%E5%8A%A8%E7%94%9F%E6%88%90%E6%8E%A9%E8%94%BD-Glenn/v2-ae1df39df3f04c6b415de4973434c2cb_r.jpg">
+<meta property="og:image" content="http://glennchen.cn/2023/05/12/Masked_Image_Model/MIM-HPM%E5%BC%95%E5%85%A5%E8%92%B8%E9%A6%8F%E6%A6%82%E5%BF%B5%E8%87%AA%E5%8A%A8%E7%94%9F%E6%88%90%E6%8E%A9%E8%94%BD-Glenn/v2-fcdb7a7f6d91b053a91da2d4c95f1f76_r.jpg">
+<meta property="og:image" content="http://glennchen.cn/2023/05/12/Masked_Image_Model/MIM-HPM%E5%BC%95%E5%85%A5%E8%92%B8%E9%A6%8F%E6%A6%82%E5%BF%B5%E8%87%AA%E5%8A%A8%E7%94%9F%E6%88%90%E6%8E%A9%E8%94%BD-Glenn/v2-5d466361e3e092368572fe3ecb2a8002_r.jpg">
+<meta property="article:published_time" content="2023-05-12T10:44:13.000Z">
+<meta property="article:modified_time" content="2023-05-12T12:17:04.465Z">
+<meta property="article:author" content="Glenn">
+<meta property="article:tag" content="Masked Image Modeling">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://glennchen.cn/2023/05/12/Masked_Image_Model/MIM-HPM%E5%BC%95%E5%85%A5%E8%92%B8%E9%A6%8F%E6%A6%82%E5%BF%B5%E8%87%AA%E5%8A%A8%E7%94%9F%E6%88%90%E6%8E%A9%E8%94%BD-Glenn/v2-0deff8109c694394c9df324f9153ac73_r.jpg">
+  <!-- Canonical links -->
+  <link rel="canonical" href="http://glennchen.cn/2023/05/12/Masked_Image_Model/MIM-HPM%E5%BC%95%E5%85%A5%E8%92%B8%E9%A6%8F%E6%A6%82%E5%BF%B5%E8%87%AA%E5%8A%A8%E7%94%9F%E6%88%90%E6%8E%A9%E8%94%BD-Glenn/index.html">
+  
+    <link rel="alternate" href="/atom.xml" title="Glenn" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="/favicon.png" type="image/x-icon">
+  
+  
+<link rel="stylesheet" href="/css/style.css">
+
+  
+  
+  
+  
+<!-- hexo injector head_end start -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/katex.min.css">
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/hexo-math@4.0.0/dist/style.css">
+<!-- hexo injector head_end end --><meta name="generator" content="Hexo 6.3.0"></head>
+
+
+<body class="main-center theme-black" itemscope itemtype="http://schema.org/WebPage">
+  <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+  <div class="slimContent">
+    <div class="navbar-header">
+      
+      
+      <div class="profile-block text-center">
+        <a id="avatar" href="https://github.com/chenluda" target="_blank">
+          <img class="img-circle img-rotate" src="/images/avatar.png" width="200" height="200">
+        </a>
+        <h2 id="name" class="hidden-xs hidden-sm">Glenn</h2>
+        <h3 id="title" class="hidden-xs hidden-sm hidden-md">Stay hungry, stay foolish.</h3>
+        <small id="location" class="text-muted hidden-xs hidden-sm"><i class="icon icon-map-marker"></i> Yunnan, China</small>
+      </div>
+      
+      <div class="search" id="search-form-wrap">
+
+    <form class="search-form sidebar-form">
+        <div class="input-group">
+            <input type="text" class="search-form-input form-control" placeholder="搜索" />
+            <span class="input-group-btn">
+                <button type="submit" class="search-form-submit btn btn-flat" onclick="return false;"><i class="icon icon-search"></i></button>
+            </span>
+        </div>
+    </form>
+    <div class="ins-search">
+  <div class="ins-search-mask"></div>
+  <div class="ins-search-container">
+    <div class="ins-input-wrapper">
+      <input type="text" class="ins-search-input" placeholder="想要查找什么..." x-webkit-speech />
+      <button type="button" class="close ins-close ins-selectable" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span></button>
+    </div>
+    <div class="ins-section-wrapper">
+      <div class="ins-section-container"></div>
+    </div>
+  </div>
+</div>
+
+
+</div>
+      <button class="navbar-toggle collapsed" type="button" data-toggle="collapse" data-target="#main-navbar" aria-controls="main-navbar" aria-expanded="false">
+        <span class="sr-only">Toggle navigation</span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+    </div>
+    <nav id="main-navbar" class="collapse navbar-collapse" itemscope itemtype="http://schema.org/SiteNavigationElement" role="navigation">
+      <ul class="nav navbar-nav main-nav ">
+        
+        
+        <li class="menu-item menu-item-home">
+          <a href="/.">
+            
+            <i class="icon icon-home-fill"></i>
+            
+            <span class="menu-title">首页</span>
+          </a>
+        </li>
+        
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives">
+            
+            <i class="icon icon-archives-fill"></i>
+            
+            <span class="menu-title">归档</span>
+          </a>
+        </li>
+        
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories">
+            
+            <i class="icon icon-folder"></i>
+            
+            <span class="menu-title">分类</span>
+          </a>
+        </li>
+        
+      </ul>
+      
+	
+    <ul class="social-links">
+    	
+        <li><a href="https://github.com/chenluda" target="_blank" title="Github" data-toggle=tooltip data-placement=top><i class="icon icon-github"></i></a></li>
+        
+        <li><a href="https://www.zhihu.com/people/Glenn" target="_blank" title="Zhihu" data-toggle=tooltip data-placement=top><i class="icon icon-zhihu"></i></a></li>
+        
+    </ul>
+
+    </nav>
+  </div>
+</header>
+
+  
+    <aside class="sidebar" itemscope itemtype="http://schema.org/WPSideBar">
+  <div class="slimContent">
+    
+      <div class="widget">
+    <h3 class="widget-title">公告</h3>
+    <div class="widget-body">
+        <div id="board">
+            <div class="content">
+                <p>欢迎交流与分享经验!</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+    
+      
+  <div class="widget">
+    <h3 class="widget-title">分类</h3>
+    <div class="widget-body">
+      <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/%E4%BB%A3%E7%A0%81/">代码</a><span class="category-list-count">4</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/%E8%AE%BA%E6%96%87%E9%80%9F%E8%A7%88/">论文速览</a><span class="category-list-count">12</span></li></ul>
+    </div>
+  </div>
+
+
+    
+      
+  <div class="widget">
+    <h3 class="widget-title">标签</h3>
+    <div class="widget-body">
+      <ul class="tag-list" itemprop="keywords"><li class="tag-list-item"><a class="tag-list-link" href="/tags/Conference-paper/" rel="tag">Conference paper</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/DataBase/" rel="tag">DataBase</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Markdown/" rel="tag">Markdown</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Masked-Image-Modeling/" rel="tag">Masked Image Modeling</a><span class="tag-list-count">12</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/OpenReview/" rel="tag">OpenReview</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Organization/" rel="tag">Organization</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/WeChat/" rel="tag">WeChat</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Zhihu/" rel="tag">Zhihu</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/arXiv/" rel="tag">arXiv</a><span class="tag-list-count">2</span></li></ul>
+    </div>
+  </div>
+
+
+    
+      
+  <div class="widget">
+    <h3 class="widget-title">标签云</h3>
+    <div class="widget-body tagcloud">
+      <a href="/tags/Conference-paper/" style="font-size: 13px;">Conference paper</a> <a href="/tags/DataBase/" style="font-size: 13.5px;">DataBase</a> <a href="/tags/Markdown/" style="font-size: 13px;">Markdown</a> <a href="/tags/Masked-Image-Modeling/" style="font-size: 14px;">Masked Image Modeling</a> <a href="/tags/OpenReview/" style="font-size: 13px;">OpenReview</a> <a href="/tags/Organization/" style="font-size: 13px;">Organization</a> <a href="/tags/WeChat/" style="font-size: 13px;">WeChat</a> <a href="/tags/Zhihu/" style="font-size: 13px;">Zhihu</a> <a href="/tags/arXiv/" style="font-size: 13.5px;">arXiv</a>
+    </div>
+  </div>
+
+    
+      
+  <div class="widget">
+    <h3 class="widget-title">归档</h3>
+    <div class="widget-body">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2023/05/">五月 2023</a><span class="archive-list-count">16</span></li></ul>
+    </div>
+  </div>
+
+
+    
+      
+  <div class="widget">
+    <h3 class="widget-title">最新文章</h3>
+    <div class="widget-body">
+      <ul class="recent-post-list list-unstyled no-thumbnail">
+        
+          <li>
+            
+            <div class="item-inner">
+              <p class="item-category">
+                <a class="category-link" href="/categories/%E4%BB%A3%E7%A0%81/">代码</a>
+              </p>
+              <p class="item-title">
+                <a href="/2023/05/12/%E4%BB%A3%E7%A0%81/%E4%BB%A3%E7%A0%81-%E8%8E%B7%E5%8F%96-arXiv-%E8%AE%BA%E6%96%87%E4%BD%9C%E8%80%85%E5%8D%95%E4%BD%8D-Glenn/" class="title">代码 | 获取 arXiv 论文作者单位</a>
+              </p>
+              <p class="item-date">
+                <time datetime="2023-05-12T10:52:40.000Z" itemprop="datePublished">2023-05-12</time>
+              </p>
+            </div>
+          </li>
+          
+          <li>
+            
+            <div class="item-inner">
+              <p class="item-category">
+                <a class="category-link" href="/categories/%E4%BB%A3%E7%A0%81/">代码</a>
+              </p>
+              <p class="item-title">
+                <a href="/2023/05/12/%E4%BB%A3%E7%A0%81/%E4%BB%A3%E7%A0%81-%E6%AF%8F%E5%A4%A9%E5%AE%9A%E7%82%B9%E5%90%91%E5%BE%AE%E4%BF%A1%E6%8E%A8%E9%80%81-arXiv-Glenn/" class="title">代码 | 每天定点向微信推送 arXiv 最新文章</a>
+              </p>
+              <p class="item-date">
+                <time datetime="2023-05-12T10:52:34.000Z" itemprop="datePublished">2023-05-12</time>
+              </p>
+            </div>
+          </li>
+          
+          <li>
+            
+            <div class="item-inner">
+              <p class="item-category">
+                <a class="category-link" href="/categories/%E4%BB%A3%E7%A0%81/">代码</a>
+              </p>
+              <p class="item-title">
+                <a href="/2023/05/12/%E4%BB%A3%E7%A0%81/%E4%BB%A3%E7%A0%81-%E5%B0%86%E7%9F%A5%E4%B9%8E%E4%B8%93%E6%A0%8F%E6%96%87%E7%AB%A0%E8%BD%AC%E6%8D%A2%E4%B8%BA-Markd-Glenn/" class="title">代码 | 将知乎专栏文章转换为 Markdown 文件保存到本地</a>
+              </p>
+              <p class="item-date">
+                <time datetime="2023-05-12T10:52:25.000Z" itemprop="datePublished">2023-05-12</time>
+              </p>
+            </div>
+          </li>
+          
+          <li>
+            
+            <div class="item-inner">
+              <p class="item-category">
+                <a class="category-link" href="/categories/%E4%BB%A3%E7%A0%81/">代码</a>
+              </p>
+              <p class="item-title">
+                <a href="/2023/05/12/%E4%BB%A3%E7%A0%81/%E4%BB%A3%E7%A0%81-%E4%BB%8E-OpenReview-%E8%8E%B7%E5%8F%96%E9%A1%B6-Glenn/" class="title">代码 | 从 OpenReview 获取顶会接收论文集并保存至本地数据库</a>
+              </p>
+              <p class="item-date">
+                <time datetime="2023-05-12T10:52:15.000Z" itemprop="datePublished">2023-05-12</time>
+              </p>
+            </div>
+          </li>
+          
+          <li>
+            
+            <div class="item-inner">
+              <p class="item-category">
+                <a class="category-link" href="/categories/%E8%AE%BA%E6%96%87%E9%80%9F%E8%A7%88/">论文速览</a>
+              </p>
+              <p class="item-title">
+                <a href="/2023/05/12/Masked_Image_Model/MIM-%E7%90%86%E8%AE%BA%E6%8E%A9%E8%94%BD%E5%9B%BE%E5%83%8F%E5%BB%BA%E6%A8%A1%E6%9C%AC%E8%B4%A8%E4%B8%8A%E5%9C%A8%E5%AD%A6%E4%B9%A0%E9%81%AE-Glenn/" class="title">MIM | 理论：掩蔽图像建模本质上在学习遮挡不变特征</a>
+              </p>
+              <p class="item-date">
+                <time datetime="2023-05-12T10:44:48.000Z" itemprop="datePublished">2023-05-12</time>
+              </p>
+            </div>
+          </li>
+          
+      </ul>
+    </div>
+  </div>
+  
+
+    
+  </div>
+</aside>
+
+  
+  
+<main class="main" role="main">
+  <div class="content">
+  <article id="post-Masked_Image_Model/MIM-HPM引入蒸馏概念自动生成掩蔽-Glenn" class="article article-type-post" itemscope itemtype="http://schema.org/BlogPosting">
+    
+    <div class="article-header">
+      
+        
+  
+    <h1 class="article-title" itemprop="name">
+      MIM | HPM：引入蒸馏概念自动生成掩蔽策略
+    </h1>
+  
+
+      
+      <div class="article-meta">
+        <span class="article-date">
+    <i class="icon icon-calendar-check"></i>
+	<a href="/2023/05/12/Masked_Image_Model/MIM-HPM%E5%BC%95%E5%85%A5%E8%92%B8%E9%A6%8F%E6%A6%82%E5%BF%B5%E8%87%AA%E5%8A%A8%E7%94%9F%E6%88%90%E6%8E%A9%E8%94%BD-Glenn/" class="article-date">
+	  <time datetime="2023-05-12T10:44:13.000Z" itemprop="datePublished">2023-05-12</time>
+	</a>
+</span>
+        
+  <span class="article-category">
+    <i class="icon icon-folder"></i>
+    <a class="article-category-link" href="/categories/%E8%AE%BA%E6%96%87%E9%80%9F%E8%A7%88/">论文速览</a>
+  </span>
+
+        
+  <span class="article-tag">
+    <i class="icon icon-tags"></i>
+	<a class="article-tag-link-link" href="/tags/Masked-Image-Modeling/" rel="tag">Masked Image Modeling</a>
+  </span>
+
+
+        
+
+        <span class="post-comment"><i class="icon icon-comment"></i> <a href="/2023/05/12/Masked_Image_Model/MIM-HPM%E5%BC%95%E5%85%A5%E8%92%B8%E9%A6%8F%E6%A6%82%E5%BF%B5%E8%87%AA%E5%8A%A8%E7%94%9F%E6%88%90%E6%8E%A9%E8%94%BD-Glenn/#comments" class="article-comment-link">评论</a></span>
+        
+      </div>
+    </div>
+    <div class="article-entry marked-body" itemprop="articleBody">
+      
+        <p><img src="/2023/05/12/Masked_Image_Model/MIM-HPM%E5%BC%95%E5%85%A5%E8%92%B8%E9%A6%8F%E6%A6%82%E5%BF%B5%E8%87%AA%E5%8A%A8%E7%94%9F%E6%88%90%E6%8E%A9%E8%94%BD-Glenn/v2-0deff8109c694394c9df324f9153ac73_r.jpg"></p>
+<blockquote>
+<p><em><strong>题目：</strong>Hard Patches Mining for Masked Image Modeling</em><br><em><strong>单位：</strong>中国科学院、旷视、中国科学院大学</em><br><em><strong>论文网址：</strong></em><a href="https://link.zhihu.com/?target=https://arxiv.org/abs/2304.05919">https://arxiv.org/abs/2304.05919</a><br><em><strong>论文代码：</strong></em> <a href="https://link.zhihu.com/?target=https://github.com/Haochen-Wang409/HPM">https://github.com/Haochen-Wang409/HPM</a><br><em><strong>首次发布时间：</strong>2023 年 4 月 12 日（收录于 CVPR 2023）</em></p>
+</blockquote>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">@article&#123;wang2023hard,</span><br><span class="line">  title=&#123;Hard Patches Mining for Masked Image Modeling&#125;,</span><br><span class="line">  author=&#123;Wang, Haochen and Song, Kaiyou and Fan, Junsong and Wang, Yuxi and Xie, Jin and Zhang, Zhaoxiang&#125;,</span><br><span class="line">  journal=&#123;arXiv preprint arXiv:2304.05919&#125;,</span><br><span class="line">  year=&#123;2023&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+<hr>
+<h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>“Learning Where to Mask”目前是 MIM 中改进掩蔽策略的主流方向之一，它分为人工选定和自动生成。</p>
+<p>人工选定：事先就决定好掩蔽策略，例如：</p>
+<ul>
+<li>PixMIM 认为，掩蔽较多的前景 patches 会阻碍模型有效捕获形状和语义先验的能力，从而限制了表征的质量，因此 PixMIM 使用了可以保留最大的前景覆盖率的 Simple Resized Crop + 75% 掩蔽策略。</li>
+</ul>
+<p>自动生成：由模型训练来得到合适的掩蔽策略，例如：</p>
+<ul>
+<li>而 AutoMAE 认为，掩蔽策略是一个 trade-off 的问题，前景掩蔽率越高，通过掩蔽图像建模获得的信息越多，但同时解码器的重建难度也越高。对此，AutoMAE 将生成对抗网络引入 MIM 来搭建一个完全可微的框架。</li>
+</ul>
+<p>而本文介绍的 HPM 从改进掩蔽策略的角度，引入蒸馏概念来自动生成合适的掩蔽策略。</p>
+<blockquote>
+<p>原文作者对本文的介绍：</p>
+</blockquote>
+<hr>
+<ol>
+<li>主要内容</li>
+</ol>
+<hr>
+<p>传统的 MIM 方法通常需要先<strong>人工给定</strong>掩蔽策略，比如 MAE 的随机掩蔽，BeiT 的逐块掩蔽等，目的是构造具有挑战性的重建任务。</p>
+<p>这个过程我们可以认为是在<strong>训练学生（即模型）解决给定任务（即预测掩蔽 patches）</strong>，如图 1(a) 所示。</p>
+<p>但如果预先给定了掩蔽策略，就无法控制重建任务的困难程度。</p>
+<p>为此，本文提出了 Hard Patches Mining（HPM），一个全新的 MIM 框架，通过让模型学习自己“出题”的能力，使其可以同时站在学生和教师的立场上，被迫对图像内容有更全面的理解，从而通过生成更理想的重建任务来引导自己，如图 1(b) 所示。</p>
+<p>具体来说，就是将 MIM 中人工给定掩蔽策略改为自动生成掩蔽策略，而生成的原则是让重建任务更具备挑战性（困难）。</p>
+<p>那么，如何让模型自己选取需要掩蔽的 patches，以使得重建任务更困难呢？</p>
+<p>我们可以用重建损失来量化重建任务的困难程度，一般来说，重建损失越大，表示重建任务越困难，则对应的掩蔽策略就是我们需要的。</p>
+<p>因此，作者引入了一个辅助的损失 predictor，用以预测每个 patch 的重建损失。并提出了一个 Easy-to-Hard 的掩蔽策略生成方法。</p>
+<h2 id="图1-传统的-MIM-预训练范式与本文提出的-HPM-之间的比较。-a-传统的方法可以理解为训练学生（即模型）解决给定任务（即预测掩蔽-patches）；b-本文提出的-HPM-预训练范式使该模型既是教师又是学生，通过自适应调整掩蔽策略来产生一个具有挑战性的重建任务。2-分析"><a href="#图1-传统的-MIM-预训练范式与本文提出的-HPM-之间的比较。-a-传统的方法可以理解为训练学生（即模型）解决给定任务（即预测掩蔽-patches）；b-本文提出的-HPM-预训练范式使该模型既是教师又是学生，通过自适应调整掩蔽策略来产生一个具有挑战性的重建任务。2-分析" class="headerlink" title="图1. 传统的 MIM 预训练范式与本文提出的 HPM 之间的比较。(a) 传统的方法可以理解为训练学生（即模型）解决给定任务（即预测掩蔽 patches）；b) 本文提出的 HPM 预训练范式使该模型既是教师又是学生，通过自适应调整掩蔽策略来产生一个具有挑战性的重建任务。2. 分析"></a><img src="/2023/05/12/Masked_Image_Model/MIM-HPM%E5%BC%95%E5%85%A5%E8%92%B8%E9%A6%8F%E6%A6%82%E5%BF%B5%E8%87%AA%E5%8A%A8%E7%94%9F%E6%88%90%E6%8E%A9%E8%94%BD-Glenn/v2-2f45314ac507b4bfe0997f74d7463918_r.jpg"><br>图1. 传统的 MIM 预训练范式与本文提出的 HPM 之间的比较。(a) 传统的方法可以理解为训练学生（即模型）解决给定任务（即预测掩蔽 patches）；b) 本文提出的 HPM 预训练范式使该模型既是教师又是学生，通过自适应调整掩蔽策略来产生一个具有挑战性的重建任务。<br>2. 分析</h2><p>1600 个 epoch 预训练的 MAE 作为 MIM 模型，使用超过 10 种不同掩蔽策略产生的平均 patch 级重建损失来可视化每个 patch 重建的困难程度，如图 2 每组的前两张图片所示。</p>
+<p>我们可以发现，通常图像的前景区域更难重建（拥有更大的重建损失）。</p>
+<p>作者提出一个重建损失预测器，用以预测每个 patch 的重建损失。如图 2 每组的后两张图片，使用 200 个 epoch 预训练过的 ViT-B 来验证该预测器的有效性。</p>
+<p>可以看出，具有较大预测损失的 patches 往往是有判别性的（前景几乎被屏蔽），因此屏蔽这些 patches 会使得重建任务更具有挑战性。</p>
+<h2 id="图2-验证实验。每组第一张：输入图像；第二张：超过-10-种不同掩蔽策略的平均-Patch-级重建损失可视化；第三张：重建损失预测器预测的重建损失可视化；第四张：根据预测的重建损失选择掩蔽的-patches（例如，预测的重建损失达到-top-75-的-patches-被掩蔽）3-方法（参考原文作者对本文的介绍）"><a href="#图2-验证实验。每组第一张：输入图像；第二张：超过-10-种不同掩蔽策略的平均-Patch-级重建损失可视化；第三张：重建损失预测器预测的重建损失可视化；第四张：根据预测的重建损失选择掩蔽的-patches（例如，预测的重建损失达到-top-75-的-patches-被掩蔽）3-方法（参考原文作者对本文的介绍）" class="headerlink" title="图2. 验证实验。每组第一张：输入图像；第二张：超过 10 种不同掩蔽策略的平均 Patch 级重建损失可视化；第三张：重建损失预测器预测的重建损失可视化；第四张：根据预测的重建损失选择掩蔽的 patches（例如，预测的重建损失达到 top-75% 的 patches 被掩蔽）3. 方法（参考原文作者对本文的介绍）"></a><img src="/2023/05/12/Masked_Image_Model/MIM-HPM%E5%BC%95%E5%85%A5%E8%92%B8%E9%A6%8F%E6%A6%82%E5%BF%B5%E8%87%AA%E5%8A%A8%E7%94%9F%E6%88%90%E6%8E%A9%E8%94%BD-Glenn/v2-f15927aa53bb967c63e39d4dbf54e2e7_r.jpg"><br>图2. 验证实验。每组第一张：输入图像；第二张：超过 10 种不同掩蔽策略的平均 Patch 级重建损失可视化；第三张：重建损失预测器预测的重建损失可视化；第四张：根据预测的重建损失选择掩蔽的 patches（例如，预测的重建损失达到 top-75% 的 patches 被掩蔽）<br>3. 方法（参考原文作者对本文的介绍）</h2><p>HPM 由一个学生模型（ f_{θ_s} 、 d_{\phi_s} 和 d_{ψ_s} ）和一个教师模型（ f_{θ_t} 、 d_{\phi_t} 和 d_{ψ_t} ）组成。两个模型使用相同的网络结构。</p>
+<p>其中 f_θ(\cdot) 、 f_\phi(\cdot) 和 d_ψ(\cdot) 分别是编码器、解码器和预测器。</p>
+<p>为了使得结果尽可能一致，教师模型的参数将由学生模型指数平滑更新而来。</p>
+<p>在每次预训练迭代中，将划分成 patches 的图像 x \in \mathbb R^{H×(P^2C)} 输入至教师网络，得到每个 patch 预测的重建损失 \hat {\mathcal L}^t&#x3D;d_{\psi_t}(f_{\theta_t}(x)) 。</p>
+<p>基于 \hat {\mathcal L}^t ，使用 Easy-to-Hard 的掩蔽策略生成方法来产生掩蔽图像 M\in \left{0,1\right}^N ，用于学生模型的重建任务。</p>
+<p>学生模型的损失函数为真实重建任务和预测任务的损失之和：</p>
+<p>\mathcal L &#x3D; \mathcal L_{rec} +\mathcal L_{pred} </p>
+<p>其中，  \mathcal L_{rec} 就是传统的 MIM 重建损失：</p>
+<p>\mathcal L_{rec}&#x3D;\mathcal M(d_{\phi_s}(f_{\theta_s}(x\odot M)),(x\odot(1-M)))) </p>
+<p>\mathcal M(\cdot,\cdot) 表示某种度量函数。</p>
+<p><img src="/2023/05/12/Masked_Image_Model/MIM-HPM%E5%BC%95%E5%85%A5%E8%92%B8%E9%A6%8F%E6%A6%82%E5%BF%B5%E8%87%AA%E5%8A%A8%E7%94%9F%E6%88%90%E6%8E%A9%E8%94%BD-Glenn/v2-3f542d018bc6c669b6ea0c48e6436f38_r.jpg"><br>图3. HPM 框架</p>
+<h3 id="3-1-重建损失预测器"><a href="#3-1-重建损失预测器" class="headerlink" title="3.1 重建损失预测器"></a>3.1 重建损失预测器</h3><p>为了使得重建损失预测器得到的损失预测值，与真实的重建损失尽可能一致，一种简单的方法就是，直接最小化真实重建损失 \mathcal{L}_{\mathrm{rec}} 和损失预测值 \hat{\mathcal L}&#x3D;d_{\psi_s}(f_{\theta_s} (\mathbf{x} \odot \mathbf{M})) 之间的均方误差（MSE），即：</p>
+<p>\mathcal{L}_{\mathrm{pred}} &#x3D; \left( d_{\psi_s}(f_{\theta_s} (\mathbf{x} \odot \mathbf{M})) - \mathcal{L}_{\mathrm{rec}} \right)^2 \odot (1 - \mathbf{M})</p>
+<p>这里的 \mathcal{L}_{\mathrm{rec}}  梯度已停止更新，作为预测损失 \hat{\mathcal L} 的金标准。</p>
+<p>然而，我们的目标是确定图像中的困难 patches，因此我们需要学习 patches 之间的相对关系。而 MSE 关注的是预测损失值和真实损失值之间的绝对差异。在训练过程中，真实重建损失 \mathcal{L}_{\mathrm{rec}} 会随着训练的进行而减少，损失预测器可能更关注于损失值的准确性，而不是提取不同patches之间的相对困难程度。</p>
+<p>为此，作者提出了一种基于二元交叉熵的相对损失作为替代方案。</p>
+<p>具体来说，给定一张含有 N  个 patch 的图片，其真实的重建损失为 \mathcal{L}_{\mathrm{rec}} \in \mathbb{R}^N，我们的目的是预测这 N 个 patch 之间重建损失的相对大小，即 \texttt{argsort}(\mathcal{L}_{\mathrm{rec}}) 。然而， \texttt{argsort}(\cdot) 并不可导，作者将问题转化为了预测两两 patches 之间的大小关系。</p>
+<p>\begin{aligned} \mathcal{L}_{\mathrm{pred}} &#x3D; -\sum_{i&#x3D;1}^N \sum_{j&#x3D;1 \atop j\neq i}^N \mathbb{I}^{+}_{ij} \log \left( \sigma(\hat{\mathcal{L}}^s_i - \hat{\mathcal{L}}^s_j) \right) -\sum_{i&#x3D;1}^N \sum_{j&#x3D;1 \atop j\neq i}^N \mathbb{I}^{-}_{ij} \log \left( 1 - \sigma(\hat{\mathcal{L}}^s_i - \hat{\mathcal{L}}^s_j) \right), \end{aligned}</p>
+<p>其中 \hat{\mathcal{L}}^s &#x3D; d_{\psi_s}(f_{\theta_s}(\mathbf{x} \odot \mathbf{M})) \in \mathbb{R}^N 表示的是学生模型输出的损失预测值，而 i, j&#x3D;1,2,\dots,N 是 patch indexes。 \sigma(\cdot) 是 \texttt{sigmoid} 函数，即 \sigma(z) &#x3D; e^z &#x2F; (e^z + 1) 。 \mathbb{I}^{+}_{ij} 和 \mathbb{I}^{-}_{ij} 是两个指示函数，表示 patch i 和 patch j 的真实重建损失大小，定义如下：</p>
+<p>\mathbb{I}^{+}_{ij} &#x3D; \left{ \begin{aligned} &amp;1, &amp;&amp;\mathcal{L}_{\mathrm{rec}}(i) &gt; \mathcal{L}_{\mathrm{rec}}(j) \mathrm{\ and\ } \mathbf{M}_i&#x3D;\mathbf{M}_j&#x3D;0, \ &amp;0, &amp;&amp;\mathrm{otherwise}, \end{aligned} \right.</p>
+<p>\mathbb{I}^{-}_{ij} &#x3D; \left{ \begin{aligned} &amp;1, &amp;&amp;\mathcal{L}_{\mathrm{rec}}(i) &lt; \mathcal{L}_{\mathrm{rec}}(j) \mathrm{\ and\ } \mathbf{M}_i&#x3D;\mathbf{M}_j&#x3D;0, \ &amp;0, &amp;&amp;\mathrm{otherwise}, \end{aligned} \right.</p>
+<p>其中 \mathbf{M}_i&#x3D;\mathbf{M}_j&#x3D;0 表示的是 patch i 和 patch j 都应当是被掩蔽的。</p>
+<h3 id="3-2-Easy-to-Hard-掩蔽策略生成方法"><a href="#3-2-Easy-to-Hard-掩蔽策略生成方法" class="headerlink" title="3.2 Easy-to-Hard 掩蔽策略生成方法"></a>3.2 <strong>Easy-to-Hard</strong> 掩蔽策略生成方法</h3><p>最简单的方式就是图 2 介绍的，直接将预测的重建损失 \texttt{argsort}(\hat{\mathcal L}^t)&#x3D;\texttt{argsort}[d_{\psi_t}(f_{\theta_t} (\mathbf{x}))] 达到 top-75% 的 patches 掩蔽掉。</p>
+<p>然而，在早期训练阶段，学习到的特征表示容易被丰富的纹理所淹没，这意味着，此时，大的预测重建损失不等同于该 patch 就难以判别。</p>
+<p>为此，作者提出了一种 Easy-to-Hard的掩蔽策略生成方法，提供一些合理的提示，引导模型逐步重建困难 patches。</p>
+<p>具体来说，对于第 t 轮 epoch，由 \texttt{argsort}(\hat{\mathcal L}^t) 决定的 \alpha_t \cdot \gamma N 个 patches 被掩蔽掉，然后剩余的 1-\alpha_t \cdot \gamma N  个 patches 被保留， \gamma 表示 mask radio， N 表示 patches 总数。而 \alpha_t 被定义为：</p>
+<p>\alpha_t&#x3D;\alpha_0+\frac{t}{T}(\alpha_T-\alpha_0) </p>
+<p>其中， T 表示 epoch 的总轮数， \alpha_0,\alpha_T\in[0,1] 是可调的超参数。</p>
+<p>也就是说， \alpha_t 随着 epoch 轮数的增加，会以线性方式从 \alpha_0 增加到 \alpha_T 。</p>
+<p>这就相当于，随着 epoch 轮数的增加，重建任务由简单到困难。</p>
+<p>整个训练过程的伪代码如图 4 所示：</p>
+<h2 id="图4-HPM-预训练伪代码4-结果"><a href="#图4-HPM-预训练伪代码4-结果" class="headerlink" title="图4. HPM 预训练伪代码4. 结果"></a><img src="/2023/05/12/Masked_Image_Model/MIM-HPM%E5%BC%95%E5%85%A5%E8%92%B8%E9%A6%8F%E6%A6%82%E5%BF%B5%E8%87%AA%E5%8A%A8%E7%94%9F%E6%88%90%E6%8E%A9%E8%94%BD-Glenn/v2-23fa5129f836f507581b4818124fb3c2_r.jpg"><br>图4. HPM 预训练伪代码<br>4. 结果</h2><p><img src="/2023/05/12/Masked_Image_Model/MIM-HPM%E5%BC%95%E5%85%A5%E8%92%B8%E9%A6%8F%E6%A6%82%E5%BF%B5%E8%87%AA%E5%8A%A8%E7%94%9F%E6%88%90%E6%8E%A9%E8%94%BD-Glenn/v2-d67f596bef993a6afabf102037fdeadb_r.jpg"><br>表1. 对不同重建目标的消融实验。<br><img src="/2023/05/12/Masked_Image_Model/MIM-HPM%E5%BC%95%E5%85%A5%E8%92%B8%E9%A6%8F%E6%A6%82%E5%BF%B5%E8%87%AA%E5%8A%A8%E7%94%9F%E6%88%90%E6%8E%A9%E8%94%BD-Glenn/v2-863c1b2ad2e2e6d2e90e507387ad6ef7_r.jpg"><br>表2. 不同掩蔽策略的消融实验。研究了不同的 α_0、α_T 和 γ 的影响。α_T 较大表示重建任务难度越大。<br><img src="/2023/05/12/Masked_Image_Model/MIM-HPM%E5%BC%95%E5%85%A5%E8%92%B8%E9%A6%8F%E6%A6%82%E5%BF%B5%E8%87%AA%E5%8A%A8%E7%94%9F%E6%88%90%E6%8E%A9%E8%94%BD-Glenn/v2-43e69cbf631a8198b22098c1b3ba534f_r.jpg"><br>表3. 不同掩蔽策略的消融研究。研究了 argmax(·) 对重建损失预测值和“easy-to-hard”方式的有效性。argmin(·) 表示掩蔽简单 patches。<br><img src="/2023/05/12/Masked_Image_Model/MIM-HPM%E5%BC%95%E5%85%A5%E8%92%B8%E9%A6%8F%E6%A6%82%E5%BF%B5%E8%87%AA%E5%8A%A8%E7%94%9F%E6%88%90%E6%8E%A9%E8%94%BD-Glenn/v2-35bc1af65c2ff76a0786bfa7117db56e_r.jpg"><br>表4. 损失预测公式的消融实验。<br><img src="/2023/05/12/Masked_Image_Model/MIM-HPM%E5%BC%95%E5%85%A5%E8%92%B8%E9%A6%8F%E6%A6%82%E5%BF%B5%E8%87%AA%E5%8A%A8%E7%94%9F%E6%88%90%E6%8E%A9%E8%94%BD-Glenn/v2-ae1df39df3f04c6b415de4973434c2cb_r.jpg"><br>表5. 在下游任务上的性能<br><img src="/2023/05/12/Masked_Image_Model/MIM-HPM%E5%BC%95%E5%85%A5%E8%92%B8%E9%A6%8F%E6%A6%82%E5%BF%B5%E8%87%AA%E5%8A%A8%E7%94%9F%E6%88%90%E6%8E%A9%E8%94%BD-Glenn/v2-fcdb7a7f6d91b053a91da2d4c95f1f76_r.jpg"><br>表6. 与 ImageNet-1K 分类任务上 SOTA 模型的比较。<br><img src="/2023/05/12/Masked_Image_Model/MIM-HPM%E5%BC%95%E5%85%A5%E8%92%B8%E9%A6%8F%E6%A6%82%E5%BF%B5%E8%87%AA%E5%8A%A8%E7%94%9F%E6%88%90%E6%8E%A9%E8%94%BD-Glenn/v2-5d466361e3e092368572fe3ecb2a8002_r.jpg"><br>表7. 与 ADE20k 语义分割任务上 SOTA 模型的比较。</p>
+
+      
+    </div>
+    <div class="article-footer">
+      <blockquote class="mt-2x">
+  <ul class="post-copyright list-unstyled">
+    
+    <li class="post-copyright-link hidden-xs">
+      <strong>本文链接：</strong>
+      <a href="http://glennchen.cn/2023/05/12/Masked_Image_Model/MIM-HPM%E5%BC%95%E5%85%A5%E8%92%B8%E9%A6%8F%E6%A6%82%E5%BF%B5%E8%87%AA%E5%8A%A8%E7%94%9F%E6%88%90%E6%8E%A9%E8%94%BD-Glenn/" title="MIM | HPM：引入蒸馏概念自动生成掩蔽策略" target="_blank" rel="external">http://glennchen.cn/2023/05/12/Masked_Image_Model/MIM-HPM引入蒸馏概念自动生成掩蔽-Glenn/</a>
+    </li>
+    
+    <li class="post-copyright-license">
+      <strong>版权声明： </strong> 本博客所有文章除特别声明外，均采用 <a href="http://creativecommons.org/licenses/by/4.0/deed.zh" target="_blank" rel="external">CC BY 4.0 CN协议</a> 许可协议。转载请注明出处！
+    </li>
+  </ul>
+</blockquote>
+
+
+<div class="panel panel-default panel-badger">
+  <div class="panel-body">
+    <figure class="media">
+      <div class="media-left">
+        <a href="https://github.com/chenluda" target="_blank" class="img-burn thumb-sm visible-lg">
+          <img src="/images/avatar.png" class="img-rounded w-full" alt="">
+        </a>
+      </div>
+      <div class="media-body">
+        <h3 class="media-heading"><a href="https://github.com/chenluda" target="_blank"><span class="text-dark">Glenn</span><small class="ml-1x">Stay hungry, stay foolish.</small></a></h3>
+        <div>咖啡，健身，热爱生活。</div>
+      </div>
+    </figure>
+  </div>
+</div>
+
+
+    </div>
+  </article>
+  
+    
+  <section id="comments">
+  	
+      <div id="vcomments"></div>
+    
+  </section>
+
+
+  
+</div>
+
+  <nav class="bar bar-footer clearfix" data-stick-bottom>
+  <div class="bar-inner">
+  
+  <ul class="pager pull-left">
+    
+    <li class="prev">
+      <a href="/2023/05/12/Masked_Image_Model/MIM-Img2Vec%E5%9F%BA%E4%BA%8E-token-Glenn/" title="MIM | Img2Vec：基于 token 多样性原则选择教师模型"><i class="icon icon-angle-left" aria-hidden="true"></i><span>&nbsp;&nbsp;上一篇</span></a>
+    </li>
+    
+    
+    <li class="next">
+      <a href="/2023/05/12/Masked_Image_Model/MIM-FreMAE%E5%9F%BA%E4%BA%8E%E5%82%85%E9%87%8C%E5%8F%B6%E5%8F%98%E6%8D%A2%E7%9A%84-Glenn/" title="MIM | FreMAE：基于傅里叶变换的 MIM 用于医学图像分割"><span>下一篇&nbsp;&nbsp;</span><i class="icon icon-angle-right" aria-hidden="true"></i></a>
+    </li>
+    
+    
+  </ul>
+  
+  
+  
+  <div class="bar-right">
+    
+    <div class="share-component" data-sites="weibo,qq,wechat,facebook,twitter" data-mobile-sites="weibo,qq,qzone"></div>
+    
+  </div>
+  </div>
+</nav>
+  
+
+
+</main>
+
+  <footer class="footer" itemscope itemtype="http://schema.org/WPFooter">
+	
+	
+    <ul class="social-links">
+    	
+        <li><a href="https://github.com/chenluda" target="_blank" title="Github" data-toggle=tooltip data-placement=top><i class="icon icon-github"></i></a></li>
+        
+        <li><a href="https://www.zhihu.com/people/Glenn" target="_blank" title="Zhihu" data-toggle=tooltip data-placement=top><i class="icon icon-zhihu"></i></a></li>
+        
+    </ul>
+
+    <div class="copyright">
+    	
+        <div class="publishby">
+        	Theme by <a href="https://github.com/cofess" target="_blank"> cofess </a>base on <a href="https://github.com/cofess/hexo-theme-pure" target="_blank">pure</a>.
+        </div>
+    </div>
+</footer>
+  <script src="//cdn.jsdelivr.net/npm/jquery@1.12.4/dist/jquery.min.js"></script>
+<script>
+window.jQuery || document.write('<script src="js/jquery.min.js"><\/script>')
+</script>
+
+<script src="/js/plugin.min.js"></script>
+
+
+<script src="/js/application.js"></script>
+
+
+    <script>
+(function (window) {
+    var INSIGHT_CONFIG = {
+        TRANSLATION: {
+            POSTS: '文章',
+            PAGES: '页面',
+            CATEGORIES: '分类',
+            TAGS: '标签',
+            UNTITLED: '(未命名)',
+        },
+        ROOT_URL: '/',
+        CONTENT_URL: '/content.json',
+    };
+    window.INSIGHT_CONFIG = INSIGHT_CONFIG;
+})(window);
+</script>
+
+<script src="/js/insight.js"></script>
+
+
+
+
+
+
+   
+
+
+
+
+   
+    
+  <script src="//cdn1.lncld.net/static/js/3.0.4/av-min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/valine"></script>
+  <script type="text/javascript">
+  var GUEST = ['nick', 'mail', 'link'];
+  var meta = 'nick,mail,link';
+  meta = meta.split(',').filter(function(item) {
+    return GUEST.indexOf(item) > -1;
+  });
+  new Valine({
+    el: '#vcomments',
+    verify: false,
+    notify: false,
+    appId: '',
+    appKey: '',
+    placeholder: 'Just go go',
+    avatar: 'mm',
+    meta: meta,
+    pageSize: '10' || 10,
+    visitor: false
+  });
+  </script>
+
+     
+
+
+
+
+
+
+
+</body>
+</html>

@@ -1,0 +1,611 @@
+<!DOCTYPE html>
+<html lang=zh>
+<head>
+  <meta charset="utf-8">
+  
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=no, minimal-ui">
+  <meta name="renderer" content="webkit">
+  <meta http-equiv="Cache-Control" content="no-transform" />
+  <meta http-equiv="Cache-Control" content="no-siteapp" />
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black">
+  <meta name="format-detection" content="telephone=no,email=no,adress=no">
+  <!-- Color theme for statusbar -->
+  <meta name="theme-color" content="#000000" />
+  <!-- 强制页面在当前窗口以独立页面显示,防止别人在框架里调用页面 -->
+  <meta http-equiv="window-target" content="_top" />
+  
+  
+  <title>MIM | DPPMask：可以保留具有代表性 patches 的掩蔽策略 | Hexo</title>
+  <meta name="description" content="题目：DPPMask: Masked Image Modeling with Determinantal Point Processes单位：中国科学院深圳先进技术研究院、中国科学院大学、之江实验室、香港中文大学论文网址：https:&#x2F;&#x2F;arxiv.org&#x2F;abs&#x2F;2303.12736论文代码：未公开首次发布时间：2023 年 3 月 13 日（2023 年 3 月 25 日 v2 版本上传）">
+<meta property="og:type" content="article">
+<meta property="og:title" content="MIM | DPPMask：可以保留具有代表性 patches 的掩蔽策略">
+<meta property="og:url" content="http://glennchen.cn/2023/05/12/Masked_Image_Model/MIM-DPPMask%E5%8F%AF%E4%BB%A5%E4%BF%9D%E7%95%99%E5%85%B7%E6%9C%89%E4%BB%A3%E8%A1%A8-Glenn/index.html">
+<meta property="og:site_name" content="Glenn">
+<meta property="og:description" content="题目：DPPMask: Masked Image Modeling with Determinantal Point Processes单位：中国科学院深圳先进技术研究院、中国科学院大学、之江实验室、香港中文大学论文网址：https:&#x2F;&#x2F;arxiv.org&#x2F;abs&#x2F;2303.12736论文代码：未公开首次发布时间：2023 年 3 月 13 日（2023 年 3 月 25 日 v2 版本上传）">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://glennchen.cn/2023/05/12/Masked_Image_Model/MIM-DPPMask%E5%8F%AF%E4%BB%A5%E4%BF%9D%E7%95%99%E5%85%B7%E6%9C%89%E4%BB%A3%E8%A1%A8-Glenn/v2-9dd9cfdc375cabbb5b05c0b791eedea8_r.jpg">
+<meta property="og:image" content="http://glennchen.cn/2023/05/12/Masked_Image_Model/MIM-DPPMask%E5%8F%AF%E4%BB%A5%E4%BF%9D%E7%95%99%E5%85%B7%E6%9C%89%E4%BB%A3%E8%A1%A8-Glenn/v2-f26c9dd6f4a0a0342a38a82a8c8d6371_r.jpg">
+<meta property="og:image" content="http://glennchen.cn/2023/05/12/Masked_Image_Model/MIM-DPPMask%E5%8F%AF%E4%BB%A5%E4%BF%9D%E7%95%99%E5%85%B7%E6%9C%89%E4%BB%A3%E8%A1%A8-Glenn/v2-d0fe5f16f8c8060353680b3063137f46_r.jpg">
+<meta property="og:image" content="http://glennchen.cn/2023/05/12/Masked_Image_Model/MIM-DPPMask%E5%8F%AF%E4%BB%A5%E4%BF%9D%E7%95%99%E5%85%B7%E6%9C%89%E4%BB%A3%E8%A1%A8-Glenn/v2-2295d39f5ecdcf7a7fd224e873f290f3_r.jpg">
+<meta property="og:image" content="http://glennchen.cn/2023/05/12/Masked_Image_Model/MIM-DPPMask%E5%8F%AF%E4%BB%A5%E4%BF%9D%E7%95%99%E5%85%B7%E6%9C%89%E4%BB%A3%E8%A1%A8-Glenn/v2-8915d3afaeeb55cd53e593260664b609_r.jpg">
+<meta property="og:image" content="http://glennchen.cn/2023/05/12/Masked_Image_Model/MIM-DPPMask%E5%8F%AF%E4%BB%A5%E4%BF%9D%E7%95%99%E5%85%B7%E6%9C%89%E4%BB%A3%E8%A1%A8-Glenn/v2-6e60a502568aaa2b4304208689ece1d3_r.jpg">
+<meta property="og:image" content="http://glennchen.cn/2023/05/12/Masked_Image_Model/MIM-DPPMask%E5%8F%AF%E4%BB%A5%E4%BF%9D%E7%95%99%E5%85%B7%E6%9C%89%E4%BB%A3%E8%A1%A8-Glenn/v2-88d7fd12b0d7a6c31045dd9eafd932d2_r.jpg">
+<meta property="og:image" content="http://glennchen.cn/2023/05/12/Masked_Image_Model/MIM-DPPMask%E5%8F%AF%E4%BB%A5%E4%BF%9D%E7%95%99%E5%85%B7%E6%9C%89%E4%BB%A3%E8%A1%A8-Glenn/v2-d56a8279915bab70cc0003787dff8f5c_r.jpg">
+<meta property="og:image" content="http://glennchen.cn/2023/05/12/Masked_Image_Model/MIM-DPPMask%E5%8F%AF%E4%BB%A5%E4%BF%9D%E7%95%99%E5%85%B7%E6%9C%89%E4%BB%A3%E8%A1%A8-Glenn/v2-921f57b26338f3dccd8724420d858494_r.jpg">
+<meta property="og:image" content="http://glennchen.cn/2023/05/12/Masked_Image_Model/MIM-DPPMask%E5%8F%AF%E4%BB%A5%E4%BF%9D%E7%95%99%E5%85%B7%E6%9C%89%E4%BB%A3%E8%A1%A8-Glenn/v2-2fee8ddf57e1c532c13b9142d9ac341a_r.jpg">
+<meta property="og:image" content="http://glennchen.cn/2023/05/12/Masked_Image_Model/MIM-DPPMask%E5%8F%AF%E4%BB%A5%E4%BF%9D%E7%95%99%E5%85%B7%E6%9C%89%E4%BB%A3%E8%A1%A8-Glenn/v2-f5e09cc37e1ffaead7e8d37a0e6378ed_r.jpg">
+<meta property="og:image" content="http://glennchen.cn/2023/05/12/Masked_Image_Model/MIM-DPPMask%E5%8F%AF%E4%BB%A5%E4%BF%9D%E7%95%99%E5%85%B7%E6%9C%89%E4%BB%A3%E8%A1%A8-Glenn/v2-2cdb40ac22914e7aba3726a8e9dd8224_r.jpg">
+<meta property="article:published_time" content="2023-05-12T10:43:54.000Z">
+<meta property="article:modified_time" content="2023-05-12T12:16:50.365Z">
+<meta property="article:author" content="Glenn">
+<meta property="article:tag" content="Masked Image Modeling">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://glennchen.cn/2023/05/12/Masked_Image_Model/MIM-DPPMask%E5%8F%AF%E4%BB%A5%E4%BF%9D%E7%95%99%E5%85%B7%E6%9C%89%E4%BB%A3%E8%A1%A8-Glenn/v2-9dd9cfdc375cabbb5b05c0b791eedea8_r.jpg">
+  <!-- Canonical links -->
+  <link rel="canonical" href="http://glennchen.cn/2023/05/12/Masked_Image_Model/MIM-DPPMask%E5%8F%AF%E4%BB%A5%E4%BF%9D%E7%95%99%E5%85%B7%E6%9C%89%E4%BB%A3%E8%A1%A8-Glenn/index.html">
+  
+    <link rel="alternate" href="/atom.xml" title="Glenn" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="/favicon.png" type="image/x-icon">
+  
+  
+<link rel="stylesheet" href="/css/style.css">
+
+  
+  
+  
+  
+<!-- hexo injector head_end start -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/katex.min.css">
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/hexo-math@4.0.0/dist/style.css">
+<!-- hexo injector head_end end --><meta name="generator" content="Hexo 6.3.0"></head>
+
+
+<body class="main-center theme-black" itemscope itemtype="http://schema.org/WebPage">
+  <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+  <div class="slimContent">
+    <div class="navbar-header">
+      
+      
+      <div class="profile-block text-center">
+        <a id="avatar" href="https://github.com/chenluda" target="_blank">
+          <img class="img-circle img-rotate" src="/images/avatar.png" width="200" height="200">
+        </a>
+        <h2 id="name" class="hidden-xs hidden-sm">Glenn</h2>
+        <h3 id="title" class="hidden-xs hidden-sm hidden-md">Stay hungry, stay foolish.</h3>
+        <small id="location" class="text-muted hidden-xs hidden-sm"><i class="icon icon-map-marker"></i> Yunnan, China</small>
+      </div>
+      
+      <div class="search" id="search-form-wrap">
+
+    <form class="search-form sidebar-form">
+        <div class="input-group">
+            <input type="text" class="search-form-input form-control" placeholder="搜索" />
+            <span class="input-group-btn">
+                <button type="submit" class="search-form-submit btn btn-flat" onclick="return false;"><i class="icon icon-search"></i></button>
+            </span>
+        </div>
+    </form>
+    <div class="ins-search">
+  <div class="ins-search-mask"></div>
+  <div class="ins-search-container">
+    <div class="ins-input-wrapper">
+      <input type="text" class="ins-search-input" placeholder="想要查找什么..." x-webkit-speech />
+      <button type="button" class="close ins-close ins-selectable" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span></button>
+    </div>
+    <div class="ins-section-wrapper">
+      <div class="ins-section-container"></div>
+    </div>
+  </div>
+</div>
+
+
+</div>
+      <button class="navbar-toggle collapsed" type="button" data-toggle="collapse" data-target="#main-navbar" aria-controls="main-navbar" aria-expanded="false">
+        <span class="sr-only">Toggle navigation</span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+    </div>
+    <nav id="main-navbar" class="collapse navbar-collapse" itemscope itemtype="http://schema.org/SiteNavigationElement" role="navigation">
+      <ul class="nav navbar-nav main-nav ">
+        
+        
+        <li class="menu-item menu-item-home">
+          <a href="/.">
+            
+            <i class="icon icon-home-fill"></i>
+            
+            <span class="menu-title">首页</span>
+          </a>
+        </li>
+        
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives">
+            
+            <i class="icon icon-archives-fill"></i>
+            
+            <span class="menu-title">归档</span>
+          </a>
+        </li>
+        
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories">
+            
+            <i class="icon icon-folder"></i>
+            
+            <span class="menu-title">分类</span>
+          </a>
+        </li>
+        
+      </ul>
+      
+	
+    <ul class="social-links">
+    	
+        <li><a href="https://github.com/chenluda" target="_blank" title="Github" data-toggle=tooltip data-placement=top><i class="icon icon-github"></i></a></li>
+        
+        <li><a href="https://www.zhihu.com/people/Glenn" target="_blank" title="Zhihu" data-toggle=tooltip data-placement=top><i class="icon icon-zhihu"></i></a></li>
+        
+    </ul>
+
+    </nav>
+  </div>
+</header>
+
+  
+    <aside class="sidebar" itemscope itemtype="http://schema.org/WPSideBar">
+  <div class="slimContent">
+    
+      <div class="widget">
+    <h3 class="widget-title">公告</h3>
+    <div class="widget-body">
+        <div id="board">
+            <div class="content">
+                <p>欢迎交流与分享经验!</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+    
+      
+  <div class="widget">
+    <h3 class="widget-title">分类</h3>
+    <div class="widget-body">
+      <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/%E4%BB%A3%E7%A0%81/">代码</a><span class="category-list-count">4</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/%E8%AE%BA%E6%96%87%E9%80%9F%E8%A7%88/">论文速览</a><span class="category-list-count">12</span></li></ul>
+    </div>
+  </div>
+
+
+    
+      
+  <div class="widget">
+    <h3 class="widget-title">标签</h3>
+    <div class="widget-body">
+      <ul class="tag-list" itemprop="keywords"><li class="tag-list-item"><a class="tag-list-link" href="/tags/Conference-paper/" rel="tag">Conference paper</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/DataBase/" rel="tag">DataBase</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Markdown/" rel="tag">Markdown</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Masked-Image-Modeling/" rel="tag">Masked Image Modeling</a><span class="tag-list-count">12</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/OpenReview/" rel="tag">OpenReview</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Organization/" rel="tag">Organization</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/WeChat/" rel="tag">WeChat</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Zhihu/" rel="tag">Zhihu</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/arXiv/" rel="tag">arXiv</a><span class="tag-list-count">2</span></li></ul>
+    </div>
+  </div>
+
+
+    
+      
+  <div class="widget">
+    <h3 class="widget-title">标签云</h3>
+    <div class="widget-body tagcloud">
+      <a href="/tags/Conference-paper/" style="font-size: 13px;">Conference paper</a> <a href="/tags/DataBase/" style="font-size: 13.5px;">DataBase</a> <a href="/tags/Markdown/" style="font-size: 13px;">Markdown</a> <a href="/tags/Masked-Image-Modeling/" style="font-size: 14px;">Masked Image Modeling</a> <a href="/tags/OpenReview/" style="font-size: 13px;">OpenReview</a> <a href="/tags/Organization/" style="font-size: 13px;">Organization</a> <a href="/tags/WeChat/" style="font-size: 13px;">WeChat</a> <a href="/tags/Zhihu/" style="font-size: 13px;">Zhihu</a> <a href="/tags/arXiv/" style="font-size: 13.5px;">arXiv</a>
+    </div>
+  </div>
+
+    
+      
+  <div class="widget">
+    <h3 class="widget-title">归档</h3>
+    <div class="widget-body">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2023/05/">五月 2023</a><span class="archive-list-count">16</span></li></ul>
+    </div>
+  </div>
+
+
+    
+      
+  <div class="widget">
+    <h3 class="widget-title">最新文章</h3>
+    <div class="widget-body">
+      <ul class="recent-post-list list-unstyled no-thumbnail">
+        
+          <li>
+            
+            <div class="item-inner">
+              <p class="item-category">
+                <a class="category-link" href="/categories/%E4%BB%A3%E7%A0%81/">代码</a>
+              </p>
+              <p class="item-title">
+                <a href="/2023/05/12/%E4%BB%A3%E7%A0%81/%E4%BB%A3%E7%A0%81-%E8%8E%B7%E5%8F%96-arXiv-%E8%AE%BA%E6%96%87%E4%BD%9C%E8%80%85%E5%8D%95%E4%BD%8D-Glenn/" class="title">代码 | 获取 arXiv 论文作者单位</a>
+              </p>
+              <p class="item-date">
+                <time datetime="2023-05-12T10:52:40.000Z" itemprop="datePublished">2023-05-12</time>
+              </p>
+            </div>
+          </li>
+          
+          <li>
+            
+            <div class="item-inner">
+              <p class="item-category">
+                <a class="category-link" href="/categories/%E4%BB%A3%E7%A0%81/">代码</a>
+              </p>
+              <p class="item-title">
+                <a href="/2023/05/12/%E4%BB%A3%E7%A0%81/%E4%BB%A3%E7%A0%81-%E6%AF%8F%E5%A4%A9%E5%AE%9A%E7%82%B9%E5%90%91%E5%BE%AE%E4%BF%A1%E6%8E%A8%E9%80%81-arXiv-Glenn/" class="title">代码 | 每天定点向微信推送 arXiv 最新文章</a>
+              </p>
+              <p class="item-date">
+                <time datetime="2023-05-12T10:52:34.000Z" itemprop="datePublished">2023-05-12</time>
+              </p>
+            </div>
+          </li>
+          
+          <li>
+            
+            <div class="item-inner">
+              <p class="item-category">
+                <a class="category-link" href="/categories/%E4%BB%A3%E7%A0%81/">代码</a>
+              </p>
+              <p class="item-title">
+                <a href="/2023/05/12/%E4%BB%A3%E7%A0%81/%E4%BB%A3%E7%A0%81-%E5%B0%86%E7%9F%A5%E4%B9%8E%E4%B8%93%E6%A0%8F%E6%96%87%E7%AB%A0%E8%BD%AC%E6%8D%A2%E4%B8%BA-Markd-Glenn/" class="title">代码 | 将知乎专栏文章转换为 Markdown 文件保存到本地</a>
+              </p>
+              <p class="item-date">
+                <time datetime="2023-05-12T10:52:25.000Z" itemprop="datePublished">2023-05-12</time>
+              </p>
+            </div>
+          </li>
+          
+          <li>
+            
+            <div class="item-inner">
+              <p class="item-category">
+                <a class="category-link" href="/categories/%E4%BB%A3%E7%A0%81/">代码</a>
+              </p>
+              <p class="item-title">
+                <a href="/2023/05/12/%E4%BB%A3%E7%A0%81/%E4%BB%A3%E7%A0%81-%E4%BB%8E-OpenReview-%E8%8E%B7%E5%8F%96%E9%A1%B6-Glenn/" class="title">代码 | 从 OpenReview 获取顶会接收论文集并保存至本地数据库</a>
+              </p>
+              <p class="item-date">
+                <time datetime="2023-05-12T10:52:15.000Z" itemprop="datePublished">2023-05-12</time>
+              </p>
+            </div>
+          </li>
+          
+          <li>
+            
+            <div class="item-inner">
+              <p class="item-category">
+                <a class="category-link" href="/categories/%E8%AE%BA%E6%96%87%E9%80%9F%E8%A7%88/">论文速览</a>
+              </p>
+              <p class="item-title">
+                <a href="/2023/05/12/Masked_Image_Model/MIM-%E7%90%86%E8%AE%BA%E6%8E%A9%E8%94%BD%E5%9B%BE%E5%83%8F%E5%BB%BA%E6%A8%A1%E6%9C%AC%E8%B4%A8%E4%B8%8A%E5%9C%A8%E5%AD%A6%E4%B9%A0%E9%81%AE-Glenn/" class="title">MIM | 理论：掩蔽图像建模本质上在学习遮挡不变特征</a>
+              </p>
+              <p class="item-date">
+                <time datetime="2023-05-12T10:44:48.000Z" itemprop="datePublished">2023-05-12</time>
+              </p>
+            </div>
+          </li>
+          
+      </ul>
+    </div>
+  </div>
+  
+
+    
+  </div>
+</aside>
+
+  
+  
+<main class="main" role="main">
+  <div class="content">
+  <article id="post-Masked_Image_Model/MIM-DPPMask可以保留具有代表-Glenn" class="article article-type-post" itemscope itemtype="http://schema.org/BlogPosting">
+    
+    <div class="article-header">
+      
+        
+  
+    <h1 class="article-title" itemprop="name">
+      MIM | DPPMask：可以保留具有代表性 patches 的掩蔽策略
+    </h1>
+  
+
+      
+      <div class="article-meta">
+        <span class="article-date">
+    <i class="icon icon-calendar-check"></i>
+	<a href="/2023/05/12/Masked_Image_Model/MIM-DPPMask%E5%8F%AF%E4%BB%A5%E4%BF%9D%E7%95%99%E5%85%B7%E6%9C%89%E4%BB%A3%E8%A1%A8-Glenn/" class="article-date">
+	  <time datetime="2023-05-12T10:43:54.000Z" itemprop="datePublished">2023-05-12</time>
+	</a>
+</span>
+        
+  <span class="article-category">
+    <i class="icon icon-folder"></i>
+    <a class="article-category-link" href="/categories/%E8%AE%BA%E6%96%87%E9%80%9F%E8%A7%88/">论文速览</a>
+  </span>
+
+        
+  <span class="article-tag">
+    <i class="icon icon-tags"></i>
+	<a class="article-tag-link-link" href="/tags/Masked-Image-Modeling/" rel="tag">Masked Image Modeling</a>
+  </span>
+
+
+        
+
+        <span class="post-comment"><i class="icon icon-comment"></i> <a href="/2023/05/12/Masked_Image_Model/MIM-DPPMask%E5%8F%AF%E4%BB%A5%E4%BF%9D%E7%95%99%E5%85%B7%E6%9C%89%E4%BB%A3%E8%A1%A8-Glenn/#comments" class="article-comment-link">评论</a></span>
+        
+      </div>
+    </div>
+    <div class="article-entry marked-body" itemprop="articleBody">
+      
+        <p><img src="/2023/05/12/Masked_Image_Model/MIM-DPPMask%E5%8F%AF%E4%BB%A5%E4%BF%9D%E7%95%99%E5%85%B7%E6%9C%89%E4%BB%A3%E8%A1%A8-Glenn/v2-9dd9cfdc375cabbb5b05c0b791eedea8_r.jpg"></p>
+<blockquote>
+<p><em><strong>题目：</strong>DPPMask: Masked Image Modeling with Determinantal Point Processes</em><br><em><strong>单位：</strong>中国科学院深圳先进技术研究院、中国科学院大学、之江实验室、香港中文大学</em><br><em><strong>论文网址：</strong><a href="https://link.zhihu.com/?target=https://arxiv.org/abs/2303.12736">https://arxiv.org/abs/2303.12736</a></em><br><em><strong>论文代码：</strong>未公开</em><br><em><strong>首次发布时间：</strong>2023 年 3 月 13 日（2023 年 3 月 25 日 v2 版本上传）</em></p>
+</blockquote>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">@article&#123;xu2023dppmask,</span><br><span class="line">  title=&#123;DPPMask: Masked Image Modeling with Determinantal Point Processes&#125;,</span><br><span class="line">  author=&#123;Xu, Junde and Lin, Zikai and Zhou, Donghao and Yang, Yaodong and Liao, Xiangyun and Wu, Bian and Chen, Guangyong and Heng, Pheng-ann&#125;,</span><br><span class="line">  journal=&#123;arXiv preprint arXiv:2303.12736&#125;,</span><br><span class="line">  year=&#123;2023&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+<hr>
+<h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>掩蔽策略被证明是 MIM 中较为重要的部分。PixMIM 使用 Simple Resized Crop 代替原始 MAE 使用的 Random Resized Crop，为了保留更多的前景 patch；AutoMAE 更是将生成对抗网络用于优化掩蔽策略。DPPMask 基于行列式点过程 (determinantal point process, DPP)，提出了 DPPMask 的 MIM 掩蔽策略，可以保留更具有代表性 patches。</p>
+<blockquote>
+<p>PixMIM 解读看这里：</p>
+</blockquote>
+<blockquote>
+<p>AutoMAE 解读看这里：</p>
+</blockquote>
+<ol>
+<li>主要内容</li>
+</ol>
+<hr>
+<p>在实际情况中，强制模型重建无法恢复的内容是不合理的。</p>
+<p>考虑一个简单的情况，如图 1 所示。</p>
+<ul>
+<li>图 1 的顶行显示了 MIM 的基本逻辑：成功的重建意味着网络捕捉了正确的语义特征。</li>
+<li>而图 1 的底行则显示了一个失败的情况：如果遮蔽过程恰好遮蔽了原始图像的一个重要语义，如图 1 中的书，则会改变原始图像的语义并使网络难以从其余部分中恢复它。</li>
+</ul>
+<p>在这种情况下，如果继续强制模型重建原始图像，则模型可能会填充遮挡的图像，干扰学习原始特征的过程。此外，随着遮挡率的增加，原始语义信息被扭曲的概率也会增加。</p>
+<p>作者将这种情况称为 <strong>misalignment problem</strong>，即遮蔽图像的语义与原始图像的语义不匹配。因此，misalignment problem 将导致不恰当样本对的对齐，最终会损害下游任务的性能。</p>
+<p><img src="/2023/05/12/Masked_Image_Model/MIM-DPPMask%E5%8F%AF%E4%BB%A5%E4%BF%9D%E7%95%99%E5%85%B7%E6%9C%89%E4%BB%A3%E8%A1%A8-Glenn/v2-f26c9dd6f4a0a0342a38a82a8c8d6371_r.jpg"><br>图1. MIM 中的 misalignment problem 的说明。<br>在对比学习中，InfoMin 原则（What Makes for Good Views for Contrastive Learning?）表明：一个图像的两个增强视图应该保留与任务相关的信息，同时最小化不相关的细微干扰。</p>
+<p>作者认为 MIM 中也应该拥有如下原则：</p>
+<ul>
+<li>所选的可见 patches 应该具有足够的代表性，以覆盖原始图像的整个语义信息。</li>
+<li>掩蔽比应设置为较高水平，以最小化同一图像的不同 masks patches 之间的无关信息共享。</li>
+</ul>
+<p>对此，作者基于行列式点过程 (determinantal point process, DPP)，提出了 DPPMask 的 MIM 掩蔽策略。</p>
+<p>DPP 是一个集合概率模型，它可以从一个底层集合中采样出具有多样性和高质量的子集。在采样过程中，DPP 会计算每个 patch 的距离，并选择与已选子集不相似的 patch。这个过程使得网络集中于具有更多代表性信息的 patch。</p>
+<hr>
+<ol start="2">
+<li><strong>misalignment problem</strong> 分析</li>
+</ol>
+<hr>
+<p><img src="/2023/05/12/Masked_Image_Model/MIM-DPPMask%E5%8F%AF%E4%BB%A5%E4%BF%9D%E7%95%99%E5%85%B7%E6%9C%89%E4%BB%A3%E8%A1%A8-Glenn/v2-d0fe5f16f8c8060353680b3063137f46_r.jpg"><br>图2. (a) 输入图像；(b) 某一个 epoch&#x2F;step 选择的掩蔽图像。<br>MIM 的训练过程中，每个 epoch&#x2F;step 会随机选择不同的掩蔽图像 ，如图 3 Input Space 所示，橙色、绿色、蓝色虚线框分别表示不同 epoch&#x2F;step 选择的掩蔽图像，通过训练网络利用这些掩蔽图像来重建原始图像。</p>
+<p>在重建过程中，网络会根据每个 epoch&#x2F;step 选择的掩蔽图像将学习到的信息构建一个语义空间。如图 3 Semantic Space 所示，假设网络可以根据绿色虚线框选择的掩蔽图像学习到原始图像的语义，则重建的目标可以定为使得网络从不同掩蔽图像学习到的信息尽可能的接近原始图像语义，这是通过最小化语义空间中每个数据点之间的距离来实现的。当错误地聚合了语义偏差的数据点（图 3 中的橙色点）时，就会出现未对齐的情况，从而导致语义空间不对齐。</p>
+<p>在实际情况中，语义在图像中的分布并不均匀。这些语义很可能因为随机掩蔽策略而被忽略。当 MIM 将不同的掩蔽图像拉到一起时，具有不同语义的两个掩蔽图像会错位。</p>
+<p>如果错位的语义是理解图像的重要线索，那么可能会严重影响下游任务性能。为此，需要一种新的掩蔽采样策略，<strong>以保留更具有代表性的 patches</strong>。</p>
+<p><img src="/2023/05/12/Masked_Image_Model/MIM-DPPMask%E5%8F%AF%E4%BB%A5%E4%BF%9D%E7%95%99%E5%85%B7%E6%9C%89%E4%BB%A3%E8%A1%A8-Glenn/v2-2295d39f5ecdcf7a7fd224e873f290f3_r.jpg"><br>图3. misalignment problem 的说明</p>
+<hr>
+<h3 id="3-方法"><a href="#3-方法" class="headerlink" title="3. 方法"></a>3. 方法</h3><p>作者基于行列式点过程 (determinantal point process, DPP)，提出了 DPPMask 的 MIM 掩蔽策略。</p>
+<blockquote>
+<p> DPP 的介绍如下：</p>
+</blockquote>
+<p>对于给定的集合 Z ， Discrete Point Processes 是定义在该集合的所有子集上的一个采样概率。</p>
+<p>而 Determinantal Point Process 将 Discrete Point Processes 问题里复杂的概率计算转换成简单的行列式计算，通过核矩阵（kernel matrix） L 的行列式计算每一个子集的采样概率。</p>
+<p>即存在一个实数型、PSD（半正定）矩阵 L ，对于集合 Z 的所有子集 Y ， Y 采样的概率与矩阵 L_Y 的行列式成正比：</p>
+<p>$$ \mathcal{P}(Y)\propto det(L_Y) $$ </p>
+<p>在本文中，首先计算列表中任意两个 patches 之间的相似度 S_{ij} （先将 patches 表示成特征向量 S_i,S_j ，然后使用相似度度量方法计算相似度），得到相似度矩阵 S ，然后用矩阵 S 的行列式 det(S)&#x3D;S_{ii} × S_{jj} − S_{ij} × S_{ji} 来表示 patches 集合多样性程度（因为矩阵是一组向量的集合，而矩阵的行列式的物理意义为矩阵中的各个向量构成的平行多面体体积的平方。这些向量彼此之间越不相似，相似性度量方法计算出的结果就会越小，构成的平行多面体的体积也就越大，矩阵的行列式也就越大，对应的 patches 集合的多样性也就越高）。</p>
+<p>DPPMask 的目的便是从候选 patches 集合 Z 中选择能够最大化后验概率的 patches 子集 Y 来保留：</p>
+<p>Y_{MAP}&#x3D;\underset{Y\in Z}{argmax}, det(L_Y) </p>
+<p>该问题是一个 NP-hard 问题。因此，在实际场景中，多使用贪心算法来获取该问题的近似解。</p>
+<p>求解过程简单来说就是，每次从候选集中贪心地选择一个能使边际收益最大的 patch 加入到最终的结果子集中，直到满足停止条件为止，即每次选择 patch j 添加到结果集 Y_g 中， Y_g 初始化为空集，patch j 需要满足下面的等式：</p>
+<p>$$ j&#x3D;\underset{i\in Z\backslash Y_{g}}{argmax}\ l o g d e t(L_{Y_{g}\cup{i}})-l o g d e t(L_{Y_{g}}) $$ </p>
+<p>其中行列式 det(L_{Y_g}) 直接求解复杂度较高，可以使用其他方法简化计算过程。感兴趣的可以查看博文和原论文。</p>
+<p>在本文中，作者将核矩阵 L 设置为 L_{ij} &#x3D; exp(-\frac{||S_i-S_j||^2}{\epsilon}) ，其中 \epsilon 经验值为 1。</p>
+<p>另外，如果一味地执行贪心算法，会导致过度保留。如图 4 所示，由于天空的 patches 彼此过于相似，前景比背景更多样，此时贪心的选择将只关注前景。这种情况会使得 MIM 任务过于简单，这对特征学习没有帮助。</p>
+<p><img src="/2023/05/12/Masked_Image_Model/MIM-DPPMask%E5%8F%AF%E4%BB%A5%E4%BF%9D%E7%95%99%E5%85%B7%E6%9C%89%E4%BB%A3%E8%A1%A8-Glenn/v2-8915d3afaeeb55cd53e593260664b609_r.jpg"><br>图4. 对三种不同清除率进行定性比较，一个合适的清除率可以保持原始图像的语义，同时保持增强输入的多样性。<br>为了解决这一问题，作者设置了一个称为清除率 \tau\in (0,1) 的参数作为最大边际增益的阈值。 具体来说，在每次迭代中，都会监控下一个 patch 与所选子集的距离，如果该距离低于清除率，则贪心的选择过程将中止，子集由随机 patches 填充。清除率可以调整 DPPMask 的 “严重” 程度，当 \tau &#x3D; 0 表示选择过程完全由贪心算法选择，而 \tau &#x3D; 1 表示完全随机抽样。</p>
+<p>DPPMask 的算法伪代码如图 5 所示：</p>
+<p><img src="/2023/05/12/Masked_Image_Model/MIM-DPPMask%E5%8F%AF%E4%BB%A5%E4%BF%9D%E7%95%99%E5%85%B7%E6%9C%89%E4%BB%A3%E8%A1%A8-Glenn/v2-6e60a502568aaa2b4304208689ece1d3_r.jpg"><br>图5. DPPMask 的采样算法伪代码</p>
+<hr>
+<h3 id="4-结果"><a href="#4-结果" class="headerlink" title="4. 结果"></a>4. 结果</h3><p>通过观察表 1 、表 2 和表 3，可以得到：</p>
+<ul>
+<li>在 ImageNet-100 数据集上，MAE 和 iBOT 的微调任务性能均得到了提升。</li>
+</ul>
+<ul>
+<li>在 MAE 中，加入 DPPMask 的精度提高了0.2%；</li>
+<li>在 iBOT 中，加入 DPPMask 的精度提高了0.4%。</li>
+</ul>
+<ul>
+<li>随着阈值 τ 的减小，预训练损失相应地变小。然而，当 τ 过低时，贪心采样会过度保留，使任务过于简单，网络无法学习有用的特征（？）。</li>
+<li>对于线性探测，加入 DPPMask 的 MAE 性能显著下降。这是因为 DPP 使样本空间缩小，以清除未对齐的样本。将更少的样本聚集在一起会使特征空间更连续，并且线性可分离性更低。</li>
+<li>相比于其他采样方法，DPPMask 取得了更好的成绩。</li>
+</ul>
+<p><img src="/2023/05/12/Masked_Image_Model/MIM-DPPMask%E5%8F%AF%E4%BB%A5%E4%BF%9D%E7%95%99%E5%85%B7%E6%9C%89%E4%BB%A3%E8%A1%A8-Glenn/v2-88d7fd12b0d7a6c31045dd9eafd932d2_r.jpg"><br>表1. MAE+DPPMask 在 ImageNet- 100上 的详细结果。<br><img src="/2023/05/12/Masked_Image_Model/MIM-DPPMask%E5%8F%AF%E4%BB%A5%E4%BF%9D%E7%95%99%E5%85%B7%E6%9C%89%E4%BB%A3%E8%A1%A8-Glenn/v2-d56a8279915bab70cc0003787dff8f5c_r.jpg"><br>表2. iBOT+DPPMask 在 ImageNet- 100上 的详细结果。<br><img src="/2023/05/12/Masked_Image_Model/MIM-DPPMask%E5%8F%AF%E4%BB%A5%E4%BF%9D%E7%95%99%E5%85%B7%E6%9C%89%E4%BB%A3%E8%A1%A8-Glenn/v2-921f57b26338f3dccd8724420d858494_r.jpg"><br>表3. 与 ImageNet-1K 上的其他采样方法的比较。<br>观察图 4，可以得到：</p>
+<ul>
+<li>Mask Ratio 越大，越容易造成 misalignment 问题。作者发现对于微调任务来说，0.75 并不是一个好的 Mask Ratio 值。</li>
+<li>加入 DPPMask 的 MAE 在任意的 Mask Ratio 上都取得了更高的性能。</li>
+</ul>
+<p><img src="/2023/05/12/Masked_Image_Model/MIM-DPPMask%E5%8F%AF%E4%BB%A5%E4%BF%9D%E7%95%99%E5%85%B7%E6%9C%89%E4%BB%A3%E8%A1%A8-Glenn/v2-2fee8ddf57e1c532c13b9142d9ac341a_r.jpg"><br>图6. 不同 Mask Ratio 下在 ImageNet-100 上 MAE 的精度。<br>观察表 4 和表 5 ，说明在 COCO 和 CLEVR 数据集的多标签分类任务上，DDPMask 也能取得较高的精度。</p>
+<p><img src="/2023/05/12/Masked_Image_Model/MIM-DPPMask%E5%8F%AF%E4%BB%A5%E4%BF%9D%E7%95%99%E5%85%B7%E6%9C%89%E4%BB%A3%E8%A1%A8-Glenn/v2-f5e09cc37e1ffaead7e8d37a0e6378ed_r.jpg"><br>表4. 在 COCO 上的多标签分类精度。<br><img src="/2023/05/12/Masked_Image_Model/MIM-DPPMask%E5%8F%AF%E4%BB%A5%E4%BF%9D%E7%95%99%E5%85%B7%E6%9C%89%E4%BB%A3%E8%A1%A8-Glenn/v2-2cdb40ac22914e7aba3726a8e9dd8224_r.jpg"><br>表5. 在 CLEVR 上的多标签分类精度。<br>2023 年 3 月 25 日上传的 v2 版中增加了附录实验，详细结果请查看原文。</p>
+
+      
+    </div>
+    <div class="article-footer">
+      <blockquote class="mt-2x">
+  <ul class="post-copyright list-unstyled">
+    
+    <li class="post-copyright-link hidden-xs">
+      <strong>本文链接：</strong>
+      <a href="http://glennchen.cn/2023/05/12/Masked_Image_Model/MIM-DPPMask%E5%8F%AF%E4%BB%A5%E4%BF%9D%E7%95%99%E5%85%B7%E6%9C%89%E4%BB%A3%E8%A1%A8-Glenn/" title="MIM | DPPMask：可以保留具有代表性 patches 的掩蔽策略" target="_blank" rel="external">http://glennchen.cn/2023/05/12/Masked_Image_Model/MIM-DPPMask可以保留具有代表-Glenn/</a>
+    </li>
+    
+    <li class="post-copyright-license">
+      <strong>版权声明： </strong> 本博客所有文章除特别声明外，均采用 <a href="http://creativecommons.org/licenses/by/4.0/deed.zh" target="_blank" rel="external">CC BY 4.0 CN协议</a> 许可协议。转载请注明出处！
+    </li>
+  </ul>
+</blockquote>
+
+
+<div class="panel panel-default panel-badger">
+  <div class="panel-body">
+    <figure class="media">
+      <div class="media-left">
+        <a href="https://github.com/chenluda" target="_blank" class="img-burn thumb-sm visible-lg">
+          <img src="/images/avatar.png" class="img-rounded w-full" alt="">
+        </a>
+      </div>
+      <div class="media-body">
+        <h3 class="media-heading"><a href="https://github.com/chenluda" target="_blank"><span class="text-dark">Glenn</span><small class="ml-1x">Stay hungry, stay foolish.</small></a></h3>
+        <div>咖啡，健身，热爱生活。</div>
+      </div>
+    </figure>
+  </div>
+</div>
+
+
+    </div>
+  </article>
+  
+    
+  <section id="comments">
+  	
+      <div id="vcomments"></div>
+    
+  </section>
+
+
+  
+</div>
+
+  <nav class="bar bar-footer clearfix" data-stick-bottom>
+  <div class="bar-inner">
+  
+  <ul class="pager pull-left">
+    
+    <li class="prev">
+      <a href="/2023/05/12/Masked_Image_Model/MIM-EMAE%E8%A7%A3%E5%86%B3-MIM-%E6%95%B0%E6%8D%AE%E5%88%A9%E7%94%A8-Glenn/" title="MIM | EMAE：解决 MIM 数据利用率低和预测结果不一致性问题"><i class="icon icon-angle-left" aria-hidden="true"></i><span>&nbsp;&nbsp;上一篇</span></a>
+    </li>
+    
+    
+    <li class="next">
+      <a href="/2023/05/12/Masked_Image_Model/MIM-DeepMIM%E5%B0%86-Deep-S-Glenn/" title="MIM | DeepMIM：将 Deep Supervision 引入掩蔽图像建模"><span>下一篇&nbsp;&nbsp;</span><i class="icon icon-angle-right" aria-hidden="true"></i></a>
+    </li>
+    
+    
+  </ul>
+  
+  
+  
+  <div class="bar-right">
+    
+    <div class="share-component" data-sites="weibo,qq,wechat,facebook,twitter" data-mobile-sites="weibo,qq,qzone"></div>
+    
+  </div>
+  </div>
+</nav>
+  
+
+
+</main>
+
+  <footer class="footer" itemscope itemtype="http://schema.org/WPFooter">
+	
+	
+    <ul class="social-links">
+    	
+        <li><a href="https://github.com/chenluda" target="_blank" title="Github" data-toggle=tooltip data-placement=top><i class="icon icon-github"></i></a></li>
+        
+        <li><a href="https://www.zhihu.com/people/Glenn" target="_blank" title="Zhihu" data-toggle=tooltip data-placement=top><i class="icon icon-zhihu"></i></a></li>
+        
+    </ul>
+
+    <div class="copyright">
+    	
+        <div class="publishby">
+        	Theme by <a href="https://github.com/cofess" target="_blank"> cofess </a>base on <a href="https://github.com/cofess/hexo-theme-pure" target="_blank">pure</a>.
+        </div>
+    </div>
+</footer>
+  <script src="//cdn.jsdelivr.net/npm/jquery@1.12.4/dist/jquery.min.js"></script>
+<script>
+window.jQuery || document.write('<script src="js/jquery.min.js"><\/script>')
+</script>
+
+<script src="/js/plugin.min.js"></script>
+
+
+<script src="/js/application.js"></script>
+
+
+    <script>
+(function (window) {
+    var INSIGHT_CONFIG = {
+        TRANSLATION: {
+            POSTS: '文章',
+            PAGES: '页面',
+            CATEGORIES: '分类',
+            TAGS: '标签',
+            UNTITLED: '(未命名)',
+        },
+        ROOT_URL: '/',
+        CONTENT_URL: '/content.json',
+    };
+    window.INSIGHT_CONFIG = INSIGHT_CONFIG;
+})(window);
+</script>
+
+<script src="/js/insight.js"></script>
+
+
+
+
+
+
+   
+
+
+
+
+   
+    
+  <script src="//cdn1.lncld.net/static/js/3.0.4/av-min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/valine"></script>
+  <script type="text/javascript">
+  var GUEST = ['nick', 'mail', 'link'];
+  var meta = 'nick,mail,link';
+  meta = meta.split(',').filter(function(item) {
+    return GUEST.indexOf(item) > -1;
+  });
+  new Valine({
+    el: '#vcomments',
+    verify: false,
+    notify: false,
+    appId: '',
+    appKey: '',
+    placeholder: 'Just go go',
+    avatar: 'mm',
+    meta: meta,
+    pageSize: '10' || 10,
+    visitor: false
+  });
+  </script>
+
+     
+
+
+
+
+
+
+
+</body>
+</html>
