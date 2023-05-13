@@ -17,33 +17,29 @@
   <meta http-equiv="window-target" content="_top" />
   
   
-  <title>MIM | EMAE：解决 MIM 数据利用率低和预测结果不一致性问题 | Hexo</title>
-  <meta name="description" content="题目：Effificient Masked Autoencoders with Self-Consistency单位：中国科学院、中国科学院大学、商汤、鹏城实验室论文网址：https:&#x2F;&#x2F;arxiv.org&#x2F;abs&#x2F;2302.14431论文代码：未公开首次发布时间：2023 年 2 月 28 日    主要内容   MIM 的高随机掩蔽比将导致两个严重问题：  数据未被有效利用，导致预训练效率">
+  <title>MIM 的小总结 | Hexo</title>
+  <meta name="description" content="MIM 专栏：  距离放出的最新 Masked Image Model（MIM）文章（非特定领域）已经过去 8 天了。 趁这段时间，赶紧对 MIM 做下小总结。  MIM 作为上游任务，其目标应该是为下游任务（例如分类、分割、目标检测）提供一个有利的初始化。 直观上来看，当模型面临具有挑战性的重建任务时，它需要学会识别图像中更复杂、更抽象的特征，以便在缺失数据的情况下进行有效的预测。这意味着编码">
 <meta property="og:type" content="article">
-<meta property="og:title" content="MIM | EMAE：解决 MIM 数据利用率低和预测结果不一致性问题">
-<meta property="og:url" content="https://chenluda.github.io/2023/05/12/Masked_Image_Model/MIM-EMAE%E8%A7%A3%E5%86%B3-MIM-%E6%95%B0%E6%8D%AE%E5%88%A9%E7%94%A8-Glenn/index.html">
+<meta property="og:title" content="MIM 的小总结">
+<meta property="og:url" content="https://chenluda.github.io/2023/05/12/Masked_Image_Model/MIM-%E7%9A%84%E5%B0%8F%E6%80%BB%E7%BB%93-Glenn/index.html">
 <meta property="og:site_name" content="Glenn">
-<meta property="og:description" content="题目：Effificient Masked Autoencoders with Self-Consistency单位：中国科学院、中国科学院大学、商汤、鹏城实验室论文网址：https:&#x2F;&#x2F;arxiv.org&#x2F;abs&#x2F;2302.14431论文代码：未公开首次发布时间：2023 年 2 月 28 日    主要内容   MIM 的高随机掩蔽比将导致两个严重问题：  数据未被有效利用，导致预训练效率">
+<meta property="og:description" content="MIM 专栏：  距离放出的最新 Masked Image Model（MIM）文章（非特定领域）已经过去 8 天了。 趁这段时间，赶紧对 MIM 做下小总结。  MIM 作为上游任务，其目标应该是为下游任务（例如分类、分割、目标检测）提供一个有利的初始化。 直观上来看，当模型面临具有挑战性的重建任务时，它需要学会识别图像中更复杂、更抽象的特征，以便在缺失数据的情况下进行有效的预测。这意味着编码">
 <meta property="og:locale" content="zh_CN">
-<meta property="og:image" content="https://chenluda.github.io/2023/05/12/Masked_Image_Model/MIM-EMAE%E8%A7%A3%E5%86%B3-MIM-%E6%95%B0%E6%8D%AE%E5%88%A9%E7%94%A8-Glenn/v2-c05f7a9e48b33166d40c24edc530c0ba_r.jpg">
-<meta property="og:image" content="https://chenluda.github.io/2023/05/12/Masked_Image_Model/MIM-EMAE%E8%A7%A3%E5%86%B3-MIM-%E6%95%B0%E6%8D%AE%E5%88%A9%E7%94%A8-Glenn/v2-d694205f3c2de30289badd9804ada337_r.jpg">
-<meta property="og:image" content="https://chenluda.github.io/2023/05/12/Masked_Image_Model/MIM-EMAE%E8%A7%A3%E5%86%B3-MIM-%E6%95%B0%E6%8D%AE%E5%88%A9%E7%94%A8-Glenn/v2-c0a39661ff3e2179b96b27c4b65095ae_r.jpg">
-<meta property="og:image" content="https://chenluda.github.io/2023/05/12/Masked_Image_Model/MIM-EMAE%E8%A7%A3%E5%86%B3-MIM-%E6%95%B0%E6%8D%AE%E5%88%A9%E7%94%A8-Glenn/v2-d63956cefdb733e72fd7f026ae134dcc_r.jpg">
-<meta property="og:image" content="https://chenluda.github.io/2023/05/12/Masked_Image_Model/MIM-EMAE%E8%A7%A3%E5%86%B3-MIM-%E6%95%B0%E6%8D%AE%E5%88%A9%E7%94%A8-Glenn/v2-d989c8ee66efc9bcc8a3a73891e0b17d_r.jpg">
-<meta property="og:image" content="https://chenluda.github.io/2023/05/12/Masked_Image_Model/MIM-EMAE%E8%A7%A3%E5%86%B3-MIM-%E6%95%B0%E6%8D%AE%E5%88%A9%E7%94%A8-Glenn/v2-922d30323c1a7d25cd7ff362cd914265_r.jpg">
-<meta property="og:image" content="https://chenluda.github.io/2023/05/12/Masked_Image_Model/MIM-EMAE%E8%A7%A3%E5%86%B3-MIM-%E6%95%B0%E6%8D%AE%E5%88%A9%E7%94%A8-Glenn/v2-5fb25986bfbd333df97958b5f177c0f4_r.jpg">
-<meta property="og:image" content="https://chenluda.github.io/2023/05/12/Masked_Image_Model/MIM-EMAE%E8%A7%A3%E5%86%B3-MIM-%E6%95%B0%E6%8D%AE%E5%88%A9%E7%94%A8-Glenn/v2-0854a91f24bd2d3cdd74f6b5e8cd1be1_r.jpg">
-<meta property="og:image" content="https://chenluda.github.io/2023/05/12/Masked_Image_Model/MIM-EMAE%E8%A7%A3%E5%86%B3-MIM-%E6%95%B0%E6%8D%AE%E5%88%A9%E7%94%A8-Glenn/v2-89e40b8bfa1bc81dc11876304a040e1f_r.jpg">
-<meta property="og:image" content="https://chenluda.github.io/2023/05/12/Masked_Image_Model/MIM-EMAE%E8%A7%A3%E5%86%B3-MIM-%E6%95%B0%E6%8D%AE%E5%88%A9%E7%94%A8-Glenn/v2-ec2df02d24767af4346b012ae979be38_r.jpg">
-<meta property="og:image" content="https://chenluda.github.io/2023/05/12/Masked_Image_Model/MIM-EMAE%E8%A7%A3%E5%86%B3-MIM-%E6%95%B0%E6%8D%AE%E5%88%A9%E7%94%A8-Glenn/v2-9317015821decd101a2812d22b9188a7_r.jpg">
-<meta property="article:published_time" content="2023-05-12T10:44:00.000Z">
-<meta property="article:modified_time" content="2023-05-12T12:16:56.418Z">
+<meta property="og:image" content="https://chenluda.github.io/2023/05/12/Masked_Image_Model/MIM-%E7%9A%84%E5%B0%8F%E6%80%BB%E7%BB%93-Glenn/v2-574a30b52a04d88b780eab87b21be5ab_r.jpg">
+<meta property="og:image" content="https://chenluda.github.io/2023/05/12/Masked_Image_Model/MIM-%E7%9A%84%E5%B0%8F%E6%80%BB%E7%BB%93-Glenn/v2-77dca549bf63f1e0f9f80bca2ca4d42b_r.jpg">
+<meta property="og:image" content="https://chenluda.github.io/2023/05/12/Masked_Image_Model/MIM-%E7%9A%84%E5%B0%8F%E6%80%BB%E7%BB%93-Glenn/v2-bef1d57159894c2cc77e5fa89f62e4e7_r.jpg">
+<meta property="og:image" content="https://chenluda.github.io/2023/05/12/Masked_Image_Model/MIM-%E7%9A%84%E5%B0%8F%E6%80%BB%E7%BB%93-Glenn/v2-3a09c6847daff217798b3479e4d6394c_r.jpg">
+<meta property="og:image" content="https://chenluda.github.io/2023/05/12/Masked_Image_Model/MIM-%E7%9A%84%E5%B0%8F%E6%80%BB%E7%BB%93-Glenn/v2-c6c541fc7ef24f85218e65d0b3fe4d26_r.jpg">
+<meta property="og:image" content="https://chenluda.github.io/2023/05/12/Masked_Image_Model/MIM-%E7%9A%84%E5%B0%8F%E6%80%BB%E7%BB%93-Glenn/v2-d30d37fe2f0a478acec274149a179546_r.jpg">
+<meta property="og:image" content="https://chenluda.github.io/2023/05/12/Masked_Image_Model/MIM-%E7%9A%84%E5%B0%8F%E6%80%BB%E7%BB%93-Glenn/v2-a3dc5d996ced8d6e58351bb800f6624d_r.jpg">
+<meta property="article:published_time" content="2023-05-12T10:44:56.000Z">
+<meta property="article:modified_time" content="2023-05-13T04:04:15.706Z">
 <meta property="article:author" content="Glenn">
 <meta property="article:tag" content="Masked Image Modeling">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:image" content="https://chenluda.github.io/2023/05/12/Masked_Image_Model/MIM-EMAE%E8%A7%A3%E5%86%B3-MIM-%E6%95%B0%E6%8D%AE%E5%88%A9%E7%94%A8-Glenn/v2-c05f7a9e48b33166d40c24edc530c0ba_r.jpg">
+<meta name="twitter:image" content="https://chenluda.github.io/2023/05/12/Masked_Image_Model/MIM-%E7%9A%84%E5%B0%8F%E6%80%BB%E7%BB%93-Glenn/v2-574a30b52a04d88b780eab87b21be5ab_r.jpg">
   <!-- Canonical links -->
-  <link rel="canonical" href="https://chenluda.github.io/2023/05/12/Masked_Image_Model/MIM-EMAE%E8%A7%A3%E5%86%B3-MIM-%E6%95%B0%E6%8D%AE%E5%88%A9%E7%94%A8-Glenn/index.html">
+  <link rel="canonical" href="https://chenluda.github.io/2023/05/12/Masked_Image_Model/MIM-%E7%9A%84%E5%B0%8F%E6%80%BB%E7%BB%93-Glenn/index.html">
   
     <link rel="alternate" href="/atom.xml" title="Glenn" type="application/atom+xml">
   
@@ -308,14 +304,14 @@
   
 <main class="main" role="main">
   <div class="content">
-  <article id="post-Masked_Image_Model/MIM-EMAE解决-MIM-数据利用-Glenn" class="article article-type-post" itemscope itemtype="http://schema.org/BlogPosting">
+  <article id="post-Masked_Image_Model/MIM-的小总结-Glenn" class="article article-type-post" itemscope itemtype="http://schema.org/BlogPosting">
     
     <div class="article-header">
       
         
   
     <h1 class="article-title" itemprop="name">
-      MIM | EMAE：解决 MIM 数据利用率低和预测结果不一致性问题
+      MIM 的小总结
     </h1>
   
 
@@ -323,8 +319,8 @@
       <div class="article-meta">
         <span class="article-date">
     <i class="icon icon-calendar-check"></i>
-	<a href="/2023/05/12/Masked_Image_Model/MIM-EMAE%E8%A7%A3%E5%86%B3-MIM-%E6%95%B0%E6%8D%AE%E5%88%A9%E7%94%A8-Glenn/" class="article-date">
-	  <time datetime="2023-05-12T10:44:00.000Z" itemprop="datePublished">2023-05-12</time>
+	<a href="/2023/05/12/Masked_Image_Model/MIM-%E7%9A%84%E5%B0%8F%E6%80%BB%E7%BB%93-Glenn/" class="article-date">
+	  <time datetime="2023-05-12T10:44:56.000Z" itemprop="datePublished">2023-05-12</time>
 	</a>
 </span>
         
@@ -342,85 +338,74 @@
 
         
 
-        <span class="post-comment"><i class="icon icon-comment"></i> <a href="/2023/05/12/Masked_Image_Model/MIM-EMAE%E8%A7%A3%E5%86%B3-MIM-%E6%95%B0%E6%8D%AE%E5%88%A9%E7%94%A8-Glenn/#comments" class="article-comment-link">评论</a></span>
+        <span class="post-comment"><i class="icon icon-comment"></i> <a href="/2023/05/12/Masked_Image_Model/MIM-%E7%9A%84%E5%B0%8F%E6%80%BB%E7%BB%93-Glenn/#comments" class="article-comment-link">评论</a></span>
         
       </div>
     </div>
     <div class="article-entry marked-body" itemprop="articleBody">
       
-        <p><img src="/2023/05/12/Masked_Image_Model/MIM-EMAE%E8%A7%A3%E5%86%B3-MIM-%E6%95%B0%E6%8D%AE%E5%88%A9%E7%94%A8-Glenn/v2-c05f7a9e48b33166d40c24edc530c0ba_r.jpg"></p>
-<blockquote>
-<p><em><strong>题目：</strong>Effificient Masked Autoencoders with Self-Consistency</em><br><em><strong>单位：</strong>中国科学院、中国科学院大学、商汤、鹏城实验室</em><br><em><strong>论文网址：</strong><a href="https://link.zhihu.com/?target=https://arxiv.org/abs/2302.14431">https://arxiv.org/abs/2302.14431</a></em><br><em><strong>论文代码：</strong>未公开</em><br><em><strong>首次发布时间：</strong>2023 年 2 月 28 日</em></p>
+        <blockquote>
+<p>MIM 专栏：</p>
 </blockquote>
+<p>距离放出的最新 Masked Image Model（MIM）文章（非特定领域）已经过去 8 天了。</p>
+<p>趁这段时间，赶紧对 MIM 做下小总结。</p>
 <hr>
-<ol>
-<li>主要内容</li>
-</ol>
-<hr>
-<p>MIM 的高随机掩蔽比将导致两个严重问题：</p>
+<p>MIM 作为上游任务，其目标应该是为下游任务（例如分类、分割、目标检测）提供一个有利的初始化。</p>
+<p>直观上来看，当模型面临具有挑战性的重建任务时，它需要学会识别图像中更复杂、更抽象的特征，以便在缺失数据的情况下进行有效的预测。这意味着编码器需要捕捉更高层次的图像特征和结构信息。通过这种方式，编码器可以学到更丰富的特征表示，从而为下游任务提供更有利的初始化。</p>
+<p><strong>通常增加重建任务难度的方式有很多，例如：</strong></p>
 <ul>
-<li><strong>数据未被有效利用</strong>，导致预训练效率低；</li>
+<li>改进掩蔽策略。可以通过改进掩蔽策略来增加重建任务的难度。例如，HPM<a href="#ref_1">[1]</a> 主张掩蔽富含语义的前景对象，从而迫使模型学习更复杂的特征表示。</li>
 </ul>
-<p>例如，在每个 epoch 中 MAE 仅利用整个图像的 25% 训练模型。相比之下，BERT 使用了 85% 的文本语料库。由于 MIM 的数据利用率不足，预训练 epoch 通常高于 MLM（masked language modeling），MAE 的 1600 个 epoch 相当于 MLM 的 40 个 epoch。此外，对于 MAE 需要 1600 个 epoch，而对于有监督学习只需要 300 个epoch。</p>
+<p><img src="/2023/05/12/Masked_Image_Model/MIM-%E7%9A%84%E5%B0%8F%E6%80%BB%E7%BB%93-Glenn/v2-574a30b52a04d88b780eab87b21be5ab_r.jpg"><br>HPM</p>
 <ul>
-<li><strong>预训练模型的不确定性和不一致性高</strong>，即同一块区域在不同 epoch 的随机掩蔽策略下，产生的预测可能不一致，如图 1 所示。</li>
+<li>改变重建目标。<br> 1）传统的像素级别重建任务可能会限制模型的表达能力。为了提高模型的性能，可以将重建目标替换为更高级的语义表示，如 MaskFeat<a href="#ref_2">[2]</a> 使用 HOG 特征，BEiT-v2<a href="#ref_3">[3]</a> 使用 CLIP 特征等。这将迫使模型学习更丰富的特征表示，从而有助于下游任务的性能；<br> 2）深度监督是一种在建模过程中引入不同监督信号的方法。通过让模型关注不同尺度和抽象级别的重建任务，可以促使模型学习更丰富的特征表示。例如，LocalMIM<a href="#ref_4">[4]</a> 对不同尺度的图像特征进行监督，DeepMIM<a href="#ref_5">[5]</a> 在模型的不同层次引入监督信号，从而强制模型在多个抽象层次上学习有效的特征表示。</li>
 </ul>
-<p><img src="/2023/05/12/Masked_Image_Model/MIM-EMAE%E8%A7%A3%E5%86%B3-MIM-%E6%95%B0%E6%8D%AE%E5%88%A9%E7%94%A8-Glenn/v2-d694205f3c2de30289badd9804ada337_r.jpg"><br>图1. 不同的随机掩蔽策略对应不同的 MAE 重建结果。(a) 由不同的随机掩蔽策略采样的掩蔽图像。(b) 对应的 MAE 重建结果。对于 (b) 的三个重建，只有第一个代表一只正常的牛，第三个甚至重建了一只狗。可见 MAE 重建的语义是不一致的。<br>为了解决这些问题，作者提出了一种具有自一致性的高效掩码自动编码器（EMAE），主要从两方面进行改进：</p>
-<p>1）将图像逐步分成 K 个不重叠的部分，每个部分由掩蔽策略随机生成，具有相同的掩蔽比。然后，在每个 epoch 中，所有部分并行进行 MIM 任务并生成预测。</p>
-<p>2）设计自一致性模块，以进一步维护部分之间重叠掩码块的预测一致性。</p>
-<p>ImageNet 上的实验表明，与 MAE（1600 个 epoch）相比，EMAE 在 ViT Base 下仅用 300 个预训练epoch 就获得了更高的结果。EMAE 在各种下游任务（如对象检测和语义分割）上也始终获得最先进的传输性能。</p>
-<hr>
-<ol start="2">
-<li>方法</li>
-</ol>
-<hr>
-<p><img src="/2023/05/12/Masked_Image_Model/MIM-EMAE%E8%A7%A3%E5%86%B3-MIM-%E6%95%B0%E6%8D%AE%E5%88%A9%E7%94%A8-Glenn/v2-c0a39661ff3e2179b96b27c4b65095ae_r.jpg"><br>图2. EMAE 模型结构。整个图像首先被逐渐划分为 K 个不重叠的部分，并且每个部分具有相同数量的可见 patches。然后，每个部分被送入编码器-解码器架构，并行执行 MIM 任务。此外，自一致性模块指导预测部分之间的重叠的 patches 被拉在一起。</p>
-<h3 id="2-1-有效利用全部数据"><a href="#2-1-有效利用全部数据" class="headerlink" title="2.1 有效利用全部数据"></a>2.1 有效利用全部数据</h3><p>为了提高数据的利用率，EMAE 将使用全部数据训练模型。</p>
-<p>具体来说，就是要将输入图像 x 划分为 K 个具有相同数量且不重叠的可见 patches 的部分，然后所有部分并行执行 MIM 任务。</p>
-<p>首先将整个图像分成 N 个图像 patches。然后，设置一个长度为 N 的随机张量 t ，其值在 [0,1] 上均匀分布。张量按值按升序排序，排序后的索引 ids 用如下表示：</p>
-<p>ids&#x3D;s(t) </p>
-<p>其中 s(\cdot) 表示按值按升序排序。</p>
-<p>将长度为 N 的排序索引等分划分为 K 个部分 ids_1，ids_2，…， 和 ids_K ：</p>
-<p>ids_i&#x3D;ids[(i-1)×\frac{N}{K}: i×\frac{N}{K}] </p>
-<p>其中 i\in\left{1,2，…，K\right} 。</p>
-<p>因此， N 个图像 patches 可以根据索引 ids_i 等分为 K 个部分 x_{1}，x_{2}，…， 和 x_{K} ，且每个部分具有相同数量且不重叠的可见 patches x_{v_i} ：</p>
-<p>x_{v_i}&#x3D;d(x_i, ids_i) </p>
-<p>其中 d(\cdot) 表示根据索引 ids_i 从输入 x_i 中查找可见 patches。</p>
-<p>对应的，掩蔽 patches 为：</p>
-<p>x_{m_i}&#x3D;d(x_i, ids-ids_i) </p>
-<p>此时，任一部分 x_{i} 都有 \frac{N}{K} 个可见 patches， N-\frac{N}{K} 个掩蔽 patches x_{m_i}。</p>
-<p>则任一部分的掩蔽比都为 (N−\frac{N}{K})&#x2F;N &#x3D;(K−1)&#x2F;K ，算法伪代码如图 3 所示。</p>
-<p><img src="/2023/05/12/Masked_Image_Model/MIM-EMAE%E8%A7%A3%E5%86%B3-MIM-%E6%95%B0%E6%8D%AE%E5%88%A9%E7%94%A8-Glenn/v2-d63956cefdb733e72fd7f026ae134dcc_r.jpg"><br>图3. 算法伪代码<br>根据上述描述，当 K 设置为 4 时，各部分的掩蔽比为 75%（与 MAE 的掩蔽比相同）。</p>
-<p>该设计保证了迭代中图像的每个 patches 都可以采样一次，使得整个图像都可以应用于模型的训练，从而提高了数据的利用率。</p>
-<p>损失函数定义如下：</p>
-<p>\mathcal{L}_{whole}(x)&#x3D;\mathbb E_{i\in[1,K]}\mathcal{L}(x_{v_i},x_{m_i})&#x3D;\mathbb E_{i\in[1,K]}||g(f(x_{v_i})) − x_{m_i}||^2 </p>
-<p>其中，  g(\cdot)  表示解码器。</p>
-<h3 id="2-2-自一致性模块"><a href="#2-2-自一致性模块" class="headerlink" title="2.2 自一致性模块"></a>2.2 自一致性模块</h3><p>进一步地，需要鼓励预训练模型的预测在来自同一图像的不同输入可见 patches 下是一致的。</p>
-<p>根据 2.1 节介绍的内容，每个部分 x_{i} 具有 N-\frac{N}{K} 个掩蔽 patches x_{m_i} ，对应的，都会生成 N-\frac{N}{K} 个预测 x_{p_i} 。</p>
-<p>显然，任何两个部分的预测之间都存在一定的重叠 patches，比例为 \frac{K-2}{K-1} 。</p>
-<p>重叠位置 s_{ij} 可以通过掩蔽 patches x_{m_i} 和 x_{m_j} 得到，其中 i, j \in \left{1,2,3,…,K\right} 且 i \neq j ：</p>
-<p>s_{ij}&#x3D;x_{m_i}\cap x_{m_j} </p>
-<p>EMAE 的自一致性模块用来指导每个重叠位置的预测保持一致。如图 2 所示，自一致性模块将任意两个预测 x_{p_i} 和 x_{p_j} 之间的重叠预测拉到一起，这使重叠重建结果之间的平均绝对误差最小化，以提高一致性。</p>
-<p>损失函数定义如下：</p>
-<p>\mathcal{L}_{consistency}(x)&#x3D;\mathbb{E}_{i\in [1,K],j\in[i+1,K]}\mathcal{L}_{sc}(x_{v_i}, x_{v_j})&#x3D;\mathbb{E}_{i\in [1,K],j\in[i+1,K]}(||sg[x_{p_i}]-x_{p_j}||+||x_{p_i}-sg[x_{p_j}]||)\odot s_{ij} </p>
-<p>其中 sg[·] 表示停止梯度。对于任一部分的每次预测，将与其他部分的预测进行 K−2 次计算。</p>
-<p>总损失为：</p>
-<p>\mathcal{L}_{total}(x)&#x3D;\mathcal{L}_{whole}(x) + \mathcal{L}_{consistency}(x) </p>
-<hr>
-<ol start="3">
-<li>结果</li>
-</ol>
-<hr>
-<p>由表 1 可以得出：</p>
+<p><img src="/2023/05/12/Masked_Image_Model/MIM-%E7%9A%84%E5%B0%8F%E6%80%BB%E7%BB%93-Glenn/v2-77dca549bf63f1e0f9f80bca2ca4d42b_r.jpg"><br>LocalMIM</p>
 <ul>
-<li>在线性探测中，相同的预训练 epoch（300 和 800）下，ViT-base 的 EMAE 比 MAE 的精度高 6.0%～6.7%。</li>
-<li>ViT-base 的 EMAE epoch 300 的分类结果与 MAE 2400 epoch 的分类结果相当。（GPU-days？）</li>
-<li>ViT-large 的 EMAE epoch 800 的分类结果与 ViT-huge 的 MAE 1600 epoch 的分类结果相当。</li>
-<li>由于基于对比学习的方法具有图像语义一致性的假设，并且该假设与线性探测任务的先验一致，因此 EMAE 的线性结果略低于基于对比学习的算法。</li>
+<li>引入额外的代理任务。CMAE<a href="#ref_6">[6]</a> 除了重建任务以外，引入了一个对比学习的任务，迫使模型学习更具区分性和局部敏感性的特征表示。MixedAE<a href="#ref_7">[7]</a> 引入了同源识别（homologous recognition） 的辅助代理任务，不仅通过明确要求每个 patch 识别同源 patches 来缓解互信息的增加，而且还可以执行 object-aware 的自监督预训练，以获得更好的下游密集感知性能。</li>
 </ul>
-<p><img src="/2023/05/12/Masked_Image_Model/MIM-EMAE%E8%A7%A3%E5%86%B3-MIM-%E6%95%B0%E6%8D%AE%E5%88%A9%E7%94%A8-Glenn/v2-d989c8ee66efc9bcc8a3a73891e0b17d_r.jpg"><br>表1. SOTA 自监督学习方法在 ImageNet top-1 精度比较。LP：线性探测；FT：端到端微调。<br>表 2 、3 、4 可以得出，EMAE 的性能优于之前的 SOTA 自监督学习方法。</p>
-<p><img src="/2023/05/12/Masked_Image_Model/MIM-EMAE%E8%A7%A3%E5%86%B3-MIM-%E6%95%B0%E6%8D%AE%E5%88%A9%E7%94%A8-Glenn/v2-922d30323c1a7d25cd7ff362cd914265_r.jpg"><br>表2. 使用带 FPNs 的 Mask R-CNN 对 COCO 上的目标检测和实例分割结果进行微调。<br><img src="/2023/05/12/Masked_Image_Model/MIM-EMAE%E8%A7%A3%E5%86%B3-MIM-%E6%95%B0%E6%8D%AE%E5%88%A9%E7%94%A8-Glenn/v2-5fb25986bfbd333df97958b5f177c0f4_r.jpg"><br>表3. 使用 ViTDet 对 COCO 上的目标检测和实例分割结果进行微调。<br><img src="/2023/05/12/Masked_Image_Model/MIM-EMAE%E8%A7%A3%E5%86%B3-MIM-%E6%95%B0%E6%8D%AE%E5%88%A9%E7%94%A8-Glenn/v2-0854a91f24bd2d3cdd74f6b5e8cd1be1_r.jpg"><br>表4. 使用 UperNet 对 ADE20K 上的语义分割结果进行微调。<br>表 5、6 反映了 EMAE 中全数据利用、自一致性模块以及 K 值取值的影响。图 4 是自一致性模块有效性的可视化证明。</p>
-<p><img src="/2023/05/12/Masked_Image_Model/MIM-EMAE%E8%A7%A3%E5%86%B3-MIM-%E6%95%B0%E6%8D%AE%E5%88%A9%E7%94%A8-Glenn/v2-89e40b8bfa1bc81dc11876304a040e1f_r.jpg"><br>表5. 消融实验。全数据利用和自一致性模块的影响。<br><img src="/2023/05/12/Masked_Image_Model/MIM-EMAE%E8%A7%A3%E5%86%B3-MIM-%E6%95%B0%E6%8D%AE%E5%88%A9%E7%94%A8-Glenn/v2-ec2df02d24767af4346b012ae979be38_r.jpg"><br>表6. 消融实验。K 值取值的影响。<br><img src="/2023/05/12/Masked_Image_Model/MIM-EMAE%E8%A7%A3%E5%86%B3-MIM-%E6%95%B0%E6%8D%AE%E5%88%A9%E7%94%A8-Glenn/v2-9317015821decd101a2812d22b9188a7_r.jpg"><br>图4. 不同的随机掩蔽策略对应不同的 EMAE 重建结果。</p>
+<p><img src="/2023/05/12/Masked_Image_Model/MIM-%E7%9A%84%E5%B0%8F%E6%80%BB%E7%BB%93-Glenn/v2-bef1d57159894c2cc77e5fa89f62e4e7_r.jpg"><br>MixedAE<br><strong>但当重建任务变得过度困难时，也会导致一系列问题：</strong></p>
+<ul>
+<li>如果过度掩蔽前景对象，模型可能会遇到错位（misalignment）问题，即模型在重建图像时，可能无法正确对齐原始图像中的局部结构和细节。这可能会导致生成的图像与原始图像的语义有所偏差，从而影响模型在下游任务中的性能。</li>
+</ul>
+<p><img src="/2023/05/12/Masked_Image_Model/MIM-%E7%9A%84%E5%B0%8F%E6%80%BB%E7%BB%93-Glenn/v2-3a09c6847daff217798b3479e4d6394c_r.jpg"><br>MIM 的错位（misalignment）问题</p>
+<ul>
+<li>针对复杂的重建目标，可能导致模型过于关注重建任务中的细节，而忽略了下游任务中更为重要的全局信息，从而影响模型性能。</li>
+<li>随着重建任务变得越来越困难，模型可能需要更多的计算资源和时间才能收敛。这可能会导致训练成本上升，对硬件资源要求更高，并且需要更多的数据来避免过拟合。</li>
+</ul>
+<p><strong>为了解决这些问题，我们可以将思路转变如下：</strong></p>
+<ul>
+<li>如何量化重建任务的难度？HPM 使用重建损失作为重建任务难度的指标，而 MixedAE 使用模型输入和重建目标之间的互信息作为量化标准。</li>
+<li>如何平衡重建任务的难度和下游任务的需求？可以通过在训练过程中逐渐增加重建任务的难度，或者在训练过程中引入多个不同难度的重建任务，以逐步提高模型的表征能力。</li>
+<li>如何选择合适的重建目标？这涉及到对具体下游任务的理解和需求。例如，对于目标检测任务，重建任务应该更注重保留物体的形状和位置信息，而对于图像分类任务，重建任务则应更注重提取图像的语义特征。</li>
+</ul>
+<p><strong>那么对应的解决方法：</strong></p>
+<ul>
+<li>权衡掩蔽策略。我们把掩蔽策略的选择看作 tradeoff 问题，即前景掩蔽率越高，通过 MIM 获得的信息越多，但同时解码器的重建难度也越高。对此 AutoMAE<a href="#ref_8">[8]</a> 将掩模生成和图像重建任务集成到一个完全可微的框架中，用于寻找具有较高信息密度的区域内找到重建难度较低的 patch 来掩蔽。DPPMask<a href="#ref_9">[9]</a> 基于行列式点过程 (determinantal point process, DPP)，逐步选择更具有代表性 patches 来保留。特别的，这些方法以及 SemeMAE<a href="#ref_10">[10]</a>、HPM 都可以轻易地构建 easy-to-hard 任务。</li>
+</ul>
+<p><img src="/2023/05/12/Masked_Image_Model/MIM-%E7%9A%84%E5%B0%8F%E6%80%BB%E7%BB%93-Glenn/v2-c6c541fc7ef24f85218e65d0b3fe4d26_r.jpg"><br>MAE、SemMAE、AutoMAE 的对比</p>
+<ul>
+<li>改变重建任务。使用更简单的任务。例如，MixMIM<a href="#ref_11">[11]</a> 和 MixedAE 使用另一幅图像的可见 patch 替换 MIM 的 patch masking&#x2F;zero（可以理解为用 0 来填充 patch），这种创建一个混合图像，然后再进行双重重建的任务，比单纯使用 patch masking&#x2F;zero 再重建的任务要简单。</li>
+</ul>
+<p><img src="/2023/05/12/Masked_Image_Model/MIM-%E7%9A%84%E5%B0%8F%E6%80%BB%E7%BB%93-Glenn/v2-d30d37fe2f0a478acec274149a179546_r.jpg"><br>MixMIM</p>
+<ul>
+<li>解耦重建任务。MIM 中由于解码器中也同时输入了编码器输出的编码特征，那么在完成重建任务的时候，就会对这部分也进行优化，这就限制了编码器的表征学习能力。CAE<a href="#ref_12">[12]</a> 提出 Latent Contextual Regressor 模块，用于解耦编码和解码的角色，前者专心做内容理解，后者专心去预测目标，从而充分激发编码器表征学习的潜能，进而提升表征质量<a href="#ref_13">[13]</a>。</li>
+</ul>
+<h2 id="CAE参考"><a href="#CAE参考" class="headerlink" title="CAE参考"></a><img src="/2023/05/12/Masked_Image_Model/MIM-%E7%9A%84%E5%B0%8F%E6%80%BB%E7%BB%93-Glenn/v2-a3dc5d996ced8d6e58351bb800f6624d_r.jpg"><br>CAE<br>参考</h2><ol>
+<li><a href="#ref_1_0">^</a>Wang, H. et al. Hard Patches Mining for Masked Image Modeling. arXiv preprint arXiv:2304.05919 (2023).</li>
+<li><a href="#ref_2_0">^</a>Wei, C. et al. Masked feature prediction for self-supervised visual pre-training. in Proceedings of the IEEE&#x2F;CVF Conference on Computer Vision and Pattern Recognition 14668–14678 (2022).</li>
+<li><a href="#ref_3_0">^</a>Peng, Z., Dong, L., Bao, H., Ye, Q. &amp; Wei, F. Beit v2: Masked image modeling with vector-quantized visual tokenizers. arXiv preprint arXiv:2208.06366 (2022).</li>
+<li><a href="#ref_4_0">^</a>Wang, H. et al. Masked Image Modeling with Local Multi-Scale Reconstruction. arXiv preprint arXiv:2303.05251 (2023).</li>
+<li><a href="#ref_5_0">^</a>Ren, S., Wei, F., Albanie, S., Zhang, Z. &amp; Hu, H. DeepMIM: Deep Supervision for Masked Image Modeling. arXiv preprint arXiv:2303.08817 (2023).</li>
+<li><a href="#ref_6_0">^</a>Huang, Z. et al. Contrastive masked autoencoders are stronger vision learners. arXiv preprint arXiv:2207.13532 (2022).</li>
+<li><a href="#ref_7_0">^</a>Chen, K. et al. Mixed Autoencoder for Self-supervised Visual Representation Learning. arXiv preprint arXiv:2303.17152 (2023).</li>
+<li><a href="#ref_8_0">^</a>Chen, H., Zhang, W., Wang, Y. &amp; Yang, X. Improving Masked Autoencoders by Learning Where to Mask. arXiv preprint arXiv:2303.06583 (2023).</li>
+<li><a href="#ref_9_0">^</a>Xu, J. et al. DPPMask: Masked Image Modeling with Determinantal Point Processes. arXiv preprint arXiv:2303.12736 (2023).</li>
+<li><a href="#ref_10_0">^</a>Li, G. et al. Semmae: Semantic-guided masking for learning masked autoencoders. arXiv preprint arXiv:2206.10207 (2022).</li>
+<li><a href="#ref_11_0">^</a>Liu, J., Huang, X., Liu, Y. &amp; Li, H. Mixmim: Mixed and masked image modeling for efficient visual representation learning. arXiv preprint arXiv:2205.13137 (2022).</li>
+<li><a href="#ref_12_0">^</a>Chen, X. et al. Context autoencoder for self-supervised representation learning. arXiv preprint arXiv:2202.03026 (2022).</li>
+<li><a href="#ref_13_0">^</a>来看看新一代 MIM 青年 CAE(Context AutoEncoder) 如何克服 MAE 中表征学习不充分的问题 - CW不要無聊的風格的文章 - 知乎 <a target="_blank" rel="noopener" href="https://zhuanlan.zhihu.com/p/519425855">https://zhuanlan.zhihu.com/p/519425855</a></li>
+</ol>
 
       
     </div>
@@ -430,7 +415,7 @@
     
     <li class="post-copyright-link hidden-xs">
       <strong>本文链接：</strong>
-      <a href="https://chenluda.github.io/2023/05/12/Masked_Image_Model/MIM-EMAE%E8%A7%A3%E5%86%B3-MIM-%E6%95%B0%E6%8D%AE%E5%88%A9%E7%94%A8-Glenn/" title="MIM | EMAE：解决 MIM 数据利用率低和预测结果不一致性问题" target="_blank" rel="external">https://chenluda.github.io/2023/05/12/Masked_Image_Model/MIM-EMAE解决-MIM-数据利用-Glenn/</a>
+      <a href="https://chenluda.github.io/2023/05/12/Masked_Image_Model/MIM-%E7%9A%84%E5%B0%8F%E6%80%BB%E7%BB%93-Glenn/" title="MIM 的小总结" target="_blank" rel="external">https://chenluda.github.io/2023/05/12/Masked_Image_Model/MIM-的小总结-Glenn/</a>
     </li>
     
     <li class="post-copyright-license">
@@ -477,12 +462,12 @@
   <ul class="pager pull-left">
     
     <li class="prev">
-      <a href="/2023/05/12/Masked_Image_Model/MIM-FreMAE%E5%9F%BA%E4%BA%8E%E5%82%85%E9%87%8C%E5%8F%B6%E5%8F%98%E6%8D%A2%E7%9A%84-Glenn/" title="MIM | FreMAE：基于傅里叶变换的 MIM 用于医学图像分割"><i class="icon icon-angle-left" aria-hidden="true"></i><span>&nbsp;&nbsp;上一篇</span></a>
+      <a href="/2023/05/12/%E4%BB%A3%E7%A0%81/%E4%BB%A3%E7%A0%81-%E4%BB%8E-OpenReview-%E8%8E%B7%E5%8F%96%E9%A1%B6-Glenn/" title="代码 | 从 OpenReview 获取顶会接收论文集并保存至本地数据库"><i class="icon icon-angle-left" aria-hidden="true"></i><span>&nbsp;&nbsp;上一篇</span></a>
     </li>
     
     
     <li class="next">
-      <a href="/2023/05/12/Masked_Image_Model/MIM-DPPMask%E5%8F%AF%E4%BB%A5%E4%BF%9D%E7%95%99%E5%85%B7%E6%9C%89%E4%BB%A3%E8%A1%A8-Glenn/" title="MIM | DPPMask：可以保留具有代表性 patches 的掩蔽策略"><span>下一篇&nbsp;&nbsp;</span><i class="icon icon-angle-right" aria-hidden="true"></i></a>
+      <a href="/2023/05/12/Masked_Image_Model/MIM-%E7%90%86%E8%AE%BA%E6%8E%A9%E8%94%BD%E5%9B%BE%E5%83%8F%E5%BB%BA%E6%A8%A1%E6%9C%AC%E8%B4%A8%E4%B8%8A%E5%9C%A8%E5%AD%A6%E4%B9%A0%E9%81%AE-Glenn/" title="MIM | 理论：掩蔽图像建模本质上在学习遮挡不变特征"><span>下一篇&nbsp;&nbsp;</span><i class="icon icon-angle-right" aria-hidden="true"></i></a>
     </li>
     
     
