@@ -1,0 +1,632 @@
+<!DOCTYPE html>
+<html lang=zh>
+<head>
+  <meta charset="utf-8">
+  
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=no, minimal-ui">
+  <meta name="renderer" content="webkit">
+  <meta http-equiv="Cache-Control" content="no-transform" />
+  <meta http-equiv="Cache-Control" content="no-siteapp" />
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black">
+  <meta name="format-detection" content="telephone=no,email=no,adress=no">
+  <!-- Color theme for statusbar -->
+  <meta name="theme-color" content="#000000" />
+  <!-- 强制页面在当前窗口以独立页面显示,防止别人在框架里调用页面 -->
+  <meta http-equiv="window-target" content="_top" />
+  
+  
+  <title>MIM | SiamMAE：用于从视频中学习视觉对应关系的 MAE 简单扩展 | Glenn&#39;s blog</title>
+  <meta name="description" content="题目：Siamese Masked Autoencoders作者单位：斯坦福大学、普林斯顿大学论文网址：https:&#x2F;&#x2F;arxiv.org&#x2F;abs&#x2F;2305.14344论文代码：未公开首次发布时间：2023 年 5 月 23 日  123456@article&amp;#123;gupta2023siamese,  title&#x3D;&amp;#123;Siamese Masked Autoencoders&amp;#12">
+<meta property="og:type" content="article">
+<meta property="og:title" content="MIM | SiamMAE：用于从视频中学习视觉对应关系的 MAE 简单扩展">
+<meta property="og:url" content="https://chenluda.github.io/2023/06/07/Masked_Image_Model/%E8%AE%BA%E6%96%87%E9%98%85%E8%AF%BB%E6%9D%8E%E9%A3%9E%E9%A3%9E-MIM-SiamMAE-Glenn/index.html">
+<meta property="og:site_name" content="Glenn">
+<meta property="og:description" content="题目：Siamese Masked Autoencoders作者单位：斯坦福大学、普林斯顿大学论文网址：https:&#x2F;&#x2F;arxiv.org&#x2F;abs&#x2F;2305.14344论文代码：未公开首次发布时间：2023 年 5 月 23 日  123456@article&amp;#123;gupta2023siamese,  title&#x3D;&amp;#123;Siamese Masked Autoencoders&amp;#12">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://chenluda.github.io/2023/06/07/Masked_Image_Model/%E8%AE%BA%E6%96%87%E9%98%85%E8%AF%BB%E6%9D%8E%E9%A3%9E%E9%A3%9E-MIM-SiamMAE-Glenn/v2-0422cd6277e6a40cba831b13f731280e_r.jpg">
+<meta property="og:image" content="https://chenluda.github.io/2023/06/07/Masked_Image_Model/%E8%AE%BA%E6%96%87%E9%98%85%E8%AF%BB%E6%9D%8E%E9%A3%9E%E9%A3%9E-MIM-SiamMAE-Glenn/v2-96a1a3873bdfffb8829a4e9658b5f341_r.jpg">
+<meta property="og:image" content="https://chenluda.github.io/2023/06/07/Masked_Image_Model/%E8%AE%BA%E6%96%87%E9%98%85%E8%AF%BB%E6%9D%8E%E9%A3%9E%E9%A3%9E-MIM-SiamMAE-Glenn/v2-7ee2d8d877ca9743454cd21606dd47df_r.jpg">
+<meta property="og:image" content="https://chenluda.github.io/2023/06/07/Masked_Image_Model/%E8%AE%BA%E6%96%87%E9%98%85%E8%AF%BB%E6%9D%8E%E9%A3%9E%E9%A3%9E-MIM-SiamMAE-Glenn/v2-2552119fd7193e8b4b6cde88814e7a8b_r.jpg">
+<meta property="og:image" content="https://chenluda.github.io/2023/06/07/Masked_Image_Model/%E8%AE%BA%E6%96%87%E9%98%85%E8%AF%BB%E6%9D%8E%E9%A3%9E%E9%A3%9E-MIM-SiamMAE-Glenn/v2-6f6944a720c1dc97176c22e5a832c60c_r.jpg">
+<meta property="og:image" content="https://chenluda.github.io/2023/06/07/Masked_Image_Model/%E8%AE%BA%E6%96%87%E9%98%85%E8%AF%BB%E6%9D%8E%E9%A3%9E%E9%A3%9E-MIM-SiamMAE-Glenn/v2-c32e7eaa8181a8095f0d7f73a2f5f2d2_r.jpg">
+<meta property="og:image" content="https://chenluda.github.io/2023/06/07/Masked_Image_Model/%E8%AE%BA%E6%96%87%E9%98%85%E8%AF%BB%E6%9D%8E%E9%A3%9E%E9%A3%9E-MIM-SiamMAE-Glenn/v2-d6426c02c4c81f3e53c592c3c2f07b50_r.jpg">
+<meta property="og:image" content="https://chenluda.github.io/2023/06/07/Masked_Image_Model/%E8%AE%BA%E6%96%87%E9%98%85%E8%AF%BB%E6%9D%8E%E9%A3%9E%E9%A3%9E-MIM-SiamMAE-Glenn/v2-fcc4ebf938fb31655205bf31cbda2977_r.jpg">
+<meta property="og:image" content="https://chenluda.github.io/2023/06/07/Masked_Image_Model/%E8%AE%BA%E6%96%87%E9%98%85%E8%AF%BB%E6%9D%8E%E9%A3%9E%E9%A3%9E-MIM-SiamMAE-Glenn/v2-ebff18b2470bebebf5a0fb456508e563_r.jpg">
+<meta property="article:published_time" content="2023-06-07T10:51:29.000Z">
+<meta property="article:modified_time" content="2023-06-07T10:53:08.135Z">
+<meta property="article:author" content="Glenn">
+<meta property="article:tag" content="Masked Image Modeling">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://chenluda.github.io/2023/06/07/Masked_Image_Model/%E8%AE%BA%E6%96%87%E9%98%85%E8%AF%BB%E6%9D%8E%E9%A3%9E%E9%A3%9E-MIM-SiamMAE-Glenn/v2-0422cd6277e6a40cba831b13f731280e_r.jpg">
+  <!-- Canonical links -->
+  <link rel="canonical" href="https://chenluda.github.io/2023/06/07/Masked_Image_Model/%E8%AE%BA%E6%96%87%E9%98%85%E8%AF%BB%E6%9D%8E%E9%A3%9E%E9%A3%9E-MIM-SiamMAE-Glenn/index.html">
+  
+    <link rel="alternate" href="/atom.xml" title="Glenn" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="/images/avatar.png" type="image/x-icon">
+  
+  
+<link rel="stylesheet" href="/css/style.css">
+
+  
+  
+  
+  
+<!-- hexo injector head_end start -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/katex.min.css">
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/hexo-math@4.0.0/dist/style.css">
+<!-- hexo injector head_end end --><meta name="generator" content="Hexo 6.3.0"></head>
+
+
+<body class="main-center theme-black" itemscope itemtype="http://schema.org/WebPage">
+  <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+  <div class="slimContent">
+    <div class="navbar-header">
+      
+      
+      <div class="profile-block text-center">
+        <a id="avatar" href="https://github.com/chenluda" target="_blank">
+          <img class="img-circle img-rotate" src="/images/avatar.png" width="200" height="200">
+        </a>
+        <h2 id="name" class="hidden-xs hidden-sm">Glenn</h2>
+        <h3 id="title" class="hidden-xs hidden-sm hidden-md">Stay hungry, stay foolish.</h3>
+        <small id="location" class="text-muted hidden-xs hidden-sm"><i class="icon icon-map-marker"></i> Yunnan, China</small>
+      </div>
+      
+      <div class="search" id="search-form-wrap">
+
+    <form class="search-form sidebar-form">
+        <div class="input-group">
+            <input type="text" class="search-form-input form-control" placeholder="搜索" />
+            <span class="input-group-btn">
+                <button type="submit" class="search-form-submit btn btn-flat" onclick="return false;"><i class="icon icon-search"></i></button>
+            </span>
+        </div>
+    </form>
+    <div class="ins-search">
+  <div class="ins-search-mask"></div>
+  <div class="ins-search-container">
+    <div class="ins-input-wrapper">
+      <input type="text" class="ins-search-input" placeholder="想要查找什么..." x-webkit-speech />
+      <button type="button" class="close ins-close ins-selectable" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span></button>
+    </div>
+    <div class="ins-section-wrapper">
+      <div class="ins-section-container"></div>
+    </div>
+  </div>
+</div>
+
+
+</div>
+      <button class="navbar-toggle collapsed" type="button" data-toggle="collapse" data-target="#main-navbar" aria-controls="main-navbar" aria-expanded="false">
+        <span class="sr-only">Toggle navigation</span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+    </div>
+    <nav id="main-navbar" class="collapse navbar-collapse" itemscope itemtype="http://schema.org/SiteNavigationElement" role="navigation">
+      <ul class="nav navbar-nav main-nav menu-highlight">
+        
+        
+        <li class="menu-item menu-item-home">
+          <a href="/.">
+            
+            <i class="icon icon-home-fill"></i>
+            
+            <span class="menu-title">首页</span>
+          </a>
+        </li>
+        
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives">
+            
+            <i class="icon icon-archives-fill"></i>
+            
+            <span class="menu-title">归档</span>
+          </a>
+        </li>
+        
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories">
+            
+            <i class="icon icon-folder"></i>
+            
+            <span class="menu-title">分类</span>
+          </a>
+        </li>
+        
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about">
+            
+            <i class="icon icon-cup-fill"></i>
+            
+            <span class="menu-title">关于</span>
+          </a>
+        </li>
+        
+      </ul>
+      
+	
+    <ul class="social-links">
+    	
+        <li><a href="https://github.com/chenluda" target="_blank" title="Github" data-toggle=tooltip data-placement=top><i class="icon icon-github"></i></a></li>
+        
+        <li><a href="https://www.zhihu.com/people/Glenn" target="_blank" title="Zhihu" data-toggle=tooltip data-placement=top><i class="icon icon-zhihu"></i></a></li>
+        
+    </ul>
+
+    </nav>
+  </div>
+</header>
+
+  
+    <aside class="sidebar" itemscope itemtype="http://schema.org/WPSideBar">
+  <div class="slimContent">
+    
+      <div class="widget">
+    <h3 class="widget-title">公告</h3>
+    <div class="widget-body">
+        <div id="board">
+            <div class="content">
+                <p>① <strong>google，chatgpt</strong> 账号注册</p> <p>② <strong>chatgpt</strong> 账号升级 <strong>plus</strong></p> <p><strong>联系 wx：GlennChen2021</strong></p> <img src="/images/chatgpt.jpg" width="200" height="200">
+            </div>
+        </div>
+    </div>
+</div>
+
+    
+      
+  <div class="widget">
+    <h3 class="widget-title">分类</h3>
+    <div class="widget-body">
+      <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/%E4%B9%A6%E7%B1%8D/">书籍</a><span class="category-list-count">4</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/%E4%BB%A3%E7%A0%81/">代码</a><span class="category-list-count">4</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/%E6%8E%A8%E8%8D%90/">推荐</a><span class="category-list-count">3</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/%E8%AE%BA%E6%96%87/">论文</a><span class="category-list-count">19</span></li></ul>
+    </div>
+  </div>
+
+
+    
+      
+  <div class="widget">
+    <h3 class="widget-title">标签云</h3>
+    <div class="widget-body tagcloud">
+      <a href="/tags/Competition/" style="font-size: 13px;">Competition</a> <a href="/tags/Masked-Image-Modeling/" style="font-size: 14px;">Masked Image Modeling</a> <a href="/tags/Medical-Image-Segmentation/" style="font-size: 13.25px;">Medical Image Segmentation</a> <a href="/tags/Research/" style="font-size: 13.75px;">Research</a> <a href="/tags/Steve-Jobs/" style="font-size: 13.5px;">Steve Jobs</a>
+    </div>
+  </div>
+
+    
+      
+  <div class="widget">
+    <h3 class="widget-title">归档</h3>
+    <div class="widget-body">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2023/06/">六月 2023</a><span class="archive-list-count">7</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2023/05/">五月 2023</a><span class="archive-list-count">23</span></li></ul>
+    </div>
+  </div>
+
+
+    
+      
+  <div class="widget">
+    <h3 class="widget-title">最新文章</h3>
+    <div class="widget-body">
+      <ul class="recent-post-list list-unstyled no-thumbnail">
+        
+          <li>
+            
+            <div class="item-inner">
+              <p class="item-category">
+                <a class="category-link" href="/categories/%E6%8E%A8%E8%8D%90/">推荐</a>
+              </p>
+              <p class="item-title">
+                <a href="/2023/06/07/%E9%80%9F%E8%A7%88/us%E4%BB%8E%E5%85%A5%E9%97%A8%E5%88%B0%E5%BA%94%E7%94%A8%E4%BB%8E%E8%87%AA%E7%84%B6%E5%88%B0%E7%A7%91%E5%AD%A6%E7%95%85%E8%A1%8C%E7%A7%91%E7%A0%94%E5%AE%87-Glenn/" class="title">Catalyst Plus：从入门到应用，从自然到科学，畅行科研宇宙</a>
+              </p>
+              <p class="item-date">
+                <time datetime="2023-06-07T11:29:23.000Z" itemprop="datePublished">2023-06-07</time>
+              </p>
+            </div>
+          </li>
+          
+          <li>
+            
+            <div class="item-inner">
+              <p class="item-category">
+                <a class="category-link" href="/categories/%E8%AE%BA%E6%96%87/">论文</a>
+              </p>
+              <p class="item-title">
+                <a href="/2023/06/07/Medical_Image_Segmentaion/Seg-%E8%85%B9%E9%83%A8%E5%A4%9A%E5%99%A8%E5%AE%98%E5%92%8C%E8%82%BF%E7%98%A4%E5%88%86%E5%89%B2%E7%9A%84%E5%A2%9E%E9%87%8F%E5%AD%A6-Glenn/" class="title">MedSeg | 腹部多器官和肿瘤分割的增量学习</a>
+              </p>
+              <p class="item-date">
+                <time datetime="2023-06-07T10:58:37.000Z" itemprop="datePublished">2023-06-07</time>
+              </p>
+            </div>
+          </li>
+          
+          <li>
+            
+            <div class="item-inner">
+              <p class="item-category">
+                <a class="category-link" href="/categories/%E8%AE%BA%E6%96%87/">论文</a>
+              </p>
+              <p class="item-title">
+                <a href="/2023/06/07/Medical_Image_Segmentaion/IFE%E5%9F%BA%E4%BA%8E%E6%9B%B2%E7%8E%87%E6%88%96%E4%BF%A1%E6%81%AF%E7%86%B5%E7%9A%84%E9%80%9A%E9%81%93%E6%B3%A8%E6%84%8F%E5%8A%9B%E6%9C%BA-Glenn/" class="title">MedSeg | IFE：基于曲率或信息熵的通道注意力机制</a>
+              </p>
+              <p class="item-date">
+                <time datetime="2023-06-07T10:58:29.000Z" itemprop="datePublished">2023-06-07</time>
+              </p>
+            </div>
+          </li>
+          
+          <li>
+            
+            <div class="item-inner">
+              <p class="item-category">
+                <a class="category-link" href="/categories/%E8%AE%BA%E6%96%87/">论文</a>
+              </p>
+              <p class="item-title">
+                <a href="/2023/06/07/Medical_Image_Segmentaion/Loss%E7%94%A8%E4%BA%8E%E5%8C%BB%E5%AD%A6%E5%9B%BE%E5%83%8F%E5%88%86%E5%89%B2%E7%9A%84%E9%B2%81%E6%A3%92%E6%8D%9F%E5%A4%B1%E5%87%BD-Glenn/" class="title">MedSeg | T-Loss：用于医学图像分割的鲁棒损失函数</a>
+              </p>
+              <p class="item-date">
+                <time datetime="2023-06-07T10:58:29.000Z" itemprop="datePublished">2023-06-07</time>
+              </p>
+            </div>
+          </li>
+          
+          <li>
+            
+            <div class="item-inner">
+              <p class="item-category">
+                <a class="category-link" href="/categories/%E8%AE%BA%E6%96%87/">论文</a>
+              </p>
+              <p class="item-title">
+                <a href="/2023/06/07/Masked_Image_Model/%E8%AE%BA%E6%96%87%E9%98%85%E8%AF%BB%E6%9D%8E%E9%A3%9E%E9%A3%9E-MIM-SiamMAE-Glenn/" class="title">MIM | SiamMAE：用于从视频中学习视觉对应关系的 MAE 简单扩展</a>
+              </p>
+              <p class="item-date">
+                <time datetime="2023-06-07T10:51:29.000Z" itemprop="datePublished">2023-06-07</time>
+              </p>
+            </div>
+          </li>
+          
+      </ul>
+    </div>
+  </div>
+  
+
+    
+  </div>
+</aside>
+
+  
+  
+  <aside class="sidebar sidebar-toc collapse   in  " id="collapseToc" itemscope itemtype="http://schema.org/WPSideBar">
+  <div class="slimContent">
+    <nav id="toc" class="article-toc">
+      <h3 class="toc-title">文章目录</h3>
+      <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#%E4%B8%BB%E8%A6%81%E5%86%85%E5%AE%B9"><span class="toc-number">1.</span> <span class="toc-text">主要内容</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E6%96%B9%E6%B3%95"><span class="toc-number">2.</span> <span class="toc-text">方法</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E8%A1%A8%E6%A0%BC%E7%BB%93%E6%9E%9C%E4%B8%8E%E8%AE%A8%E8%AE%BA"><span class="toc-number">3.</span> <span class="toc-text">表格结果与讨论</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E5%8F%AF%E8%A7%86%E5%8C%96%E7%BB%93%E6%9E%9C%E4%B8%8E%E8%AE%A8%E8%AE%BA"><span class="toc-number">4.</span> <span class="toc-text">可视化结果与讨论</span></a></li></ol>
+    </nav>
+  </div>
+</aside>
+
+<main class="main" role="main">
+  <div class="content">
+  <article id="post-Masked_Image_Model/论文阅读李飞飞-MIM-SiamMAE-Glenn" class="article article-type-post" itemscope itemtype="http://schema.org/BlogPosting">
+    
+    <div class="article-header">
+      
+        
+  
+    <h1 class="article-title" itemprop="name">
+      MIM | SiamMAE：用于从视频中学习视觉对应关系的 MAE 简单扩展
+    </h1>
+  
+
+      
+      <div class="article-meta">
+        <span class="article-date">
+    <i class="icon icon-calendar-check"></i>
+	<a href="/2023/06/07/Masked_Image_Model/%E8%AE%BA%E6%96%87%E9%98%85%E8%AF%BB%E6%9D%8E%E9%A3%9E%E9%A3%9E-MIM-SiamMAE-Glenn/" class="article-date">
+	  <time datetime="2023-06-07T10:51:29.000Z" itemprop="datePublished">2023-06-07</time>
+	</a>
+</span>
+        
+  <span class="article-category">
+    <i class="icon icon-folder"></i>
+    <a class="article-category-link" href="/categories/%E8%AE%BA%E6%96%87/">论文</a>
+  </span>
+
+        
+  <span class="article-tag">
+    <i class="icon icon-tags"></i>
+	<a class="article-tag-link-link" href="/tags/Masked-Image-Modeling/" rel="tag">Masked Image Modeling</a>
+  </span>
+
+
+        
+
+	<span class="article-read hidden-xs">
+    	<i class="icon icon-eye-fill" aria-hidden="true"></i>
+    	<span id="/2023/06/07/Masked_Image_Model/%E8%AE%BA%E6%96%87%E9%98%85%E8%AF%BB%E6%9D%8E%E9%A3%9E%E9%A3%9E-MIM-SiamMAE-Glenn/" class="leancloud_visitors"  data-flag-title="MIM | SiamMAE：用于从视频中学习视觉对应关系的 MAE 简单扩展">
+			<span class="leancloud-visitors-count">0</span>
+		</span>
+    </span>
+
+        <span class="post-comment"><i class="icon icon-comment"></i> <a href="/2023/06/07/Masked_Image_Model/%E8%AE%BA%E6%96%87%E9%98%85%E8%AF%BB%E6%9D%8E%E9%A3%9E%E9%A3%9E-MIM-SiamMAE-Glenn/#comments" class="article-comment-link">评论</a></span>
+        
+      </div>
+    </div>
+    <div class="article-entry marked-body" itemprop="articleBody">
+      
+        <p><img src="/2023/06/07/Masked_Image_Model/%E8%AE%BA%E6%96%87%E9%98%85%E8%AF%BB%E6%9D%8E%E9%A3%9E%E9%A3%9E-MIM-SiamMAE-Glenn/v2-0422cd6277e6a40cba831b13f731280e_r.jpg"></p>
+<blockquote>
+<p><em><strong>题目：</strong>Siamese Masked Autoencoders</em><br><em><strong>作者单位：</strong>斯坦福大学、普林斯顿大学</em><br><em><strong>论文网址：</strong><a href="https://link.zhihu.com/?target=https://arxiv.org/abs/2305.14344">https://arxiv.org/abs/2305.14344</a></em><br><em><strong>论文代码：</strong>未公开</em><br><em><strong>首次发布时间：</strong>2023 年 5 月 23 日</em></p>
+</blockquote>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">@article&#123;gupta2023siamese,</span><br><span class="line">  title=&#123;Siamese Masked Autoencoders&#125;,</span><br><span class="line">  author=&#123;Gupta, Agrim and Wu, Jiajun and Deng, Jia and Fei-Fei, Li&#125;,</span><br><span class="line">  journal=&#123;arXiv preprint arXiv:2305.14344&#125;,</span><br><span class="line">  year=&#123;2023&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+
+<h1 id="主要内容"><a href="#主要内容" class="headerlink" title="主要内容"></a>主要内容</h1><p>将 MIM 方法从图像扩展到视频以学习对应关系并非易事，原因有二：</p>
+<ul>
+<li>类似 MAE 的架构学习的特征专门用于像素重建任务，在微调方面显示出出色的下游性能，但在 zero-shot 设置下传播性能不佳；</li>
+<li>视频的时间维度具有独特性。与图像（近似各向同性）不同，视频中的时间维度是有方向性的。这意味着视频数据不能简单地视为图像数据的集合，而应该考虑到时间维度中的连续性和动态变化。</li>
+</ul>
+<p>因此，对空间和时间信息进行相同的处理可能并不是最优的选择。</p>
+<p>为了解决这些局限性给，作者提出了 Siamese Masked Autoencoders（SiamMAE）：用于从视频中学习视觉对应关系的 MAE 的简单扩展。</p>
+<ul>
+<li>SiamMAE 从一个视频中随机选择两帧，将<strong>未来帧的</strong> patches （95%）随机屏蔽，而<strong>过去帧</strong>保持不变；</li>
+<li>编码器独立处理这两帧，以提取对应的特征表示；</li>
+<li>将特征表示输入由一系列 cross-attention 层组成的解码器，以预测未来帧中丢失的 patches。</li>
+</ul>
+<p>对称遮罩的简单扩展方法（即在过去和未来的帧中都进行遮罩）可能会浪费模型的容量，因为它需要模型在低级别的图像细节上花费大量的计算能力。而 SiamMAE 这种不对称遮罩方法（asymmetric masking approach）可以专注于理解和学习高级别的动态信息，例如物体的运动和变化，而不是低级别的图像细节。这可能会提高模型处理视频数据的性能，尤其是在预测未来帧中丢失的 patches 或理解视频中的时间连续性和动态变化等任务上。</p>
+<hr>
+<h1 id="方法"><a href="#方法" class="headerlink" title="方法"></a>方法</h1><p>SiamMAE 的框架如图 1 所示：</p>
+<p><img src="/2023/06/07/Masked_Image_Model/%E8%AE%BA%E6%96%87%E9%98%85%E8%AF%BB%E6%9D%8E%E9%A3%9E%E9%A3%9E-MIM-SiamMAE-Glenn/v2-96a1a3873bdfffb8829a4e9658b5f341_r.jpg"><br>图1. SiamMAE 框架<br><strong>Patchify：</strong></p>
+<ul>
+<li>给定具有 L 帧的视频，首先随机采样 2 帧 f_1 和 f_2 。这两帧之间的距离是通过从预先确定的帧间隙范围中选择一个随机值来确定的。</li>
+<li>然后，将每个帧转换为非重叠的 N×N 个 patches 序列。</li>
+<li>最后，将 position embeddings 添加到 patches 的 linear projections 中，并添加 [CLS] tokens。此阶段不使用任何时间位置嵌入。</li>
+</ul>
+<p><strong>Masking：</strong></p>
+<ul>
+<li>在第一帧（ f_1 ）中不遮罩任何 patches（0%），并在第二帧（ f_2 ）中遮罩非常高的比例（95%）的 patches。通过提供整个过去帧作为输入，网络只需要将过去帧的 patches 传播到未来帧中的适当位置。</li>
+<li>为了进一步增加任务的难度，对具有较大时间间隙的两个帧进行了采样。尽管对未来的预测本质上是不确定的，可能产生多个看似合理的结果，但提供少量可见 patches 作为第二帧的输入，可以产生具有挑战性但易于处理的自监督学习任务。</li>
+</ul>
+<p><strong>Patchify</strong> 和 <strong>Masking</strong> 的操作可视化如图 2 所示。</p>
+<p><img src="/2023/06/07/Masked_Image_Model/%E8%AE%BA%E6%96%87%E9%98%85%E8%AF%BB%E6%9D%8E%E9%A3%9E%E9%A3%9E-MIM-SiamMAE-Glenn/v2-7ee2d8d877ca9743454cd21606dd47df_r.jpg"><br>图2. Kinetics-400 验证集的可视化（掩蔽率 90%）。对于每个视频序列，先采样一个 8 帧的片段，帧间隙为 4。显示原始视频（顶部） ，SiamMAE 输出（中部），屏蔽未来帧（底部）。使用 f1 作为视频片段的第一帧，f2 作为其余帧。<br><strong>Encoder：</strong>SiamMAE 探索了两种 Encoder。 </p>
+<ul>
+<li>Joint Encoder，将来自两帧的未遮罩 patches 连接起来，然后由标准的 ViT 编码器进行处理；</li>
+<li>Siamese Encoder，不对称遮罩作为信息瓶颈来独立处理两帧。</li>
+</ul>
+<p><strong>Decoder：</strong>SiamMAE 探索了三种 Decoder。</p>
+<ul>
+<li>Joint Decoder，将来自两帧的所有 tokens 连接起来，然后由标准的 Transformer Block 进行处理；</li>
+<li>Cross-Self Decoder，这种解码器类似于原始的 Transformer 模型的编码器-解码器设计。每个解码器块由一个交叉注意力层和一个自注意力层组成。来自第二帧的 tokens 通过交叉注意力层关注来自第一帧的 tokens，然后通过自注意力层相互关注；</li>
+<li>Cross Decoder，这种解码器由只有交叉注意力层的解码器块组成，其中来自第二帧的 tokens 关注来自第一帧的 tokens。</li>
+</ul>
+<hr>
+<h1 id="表格结果与讨论"><a href="#表格结果与讨论" class="headerlink" title="表格结果与讨论"></a>表格结果与讨论</h1><p>如表 1 和图 3 所示，SiamMAE 在视频对象分割（DAVIS-2017）、人体姿态传播（JHMDB）和语义部分传播（VIP）三个下游任务上的性能超过了所有之前的对比学习和自监督对应学习方法。</p>
+<p><img src="/2023/06/07/Masked_Image_Model/%E8%AE%BA%E6%96%87%E9%98%85%E8%AF%BB%E6%9D%8E%E9%A3%9E%E9%A3%9E-MIM-SiamMAE-Glenn/v2-2552119fd7193e8b4b6cde88814e7a8b_r.jpg"><br>表1. 在视频对象分割（DAVIS-2017）、人体姿态传播（JHMDB）和语义部分传播（VIP）三个下游任务上模型性能对比<br><img src="/2023/06/07/Masked_Image_Model/%E8%AE%BA%E6%96%87%E9%98%85%E8%AF%BB%E6%9D%8E%E9%A3%9E%E9%A3%9E-MIM-SiamMAE-Glenn/v2-6f6944a720c1dc97176c22e5a832c60c_r.jpg"><br>图3. 在视频对象分割（DAVIS-2017）、人体姿态传播（JHMDB）和语义部分传播（VIP）三个下游任务上模型性能可视化结果<br>表 2 对 SiamMAE 方法进行了消融研究，以了解每项设计决策对最终结果的影响。这些设计包括：siamese encoder、cross-self decoder、不对称掩蔽比率（asymmetric masking ratio，95%）、帧采样间隔（frame sampling gap，4-48）。</p>
+<p><img src="/2023/06/07/Masked_Image_Model/%E8%AE%BA%E6%96%87%E9%98%85%E8%AF%BB%E6%9D%8E%E9%A3%9E%E9%A3%9E-MIM-SiamMAE-Glenn/v2-c32e7eaa8181a8095f0d7f73a2f5f2d2_r.jpg"><br>表2. 在 DAVIS-2017 上 SiamMAE 的消融实验<br><strong>FrameMAE：</strong></p>
+<p>FrameMAE 是 SiamMAE 方法的一种变体，其将 MAE 扩展到视频帧上，即使用 Joint Encoder 和 Joint Decoder，并配合对称的掩蔽比率。如表 2 (a) 所示：</p>
+<ul>
+<li>实验结果显示，当掩蔽比率过高（90%）或过低（50%）时，FrameMAE 的性能会显著下降。90% 的掩蔽比率使得学习时序对应关系的任务变得具有挑战性（损失增大），因为可用于学习的 patches 数量不足。</li>
+<li>而掩蔽比率为 50% 时，任务变得更容易（损失降低），由于图像的空间冗余，网络可以在不依赖时序信息的情况下重建帧。</li>
+<li>采用不对称掩蔽比率的 SiamMAE 效果最佳。</li>
+</ul>
+<p><strong>Encoder-decoder design：</strong></p>
+<p>编码器-解码器设计是 SiamMAE 的重要设计决策之一。研究表明，不同编码器和解码器的组合会影响模型的性能。如表 2 (b) 所示：</p>
+<ul>
+<li>在所有的解码器设计中，Joint Encoder 的性能都显著低于 Siamese Encoder。这可以归因于训练和测试设置之间的差异，因为在测试阶段，每一帧都是独立处理的。</li>
+<li>Siamese Encoder 和 Cross Decoder 的组合在所有 Siamese Encoder 组合中性能最差。此外，还观察到，训练损失较高，且重建的帧在空间上不连贯，原因是 f_2 中的所有 patches 都是独立处理的。</li>
+<li>Joint Encoder 和 Cross-Self Decoder 的组合性能超过所有其他组合。</li>
+</ul>
+<p><strong>Masking：</strong></p>
+<p>这里对 Joint Encoder 和 Cross-Self Decoder 的遮罩方案进行了研究。</p>
+<p>随机对称遮罩的效果较差，也比对应的 FrameMAE 配置差。</p>
+<p>该研究还探讨了网格化的遮罩采样策略，该策略保留每个交替的 patches。这是一个相对容易的任务，因为遮罩模式使网络能够利用并学习空间-时间相关性。虽然我们看到了显著的提升（41.5到48.2），但与 SiamMAE 相比，性能仍然显著低。此外，研究还探讨了不同的不对称掩蔽比率。我们发现一个明显的趋势：将遮罩比率从50%增加到95%会提高性能（49.0%到58.1%）。</p>
+<p><strong>Data augmentation：</strong></p>
+<p>如表 3(a) 所示，该研究还探讨了不同的数据增强策略的影响。</p>
+<p><img src="/2023/06/07/Masked_Image_Model/%E8%AE%BA%E6%96%87%E9%98%85%E8%AF%BB%E6%9D%8E%E9%A3%9E%E9%A3%9E-MIM-SiamMAE-Glenn/v2-d6426c02c4c81f3e53c592c3c2f07b50_r.jpg"><br>表3. 在 DAVIS-2017 上 SiamMAE 的数据增强消融实验</p>
+<ul>
+<li>与图像和视频领域的研究结果类似，SiamMAE 不需要大量的数据增强就可以达到竞争性的性能。</li>
+<li>随机裁剪（缩放范围在 [0.5, 1]）和水平翻转效果最好，而增加颜色抖动则会导致性能下降。</li>
+<li>SiamMAE 通过依赖视频中可用的自然数据增强来获得优越的结果。</li>
+</ul>
+<p><strong>Frame sampling：</strong></p>
+<p>视频数据是丰富的数据增强源，例如姿势、光照视点、遮挡等的变化。为了有效地利用这一点，表 3 (b) 展示了帧采样的重要性。</p>
+<p>随着帧采样间隔的增加，性能有所提高。自然视频通常表现出逐渐的时间变化，因此，增加帧间隔导致更强大的自然数据增强，从而提高性能。</p>
+<p><strong>Training schedule：</strong></p>
+<p>消融研究都是基于 400 epochs 的预训练。图 4 研究了训练 epochs 对 ViT-S&#x2F;16 和 ViT-S&#x2F;8 模型在三个下游任务中的影响。</p>
+<p><img src="/2023/06/07/Masked_Image_Model/%E8%AE%BA%E6%96%87%E9%98%85%E8%AF%BB%E6%9D%8E%E9%A3%9E%E9%A3%9E-MIM-SiamMAE-Glenn/v2-fcc4ebf938fb31655205bf31cbda2977_r.jpg"><br>图4. 训练 epochs 和 patches 尺寸对三个下游任务的性能影响<br>在所有的 patch 尺寸和所有的任务中，随着训练时间的增加和 patches 尺寸的减小，准确度都会逐渐提高。</p>
+<hr>
+<h1 id="可视化结果与讨论"><a href="#可视化结果与讨论" class="headerlink" title="可视化结果与讨论"></a>可视化结果与讨论</h1><p>作者可视化了 ViT-S&#x2F;8 模型的自注意力图。用 [CLS] token 作为 query，并从最后一层的 single head 可视化 ImageNet 的 720p 图像的注意力图。</p>
+<p>由图 5 可以看出模型关注对象的边界。例如，它可以清楚地勾勒出标志性的对象（如第一行第一列的羊），多个对象（如第三行第六列的三个棒球运动员），甚至在场景混乱时也能做到这一点（如第二行第四列的鸟）。</p>
+<p><img src="/2023/06/07/Masked_Image_Model/%E8%AE%BA%E6%96%87%E9%98%85%E8%AF%BB%E6%9D%8E%E9%A3%9E%E9%A3%9E-MIM-SiamMAE-Glenn/v2-ebff18b2470bebebf5a0fb456508e563_r.jpg"><br>图5. ViT-S&#x2F;8 模型的自注意力图</p>
+
+      
+    </div>
+    <div class="article-footer">
+      <blockquote class="mt-2x">
+  <ul class="post-copyright list-unstyled">
+    
+    <li class="post-copyright-link hidden-xs">
+      <strong>本文链接：</strong>
+      <a href="https://chenluda.github.io/2023/06/07/Masked_Image_Model/%E8%AE%BA%E6%96%87%E9%98%85%E8%AF%BB%E6%9D%8E%E9%A3%9E%E9%A3%9E-MIM-SiamMAE-Glenn/" title="MIM | SiamMAE：用于从视频中学习视觉对应关系的 MAE 简单扩展" target="_blank" rel="external">https://chenluda.github.io/2023/06/07/Masked_Image_Model/论文阅读李飞飞-MIM-SiamMAE-Glenn/</a>
+    </li>
+    
+    <li class="post-copyright-license">
+      <strong>版权声明： </strong> 本博客所有文章除特别声明外，均采用 <a href="http://creativecommons.org/licenses/by/4.0/deed.zh" target="_blank" rel="external">CC BY 4.0 CN协议</a> 许可协议。转载请注明出处！
+    </li>
+  </ul>
+</blockquote>
+
+
+<div class="panel panel-default panel-badger">
+  <div class="panel-body">
+    <figure class="media">
+      <div class="media-left">
+        <a href="https://github.com/chenluda" target="_blank" class="img-burn thumb-sm visible-lg">
+          <img src="/images/avatar.png" class="img-rounded w-full" alt="">
+        </a>
+      </div>
+      <div class="media-body">
+        <h3 class="media-heading"><a href="https://github.com/chenluda" target="_blank"><span class="text-dark">Glenn</span><small class="ml-1x">Stay hungry, stay foolish.</small></a></h3>
+        <div>咖啡，健身，热爱生活。</div>
+      </div>
+    </figure>
+  </div>
+</div>
+
+
+    </div>
+  </article>
+  
+    
+  <section id="comments">
+  	
+      <div id="vcomments"></div>
+    
+  </section>
+
+
+  
+</div>
+
+  <nav class="bar bar-footer clearfix" data-stick-bottom>
+  <div class="bar-inner">
+  
+  <ul class="pager pull-left">
+    
+    <li class="prev">
+      <a href="/2023/06/07/Medical_Image_Segmentaion/Loss%E7%94%A8%E4%BA%8E%E5%8C%BB%E5%AD%A6%E5%9B%BE%E5%83%8F%E5%88%86%E5%89%B2%E7%9A%84%E9%B2%81%E6%A3%92%E6%8D%9F%E5%A4%B1%E5%87%BD-Glenn/" title="MedSeg | T-Loss：用于医学图像分割的鲁棒损失函数"><i class="icon icon-angle-left" aria-hidden="true"></i><span>&nbsp;&nbsp;上一篇</span></a>
+    </li>
+    
+    
+    <li class="next">
+      <a href="/2023/06/07/Masked_Image_Model/%E8%AE%BA%E6%96%87%E9%98%85%E8%AF%BB-MIM-MR-MAE%E5%AE%8C%E7%BE%8E%E5%88%A9%E7%94%A8-Glenn/" title="MIM | MR-MAE：完美利用 MIM 的高级与低级特征"><span>下一篇&nbsp;&nbsp;</span><i class="icon icon-angle-right" aria-hidden="true"></i></a>
+    </li>
+    
+    
+    <li class="toggle-toc">
+      <a class="toggle-btn " data-toggle="collapse" href="#collapseToc" aria-expanded="false" title="文章目录" role="button">    <span>[&nbsp;</span><span>文章目录</span>
+        <i class="text-collapsed icon icon-anchor"></i>
+        <i class="text-in icon icon-close"></i>
+        <span>]</span>
+      </a>
+    </li>
+    
+  </ul>
+  
+  
+  
+  <div class="bar-right">
+    
+    <div class="share-component" data-sites="weibo,qq,wechat,facebook,twitter" data-mobile-sites="weibo,qq,qzone"></div>
+    
+  </div>
+  </div>
+</nav>
+  
+
+
+</main>
+
+  <footer class="footer" itemscope itemtype="http://schema.org/WPFooter">
+	
+	
+    <ul class="social-links">
+    	
+        <li><a href="https://github.com/chenluda" target="_blank" title="Github" data-toggle=tooltip data-placement=top><i class="icon icon-github"></i></a></li>
+        
+        <li><a href="https://www.zhihu.com/people/Glenn" target="_blank" title="Zhihu" data-toggle=tooltip data-placement=top><i class="icon icon-zhihu"></i></a></li>
+        
+    </ul>
+
+    <div class="copyright">
+    	
+        &copy; 2023 Glenn
+        
+        <div class="publishby">
+        	Theme by <a href="https://github.com/cofess" target="_blank"> cofess </a>base on <a href="https://github.com/cofess/hexo-theme-pure" target="_blank">pure</a>.
+        </div>
+    </div>
+</footer>
+  <script src="//cdn.jsdelivr.net/npm/jquery@1.12.4/dist/jquery.min.js"></script>
+<script>
+window.jQuery || document.write('<script src="js/jquery.min.js"><\/script>')
+</script>
+
+<script src="/js/plugin.min.js"></script>
+
+
+<script src="/js/application.js"></script>
+
+
+    <script>
+(function (window) {
+    var INSIGHT_CONFIG = {
+        TRANSLATION: {
+            POSTS: '文章',
+            PAGES: '页面',
+            CATEGORIES: '分类',
+            TAGS: '标签',
+            UNTITLED: '(未命名)',
+        },
+        ROOT_URL: '/',
+        CONTENT_URL: '/content.json',
+    };
+    window.INSIGHT_CONFIG = INSIGHT_CONFIG;
+})(window);
+</script>
+
+<script src="/js/insight.js"></script>
+
+
+
+
+
+
+   
+
+
+
+
+   
+    
+  <script src="//cdn1.lncld.net/static/js/3.0.4/av-min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/valine"></script>
+  <script type="text/javascript">
+  var GUEST = ['nick', 'mail', 'link'];
+  var meta = 'nick,mail,link';
+  meta = meta.split(',').filter(function(item) {
+    return GUEST.indexOf(item) > -1;
+  });
+  new Valine({
+    el: '#vcomments',
+    verify: false,
+    notify: false,
+    appId: 'rSq08S6gdVroDI1A4r7XWnix-MdYXbMMI',
+    appKey: '5UM6jz8DwNaaEQTN5ojTHB1N',
+    placeholder: '请输入...',
+    avatar: 'mm',
+    meta: meta,
+    pageSize: '10' || 10,
+    visitor: true
+  });
+  </script>
+
+     
+
+
+
+
+
+
+
+</body>
+</html>

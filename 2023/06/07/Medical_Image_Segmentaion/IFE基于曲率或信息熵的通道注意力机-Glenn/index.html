@@ -1,0 +1,620 @@
+<!DOCTYPE html>
+<html lang=zh>
+<head>
+  <meta charset="utf-8">
+  
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=no, minimal-ui">
+  <meta name="renderer" content="webkit">
+  <meta http-equiv="Cache-Control" content="no-transform" />
+  <meta http-equiv="Cache-Control" content="no-siteapp" />
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black">
+  <meta name="format-detection" content="telephone=no,email=no,adress=no">
+  <!-- Color theme for statusbar -->
+  <meta name="theme-color" content="#000000" />
+  <!-- 强制页面在当前窗口以独立页面显示,防止别人在框架里调用页面 -->
+  <meta http-equiv="window-target" content="_top" />
+  
+  
+  <title>MedSeg | IFE：基于曲率或信息熵的通道注意力机制 | Glenn&#39;s blog</title>
+  <meta name="description" content="题目：Instructive Feature Enhancement for Dichotomous Medical Image Segmentation作者单位：深圳大学、Shenzhen RayShape Medical Technology Co.、苏黎世联邦理工学院论文网址：https:&#x2F;&#x2F;arxiv.org&#x2F;abs&#x2F;2306.03497论文代码：https:&#x2F;&#x2F;github.com&#x2F;">
+<meta property="og:type" content="article">
+<meta property="og:title" content="MedSeg | IFE：基于曲率或信息熵的通道注意力机制">
+<meta property="og:url" content="https://chenluda.github.io/2023/06/07/Medical_Image_Segmentaion/IFE%E5%9F%BA%E4%BA%8E%E6%9B%B2%E7%8E%87%E6%88%96%E4%BF%A1%E6%81%AF%E7%86%B5%E7%9A%84%E9%80%9A%E9%81%93%E6%B3%A8%E6%84%8F%E5%8A%9B%E6%9C%BA-Glenn/index.html">
+<meta property="og:site_name" content="Glenn">
+<meta property="og:description" content="题目：Instructive Feature Enhancement for Dichotomous Medical Image Segmentation作者单位：深圳大学、Shenzhen RayShape Medical Technology Co.、苏黎世联邦理工学院论文网址：https:&#x2F;&#x2F;arxiv.org&#x2F;abs&#x2F;2306.03497论文代码：https:&#x2F;&#x2F;github.com&#x2F;">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://chenluda.github.io/2023/06/07/Medical_Image_Segmentaion/IFE%E5%9F%BA%E4%BA%8E%E6%9B%B2%E7%8E%87%E6%88%96%E4%BF%A1%E6%81%AF%E7%86%B5%E7%9A%84%E9%80%9A%E9%81%93%E6%B3%A8%E6%84%8F%E5%8A%9B%E6%9C%BA-Glenn/v2-7b066634f116196c6a3c9ff6a6634c75_r.jpg">
+<meta property="og:image" content="https://chenluda.github.io/2023/06/07/Medical_Image_Segmentaion/IFE%E5%9F%BA%E4%BA%8E%E6%9B%B2%E7%8E%87%E6%88%96%E4%BF%A1%E6%81%AF%E7%86%B5%E7%9A%84%E9%80%9A%E9%81%93%E6%B3%A8%E6%84%8F%E5%8A%9B%E6%9C%BA-Glenn/v2-ce3d6d6561307d384ab3ff471adf936e_r.jpg">
+<meta property="og:image" content="https://chenluda.github.io/2023/06/07/Medical_Image_Segmentaion/IFE%E5%9F%BA%E4%BA%8E%E6%9B%B2%E7%8E%87%E6%88%96%E4%BF%A1%E6%81%AF%E7%86%B5%E7%9A%84%E9%80%9A%E9%81%93%E6%B3%A8%E6%84%8F%E5%8A%9B%E6%9C%BA-Glenn/v2-d886937e24da4eb32dc05ad7c6b4a2fd_r.jpg">
+<meta property="og:image" content="https://chenluda.github.io/2023/06/07/Medical_Image_Segmentaion/IFE%E5%9F%BA%E4%BA%8E%E6%9B%B2%E7%8E%87%E6%88%96%E4%BF%A1%E6%81%AF%E7%86%B5%E7%9A%84%E9%80%9A%E9%81%93%E6%B3%A8%E6%84%8F%E5%8A%9B%E6%9C%BA-Glenn/v2-09937b209a7890ba179019e39485006c_r.jpg">
+<meta property="og:image" content="https://chenluda.github.io/2023/06/07/Medical_Image_Segmentaion/IFE%E5%9F%BA%E4%BA%8E%E6%9B%B2%E7%8E%87%E6%88%96%E4%BF%A1%E6%81%AF%E7%86%B5%E7%9A%84%E9%80%9A%E9%81%93%E6%B3%A8%E6%84%8F%E5%8A%9B%E6%9C%BA-Glenn/v2-1bf12076aef50735d17d05d14e1b529f_r.jpg">
+<meta property="og:image" content="https://chenluda.github.io/2023/06/07/Medical_Image_Segmentaion/IFE%E5%9F%BA%E4%BA%8E%E6%9B%B2%E7%8E%87%E6%88%96%E4%BF%A1%E6%81%AF%E7%86%B5%E7%9A%84%E9%80%9A%E9%81%93%E6%B3%A8%E6%84%8F%E5%8A%9B%E6%9C%BA-Glenn/v2-8474e35e7bd9800eaf111a0c2f7538ee_r.jpg">
+<meta property="og:image" content="https://chenluda.github.io/2023/06/07/Medical_Image_Segmentaion/IFE%E5%9F%BA%E4%BA%8E%E6%9B%B2%E7%8E%87%E6%88%96%E4%BF%A1%E6%81%AF%E7%86%B5%E7%9A%84%E9%80%9A%E9%81%93%E6%B3%A8%E6%84%8F%E5%8A%9B%E6%9C%BA-Glenn/v2-aa19efdef12f7132fdef44620ae99efb_r.jpg">
+<meta property="og:image" content="https://chenluda.github.io/2023/06/07/Medical_Image_Segmentaion/IFE%E5%9F%BA%E4%BA%8E%E6%9B%B2%E7%8E%87%E6%88%96%E4%BF%A1%E6%81%AF%E7%86%B5%E7%9A%84%E9%80%9A%E9%81%93%E6%B3%A8%E6%84%8F%E5%8A%9B%E6%9C%BA-Glenn/v2-25bca420244d9148b2c4c3dfac1b7a44_r.jpg">
+<meta property="og:image" content="https://chenluda.github.io/2023/06/07/Medical_Image_Segmentaion/IFE%E5%9F%BA%E4%BA%8E%E6%9B%B2%E7%8E%87%E6%88%96%E4%BF%A1%E6%81%AF%E7%86%B5%E7%9A%84%E9%80%9A%E9%81%93%E6%B3%A8%E6%84%8F%E5%8A%9B%E6%9C%BA-Glenn/v2-51718417bf44bdcaea864944c3eb9ce8_r.jpg">
+<meta property="og:image" content="https://chenluda.github.io/2023/06/07/Medical_Image_Segmentaion/IFE%E5%9F%BA%E4%BA%8E%E6%9B%B2%E7%8E%87%E6%88%96%E4%BF%A1%E6%81%AF%E7%86%B5%E7%9A%84%E9%80%9A%E9%81%93%E6%B3%A8%E6%84%8F%E5%8A%9B%E6%9C%BA-Glenn/v2-4b5c78e06def5675386d8b085ed612da_r.jpg">
+<meta property="og:image" content="https://chenluda.github.io/2023/06/07/Medical_Image_Segmentaion/IFE%E5%9F%BA%E4%BA%8E%E6%9B%B2%E7%8E%87%E6%88%96%E4%BF%A1%E6%81%AF%E7%86%B5%E7%9A%84%E9%80%9A%E9%81%93%E6%B3%A8%E6%84%8F%E5%8A%9B%E6%9C%BA-Glenn/v2-f533122282757523a00c372e9fc4fb56_r.jpg">
+<meta property="article:published_time" content="2023-06-07T10:58:29.000Z">
+<meta property="article:modified_time" content="2023-06-07T11:05:57.926Z">
+<meta property="article:author" content="Glenn">
+<meta property="article:tag" content="Medical Image Segmentation">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://chenluda.github.io/2023/06/07/Medical_Image_Segmentaion/IFE%E5%9F%BA%E4%BA%8E%E6%9B%B2%E7%8E%87%E6%88%96%E4%BF%A1%E6%81%AF%E7%86%B5%E7%9A%84%E9%80%9A%E9%81%93%E6%B3%A8%E6%84%8F%E5%8A%9B%E6%9C%BA-Glenn/v2-7b066634f116196c6a3c9ff6a6634c75_r.jpg">
+  <!-- Canonical links -->
+  <link rel="canonical" href="https://chenluda.github.io/2023/06/07/Medical_Image_Segmentaion/IFE%E5%9F%BA%E4%BA%8E%E6%9B%B2%E7%8E%87%E6%88%96%E4%BF%A1%E6%81%AF%E7%86%B5%E7%9A%84%E9%80%9A%E9%81%93%E6%B3%A8%E6%84%8F%E5%8A%9B%E6%9C%BA-Glenn/index.html">
+  
+    <link rel="alternate" href="/atom.xml" title="Glenn" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="/images/avatar.png" type="image/x-icon">
+  
+  
+<link rel="stylesheet" href="/css/style.css">
+
+  
+  
+  
+  
+<!-- hexo injector head_end start -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/katex.min.css">
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/hexo-math@4.0.0/dist/style.css">
+<!-- hexo injector head_end end --><meta name="generator" content="Hexo 6.3.0"></head>
+
+
+<body class="main-center theme-black" itemscope itemtype="http://schema.org/WebPage">
+  <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+  <div class="slimContent">
+    <div class="navbar-header">
+      
+      
+      <div class="profile-block text-center">
+        <a id="avatar" href="https://github.com/chenluda" target="_blank">
+          <img class="img-circle img-rotate" src="/images/avatar.png" width="200" height="200">
+        </a>
+        <h2 id="name" class="hidden-xs hidden-sm">Glenn</h2>
+        <h3 id="title" class="hidden-xs hidden-sm hidden-md">Stay hungry, stay foolish.</h3>
+        <small id="location" class="text-muted hidden-xs hidden-sm"><i class="icon icon-map-marker"></i> Yunnan, China</small>
+      </div>
+      
+      <div class="search" id="search-form-wrap">
+
+    <form class="search-form sidebar-form">
+        <div class="input-group">
+            <input type="text" class="search-form-input form-control" placeholder="搜索" />
+            <span class="input-group-btn">
+                <button type="submit" class="search-form-submit btn btn-flat" onclick="return false;"><i class="icon icon-search"></i></button>
+            </span>
+        </div>
+    </form>
+    <div class="ins-search">
+  <div class="ins-search-mask"></div>
+  <div class="ins-search-container">
+    <div class="ins-input-wrapper">
+      <input type="text" class="ins-search-input" placeholder="想要查找什么..." x-webkit-speech />
+      <button type="button" class="close ins-close ins-selectable" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span></button>
+    </div>
+    <div class="ins-section-wrapper">
+      <div class="ins-section-container"></div>
+    </div>
+  </div>
+</div>
+
+
+</div>
+      <button class="navbar-toggle collapsed" type="button" data-toggle="collapse" data-target="#main-navbar" aria-controls="main-navbar" aria-expanded="false">
+        <span class="sr-only">Toggle navigation</span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+    </div>
+    <nav id="main-navbar" class="collapse navbar-collapse" itemscope itemtype="http://schema.org/SiteNavigationElement" role="navigation">
+      <ul class="nav navbar-nav main-nav menu-highlight">
+        
+        
+        <li class="menu-item menu-item-home">
+          <a href="/.">
+            
+            <i class="icon icon-home-fill"></i>
+            
+            <span class="menu-title">首页</span>
+          </a>
+        </li>
+        
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives">
+            
+            <i class="icon icon-archives-fill"></i>
+            
+            <span class="menu-title">归档</span>
+          </a>
+        </li>
+        
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories">
+            
+            <i class="icon icon-folder"></i>
+            
+            <span class="menu-title">分类</span>
+          </a>
+        </li>
+        
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about">
+            
+            <i class="icon icon-cup-fill"></i>
+            
+            <span class="menu-title">关于</span>
+          </a>
+        </li>
+        
+      </ul>
+      
+	
+    <ul class="social-links">
+    	
+        <li><a href="https://github.com/chenluda" target="_blank" title="Github" data-toggle=tooltip data-placement=top><i class="icon icon-github"></i></a></li>
+        
+        <li><a href="https://www.zhihu.com/people/Glenn" target="_blank" title="Zhihu" data-toggle=tooltip data-placement=top><i class="icon icon-zhihu"></i></a></li>
+        
+    </ul>
+
+    </nav>
+  </div>
+</header>
+
+  
+    <aside class="sidebar" itemscope itemtype="http://schema.org/WPSideBar">
+  <div class="slimContent">
+    
+      <div class="widget">
+    <h3 class="widget-title">公告</h3>
+    <div class="widget-body">
+        <div id="board">
+            <div class="content">
+                <p>① <strong>google，chatgpt</strong> 账号注册</p> <p>② <strong>chatgpt</strong> 账号升级 <strong>plus</strong></p> <p><strong>联系 wx：GlennChen2021</strong></p> <img src="/images/chatgpt.jpg" width="200" height="200">
+            </div>
+        </div>
+    </div>
+</div>
+
+    
+      
+  <div class="widget">
+    <h3 class="widget-title">分类</h3>
+    <div class="widget-body">
+      <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/%E4%B9%A6%E7%B1%8D/">书籍</a><span class="category-list-count">4</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/%E4%BB%A3%E7%A0%81/">代码</a><span class="category-list-count">4</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/%E6%8E%A8%E8%8D%90/">推荐</a><span class="category-list-count">3</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/%E8%AE%BA%E6%96%87/">论文</a><span class="category-list-count">19</span></li></ul>
+    </div>
+  </div>
+
+
+    
+      
+  <div class="widget">
+    <h3 class="widget-title">标签云</h3>
+    <div class="widget-body tagcloud">
+      <a href="/tags/Competition/" style="font-size: 13px;">Competition</a> <a href="/tags/Masked-Image-Modeling/" style="font-size: 14px;">Masked Image Modeling</a> <a href="/tags/Medical-Image-Segmentation/" style="font-size: 13.25px;">Medical Image Segmentation</a> <a href="/tags/Research/" style="font-size: 13.75px;">Research</a> <a href="/tags/Steve-Jobs/" style="font-size: 13.5px;">Steve Jobs</a>
+    </div>
+  </div>
+
+    
+      
+  <div class="widget">
+    <h3 class="widget-title">归档</h3>
+    <div class="widget-body">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2023/06/">六月 2023</a><span class="archive-list-count">7</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2023/05/">五月 2023</a><span class="archive-list-count">23</span></li></ul>
+    </div>
+  </div>
+
+
+    
+      
+  <div class="widget">
+    <h3 class="widget-title">最新文章</h3>
+    <div class="widget-body">
+      <ul class="recent-post-list list-unstyled no-thumbnail">
+        
+          <li>
+            
+            <div class="item-inner">
+              <p class="item-category">
+                <a class="category-link" href="/categories/%E6%8E%A8%E8%8D%90/">推荐</a>
+              </p>
+              <p class="item-title">
+                <a href="/2023/06/07/%E9%80%9F%E8%A7%88/us%E4%BB%8E%E5%85%A5%E9%97%A8%E5%88%B0%E5%BA%94%E7%94%A8%E4%BB%8E%E8%87%AA%E7%84%B6%E5%88%B0%E7%A7%91%E5%AD%A6%E7%95%85%E8%A1%8C%E7%A7%91%E7%A0%94%E5%AE%87-Glenn/" class="title">Catalyst Plus：从入门到应用，从自然到科学，畅行科研宇宙</a>
+              </p>
+              <p class="item-date">
+                <time datetime="2023-06-07T11:29:23.000Z" itemprop="datePublished">2023-06-07</time>
+              </p>
+            </div>
+          </li>
+          
+          <li>
+            
+            <div class="item-inner">
+              <p class="item-category">
+                <a class="category-link" href="/categories/%E8%AE%BA%E6%96%87/">论文</a>
+              </p>
+              <p class="item-title">
+                <a href="/2023/06/07/Medical_Image_Segmentaion/Seg-%E8%85%B9%E9%83%A8%E5%A4%9A%E5%99%A8%E5%AE%98%E5%92%8C%E8%82%BF%E7%98%A4%E5%88%86%E5%89%B2%E7%9A%84%E5%A2%9E%E9%87%8F%E5%AD%A6-Glenn/" class="title">MedSeg | 腹部多器官和肿瘤分割的增量学习</a>
+              </p>
+              <p class="item-date">
+                <time datetime="2023-06-07T10:58:37.000Z" itemprop="datePublished">2023-06-07</time>
+              </p>
+            </div>
+          </li>
+          
+          <li>
+            
+            <div class="item-inner">
+              <p class="item-category">
+                <a class="category-link" href="/categories/%E8%AE%BA%E6%96%87/">论文</a>
+              </p>
+              <p class="item-title">
+                <a href="/2023/06/07/Medical_Image_Segmentaion/IFE%E5%9F%BA%E4%BA%8E%E6%9B%B2%E7%8E%87%E6%88%96%E4%BF%A1%E6%81%AF%E7%86%B5%E7%9A%84%E9%80%9A%E9%81%93%E6%B3%A8%E6%84%8F%E5%8A%9B%E6%9C%BA-Glenn/" class="title">MedSeg | IFE：基于曲率或信息熵的通道注意力机制</a>
+              </p>
+              <p class="item-date">
+                <time datetime="2023-06-07T10:58:29.000Z" itemprop="datePublished">2023-06-07</time>
+              </p>
+            </div>
+          </li>
+          
+          <li>
+            
+            <div class="item-inner">
+              <p class="item-category">
+                <a class="category-link" href="/categories/%E8%AE%BA%E6%96%87/">论文</a>
+              </p>
+              <p class="item-title">
+                <a href="/2023/06/07/Medical_Image_Segmentaion/Loss%E7%94%A8%E4%BA%8E%E5%8C%BB%E5%AD%A6%E5%9B%BE%E5%83%8F%E5%88%86%E5%89%B2%E7%9A%84%E9%B2%81%E6%A3%92%E6%8D%9F%E5%A4%B1%E5%87%BD-Glenn/" class="title">MedSeg | T-Loss：用于医学图像分割的鲁棒损失函数</a>
+              </p>
+              <p class="item-date">
+                <time datetime="2023-06-07T10:58:29.000Z" itemprop="datePublished">2023-06-07</time>
+              </p>
+            </div>
+          </li>
+          
+          <li>
+            
+            <div class="item-inner">
+              <p class="item-category">
+                <a class="category-link" href="/categories/%E8%AE%BA%E6%96%87/">论文</a>
+              </p>
+              <p class="item-title">
+                <a href="/2023/06/07/Masked_Image_Model/%E8%AE%BA%E6%96%87%E9%98%85%E8%AF%BB%E6%9D%8E%E9%A3%9E%E9%A3%9E-MIM-SiamMAE-Glenn/" class="title">MIM | SiamMAE：用于从视频中学习视觉对应关系的 MAE 简单扩展</a>
+              </p>
+              <p class="item-date">
+                <time datetime="2023-06-07T10:51:29.000Z" itemprop="datePublished">2023-06-07</time>
+              </p>
+            </div>
+          </li>
+          
+      </ul>
+    </div>
+  </div>
+  
+
+    
+  </div>
+</aside>
+
+  
+  
+  <aside class="sidebar sidebar-toc collapse   in  " id="collapseToc" itemscope itemtype="http://schema.org/WPSideBar">
+  <div class="slimContent">
+    <nav id="toc" class="article-toc">
+      <h3 class="toc-title">文章目录</h3>
+      <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#%E4%B8%BB%E8%A6%81%E5%86%85%E5%AE%B9"><span class="toc-number">1.</span> <span class="toc-text">主要内容</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E6%96%B9%E6%B3%95"><span class="toc-number">2.</span> <span class="toc-text">方法</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%9F%BA%E4%BA%8E%E6%9B%B2%E7%8E%87%E7%9A%84%E7%89%B9%E5%BE%81%E9%80%89%E6%8B%A9"><span class="toc-number">2.1.</span> <span class="toc-text">基于曲率的特征选择</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%9F%BA%E4%BA%8E%E4%BF%A1%E6%81%AF%E7%86%B5%E7%9A%84%E7%89%B9%E5%BE%81%E9%80%89%E6%8B%A9"><span class="toc-number">2.2.</span> <span class="toc-text">基于信息熵的特征选择</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%9E%84%E9%80%A0%E5%A2%9E%E5%BC%BA%E7%9A%84%E7%89%B9%E5%BE%81"><span class="toc-number">2.3.</span> <span class="toc-text">构造增强的特征</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E7%BB%93%E6%9E%9C%E4%B8%8E%E8%AE%A8%E8%AE%BA"><span class="toc-number">3.</span> <span class="toc-text">结果与讨论</span></a></li></ol>
+    </nav>
+  </div>
+</aside>
+
+<main class="main" role="main">
+  <div class="content">
+  <article id="post-Medical_Image_Segmentaion/IFE基于曲率或信息熵的通道注意力机-Glenn" class="article article-type-post" itemscope itemtype="http://schema.org/BlogPosting">
+    
+    <div class="article-header">
+      
+        
+  
+    <h1 class="article-title" itemprop="name">
+      MedSeg | IFE：基于曲率或信息熵的通道注意力机制
+    </h1>
+  
+
+      
+      <div class="article-meta">
+        <span class="article-date">
+    <i class="icon icon-calendar-check"></i>
+	<a href="/2023/06/07/Medical_Image_Segmentaion/IFE%E5%9F%BA%E4%BA%8E%E6%9B%B2%E7%8E%87%E6%88%96%E4%BF%A1%E6%81%AF%E7%86%B5%E7%9A%84%E9%80%9A%E9%81%93%E6%B3%A8%E6%84%8F%E5%8A%9B%E6%9C%BA-Glenn/" class="article-date">
+	  <time datetime="2023-06-07T10:58:29.000Z" itemprop="datePublished">2023-06-07</time>
+	</a>
+</span>
+        
+  <span class="article-category">
+    <i class="icon icon-folder"></i>
+    <a class="article-category-link" href="/categories/%E8%AE%BA%E6%96%87/">论文</a>
+  </span>
+
+        
+  <span class="article-tag">
+    <i class="icon icon-tags"></i>
+	<a class="article-tag-link-link" href="/tags/Medical-Image-Segmentation/" rel="tag">Medical Image Segmentation</a>
+  </span>
+
+
+        
+
+	<span class="article-read hidden-xs">
+    	<i class="icon icon-eye-fill" aria-hidden="true"></i>
+    	<span id="/2023/06/07/Medical_Image_Segmentaion/IFE%E5%9F%BA%E4%BA%8E%E6%9B%B2%E7%8E%87%E6%88%96%E4%BF%A1%E6%81%AF%E7%86%B5%E7%9A%84%E9%80%9A%E9%81%93%E6%B3%A8%E6%84%8F%E5%8A%9B%E6%9C%BA-Glenn/" class="leancloud_visitors"  data-flag-title="MedSeg | IFE：基于曲率或信息熵的通道注意力机制">
+			<span class="leancloud-visitors-count">0</span>
+		</span>
+    </span>
+
+        <span class="post-comment"><i class="icon icon-comment"></i> <a href="/2023/06/07/Medical_Image_Segmentaion/IFE%E5%9F%BA%E4%BA%8E%E6%9B%B2%E7%8E%87%E6%88%96%E4%BF%A1%E6%81%AF%E7%86%B5%E7%9A%84%E9%80%9A%E9%81%93%E6%B3%A8%E6%84%8F%E5%8A%9B%E6%9C%BA-Glenn/#comments" class="article-comment-link">评论</a></span>
+        
+      </div>
+    </div>
+    <div class="article-entry marked-body" itemprop="articleBody">
+      
+        <p><img src="/2023/06/07/Medical_Image_Segmentaion/IFE%E5%9F%BA%E4%BA%8E%E6%9B%B2%E7%8E%87%E6%88%96%E4%BF%A1%E6%81%AF%E7%86%B5%E7%9A%84%E9%80%9A%E9%81%93%E6%B3%A8%E6%84%8F%E5%8A%9B%E6%9C%BA-Glenn/v2-7b066634f116196c6a3c9ff6a6634c75_r.jpg"></p>
+<blockquote>
+<p><em><strong>题目：</strong>Instructive Feature Enhancement for Dichotomous Medical Image Segmentation</em><br><em><strong>作者单位：</strong>深圳大学、Shenzhen RayShape Medical Technology Co.、苏黎世联邦理工学院</em><br><em><strong>论文网址：</strong></em><a href="https://link.zhihu.com/?target=https://arxiv.org/abs/2306.03497">https://arxiv.org/abs/2306.03497</a><br><em><strong>论文代码：</strong></em><a href="https://link.zhihu.com/?target=https://github.com/yezi-66/IFE">https://github.com/yezi-66/IFE</a><br><em><strong>首次发布时间：</strong>2023 年 6 月 6 日</em></p>
+</blockquote>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">@misc&#123;liu2023instructive,</span><br><span class="line">      title=&#123;Instructive Feature Enhancement for Dichotomous Medical Image Segmentation&#125;, </span><br><span class="line">      author=&#123;Lian Liu and Han Zhou and Jiongquan Chen and Sijing Liu and Wenlong Shi and Dong Ni and Deng-Ping Fan and Xin Yang&#125;,</span><br><span class="line">      year=&#123;2023&#125;,</span><br><span class="line">      eprint=&#123;2306.03497&#125;,</span><br><span class="line">      archivePrefix=&#123;arXiv&#125;,</span><br><span class="line">      primaryClass=&#123;cs.CV&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+<hr>
+<h1 id="主要内容"><a href="#主要内容" class="headerlink" title="主要内容"></a>主要内容</h1><hr>
+<p><strong>背景介绍：</strong></p>
+<ul>
+<li>由于成像方法的不同，医学图像具有不同的表现形式。来自同一模态但不同部位的图像在整体结构上具有高度的相似性，但在细节和纹理上具有多样性。</li>
+<li>现有的医学图像分割模型在特定模态或解剖结构数据集上训练的模型可能不适应新的数据集。</li>
+</ul>
+<p><strong>现有研究：</strong></p>
+<ul>
+<li>有些研究增加了骨干网络的深度或宽度，如 UNet++，使用嵌套结构和密集的跳跃连接；DeepLabV3+，它将膨胀卷积和特征金字塔池与一个有效的解码器模块相结合；</li>
+<li>还有些工作专门设计即插即用的功能模块，如 Inception 及其变体，深度可分卷积，注意力机制和多尺度特征融合。</li>
+<li>像 nnUNet 这样的框架通过集成关键数据集属性，为多个分割任务开发了一个自适应分割管道，达到 SOTA。</li>
+</ul>
+<p><strong>现有研究的缺陷：</strong></p>
+<ul>
+<li>大多数现有的医学图像分割的模型架构都是经过精心设计的。尽管这些工作都很有前途并且可以灵活使用，但它们通常需要针对不同的分割任务进行手工调整。</li>
+<li>nnUNet 需要大量的设计工作，而且成本非常昂贵。</li>
+<li>作者观察到<strong>特定特征通道</strong>中<strong>丰富的纹理和尖锐的边缘线索</strong>对于准确地分割目标是至关重要的且具有指导意义的。以往的分割网络往往忽视了<strong>特征通道的重要性</strong>，这可能会限制其在一般分割任务中的性能。</li>
+</ul>
+<p><strong>方法提出：</strong></p>
+<ul>
+<li>曲率（Curvature）可以表示图像的边缘特征。熵（Information entropy）可以描述图像的纹理和内容的复杂性。</li>
+<li>基于曲率和熵，作者提出了提出了一种简单、通用、有效的特征增强方法，即 IFE。基于<strong>局部曲率</strong>或<strong>全局信息熵</strong>准则，可以自适应地选择具有丰富纹理线索和强可分辨性的特征通道来增强原始特征。</li>
+<li>IFE 是即插即用的，适用于不同的分割任务，它鼓励模型关注纹理丰富的特征，这些特征对于模糊和具有挑战性的边界识别特别重要，同时实现简单性、通用性和一定的可解释性。</li>
+</ul>
+<hr>
+<h1 id="方法"><a href="#方法" class="headerlink" title="方法"></a>方法</h1><p>IFF 提供了两种方法，即基于曲率的特征量化方法和基于信息熵的特征量化方法，量化出的参数表示了每个特征通道的内容丰富度。这些参数越大，对应通道特征的纹理和细节就越丰富。</p>
+<p>通过选择一定比例的具有高曲率或信息熵的通道特征，并将它们与原始特征相结合。IFE 通过对分割网络架构进行微小修改来提高性能。</p>
+<h2 id="基于曲率的特征选择"><a href="#基于曲率的特征选择" class="headerlink" title="基于曲率的特征选择"></a>基于曲率的特征选择</h2><p>对于嵌入欧几里得空间 R^3 中的二维曲面，存在两种曲率：高斯曲率和平均曲率。与高斯曲率相比，平均曲率可以更好地反映表面的不均匀性。</p>
+<p>Gong 提出了一个计算公式，只需要简单的线性卷积就可以获得近似的平均曲率，如下所示：</p>
+<p>C&#x3D;[C_1\quad C_2 \quad C_3] *X </p>
+<p>式中， C_1&#x3D;[α,β,α]^T ， C_2&#x3D;[β,γ,β]^T ， C_3&#x3D;[α, β, α]^T ， α 、 β 和 γ 的值分别为 −1&#x2F;16 、 5&#x2F;16 、 −1 。 * 表示卷积， X 表示输入图像， C 是平均曲线。</p>
+<p>图 1 展示了该过程，从图中可以看出曲率图像可以有效地突出特征中的边缘细节。</p>
+<p><img src="/2023/06/07/Medical_Image_Segmentaion/IFE%E5%9F%BA%E4%BA%8E%E6%9B%B2%E7%8E%87%E6%88%96%E4%BF%A1%E6%81%AF%E7%86%B5%E7%9A%84%E9%80%9A%E9%81%93%E6%B3%A8%E6%84%8F%E5%8A%9B%E6%9C%BA-Glenn/v2-ce3d6d6561307d384ab3ff471adf936e_r.jpg"><br>图1. 使用曲率进行特征选择。</p>
+<h2 id="基于信息熵的特征选择"><a href="#基于信息熵的特征选择" class="headerlink" title="基于信息熵的特征选择"></a>基于信息熵的特征选择</h2><p>信息熵反映了强度分布的空间和聚集特征。它可以公式化为：</p>
+<p>E&#x3D;-\sum_{i&#x3D;0}^{255}\sum_{j&#x3D;0}^{255}P_{i,j}l o g_{2}\left(P_{i,j}\right) </p>
+<p>;P_{i,j}&#x3D;f\left(i_{n},j_{n}\right)&#x2F;\left(H\times W\right) </p>
+<p>i_n 表示第 n 个 3×3 滑动窗口中中心像素的灰度值， j_n 表示该窗口中剩余像素的平均灰度值。 (i_n,j_n) 出现在整个图像中的概率由 P_{i,j} 表示， E 表示信息熵。</p>
+<p><img src="/2023/06/07/Medical_Image_Segmentaion/IFE%E5%9F%BA%E4%BA%8E%E6%9B%B2%E7%8E%87%E6%88%96%E4%BF%A1%E6%81%AF%E7%86%B5%E7%9A%84%E9%80%9A%E9%81%93%E6%B3%A8%E6%84%8F%E5%8A%9B%E6%9C%BA-Glenn/v2-d886937e24da4eb32dc05ad7c6b4a2fd_r.jpg"><br>图2. 用 2D 信息熵进行特征选择。<br>图像上的每个像素对应一个灰度或颜色值，范围从0到255。而特征映射中的每个元素都表示在输入图像的特定位置上卷积的激活水平。</p>
+<p>给定输入特征 F_x ，如图 3 所示，通过滑动窗口获得的元组 (i,j) 被转换为直方图，表示激活水平的大小和邻域内的分布。这涉及到重新排列特征图的激活级别。图 3 展示了直方图转换方法 histc 和信息熵 E 计算方法。概率 P_{hist}(i,j) 将用于计算信息熵。</p>
+<p><img src="/2023/06/07/Medical_Image_Segmentaion/IFE%E5%9F%BA%E4%BA%8E%E6%9B%B2%E7%8E%87%E6%88%96%E4%BF%A1%E6%81%AF%E7%86%B5%E7%9A%84%E9%80%9A%E9%81%93%E6%B3%A8%E6%84%8F%E5%8A%9B%E6%9C%BA-Glenn/v2-09937b209a7890ba179019e39485006c_r.jpg"><br>图3. 直方图转换方法和信息熵计算方法</p>
+<h2 id="构造增强的特征"><a href="#构造增强的特征" class="headerlink" title="构造增强的特征"></a>构造增强的特征</h2><p>虽然 IFE 可以应用于各种深层神经网络，但本文的研究主要集中在广泛应用的分割网络。</p>
+<p>图 4 展示了嵌入在代表性网络中的 IFE 的框架，例如 DeepLabV3+、UNet、nnUNet 和 SINetV2。前三种是经典的分割网络。由于分割任务类似于<strong>伪装目标检测</strong>，比如低对比度和模糊边缘，作者也考虑了 SINetv2。</p>
+<p>如图 4 所示，在 UNet 和 nnUNet 的中间层，DeepLabV3+ 的低级特征以及 SINetV2 的 TEM 输出上接入 IFE。</p>
+<p><img src="/2023/06/07/Medical_Image_Segmentaion/IFE%E5%9F%BA%E4%BA%8E%E6%9B%B2%E7%8E%87%E6%88%96%E4%BF%A1%E6%81%AF%E7%86%B5%E7%9A%84%E9%80%9A%E9%81%93%E6%B3%A8%E6%84%8F%E5%8A%9B%E6%9C%BA-Glenn/v2-1bf12076aef50735d17d05d14e1b529f_r.jpg"><br>图4. 经典网络中的 IFE 接入位置。<br>当输入图像被编码到特征空间时，不同的通道特征在不同的方向和频率上保留了纹理。值得注意的是，同一个通道所包含的信息可能在不同的图像上有所不同，如图 5 所示。</p>
+<p>例如，肺部 CT 特征图的第 15 通道包含有价值的纹理和细节，而主动脉 CT 特征图的同一通道可能不会提供有意义的信息内容。然而，他们的第二通道功能都侧重于边缘细节。通过保留原始特征，可以动态地从输入特征中选择对当前对象分割有较大贡献的信道特征。</p>
+<p><img src="/2023/06/07/Medical_Image_Segmentaion/IFE%E5%9F%BA%E4%BA%8E%E6%9B%B2%E7%8E%87%E6%88%96%E4%BF%A1%E6%81%AF%E7%86%B5%E7%9A%84%E9%80%9A%E9%81%93%E6%B3%A8%E6%84%8F%E5%8A%9B%E6%9C%BA-Glenn/v2-8474e35e7bd9800eaf111a0c2f7538ee_r.jpg"><br>图5. SINetV2 stage 3 的特征图可视化。第一排是肺，第二排是主动脉。2、15 和 17 是通道的索引。<br>IFF 可以显式地增加模型对通道信息的敏感性。</p>
+<p>具体来说，对于输入图像 X ，使用参数为 θ_x 的编码器 Encoder(X,θ_x) 提取深度特征 F_x &#x3D; [ f_1,f_2,f_3,… ,f_C ]∈\mathbb R^{\mathbb C * \mathbb H * \mathbb W} ，IFE 可以表示为：</p>
+<p>F’_x&#x3D;max\left{S(F_x),r\right} </p>
+<p>F’_x 是所选的特征图， S 是量化方法（基于曲率或信息熵）， r 是选择比例。</p>
+<p>但通过 pixel-wise addition 增强原始特征可能会引入不需要的背景噪声。所以使用 concatenate 操作直接连接特征，将 F&#x3D;[F_x,F′_x] 作为网络下一阶段的输入。</p>
+<hr>
+<h1 id="结果与讨论"><a href="#结果与讨论" class="headerlink" title="结果与讨论"></a>结果与讨论</h1><p>作者在自己构建并公开的数据集 Cosmos55k 上进行验证实验。</p>
+<p>如图 6 所示，Cosmos55k 提供了 7 种成像模式，包括 CT、MRI、X光、眼底等，涵盖了 26 个解剖结构，如肝脏、息肉、黑色素瘤和脊椎等。图像只包含一个标记的对象，减少了具有不同结构的多个对象的混淆。</p>
+<p><img src="/2023/06/07/Medical_Image_Segmentaion/IFE%E5%9F%BA%E4%BA%8E%E6%9B%B2%E7%8E%87%E6%88%96%E4%BF%A1%E6%81%AF%E7%86%B5%E7%9A%84%E9%80%9A%E9%81%93%E6%B3%A8%E6%84%8F%E5%8A%9B%E6%9C%BA-Glenn/v2-aa19efdef12f7132fdef44620ae99efb_r.jpg"><br>图6. Cosmos55k。<br>Cosmos55k 包括 55023 张图像，其中 31548 张用于训练，5884 张用于验证，17591 张用于测试。</p>
+<p>UNet、DeeplabV3+、SINetV2 和 nnUNet 的定量结果如表 1 所示。从表中可以得出结论，IFE 可以提高网络在大多数细分指标上的性能。</p>
+<p>此外，图 7 显示 IFE 有助于模型在大多数模态和解剖结构中表现更好。</p>
+<p>图 8 给出了定性比较。IFE 有助于定位可能难以注意到的物体中的结构，并增强对边缘灰度变化的敏感性。IFE 可以在具有挑战性的场景中显著提高基础模型的分割精度。</p>
+<p><img src="/2023/06/07/Medical_Image_Segmentaion/IFE%E5%9F%BA%E4%BA%8E%E6%9B%B2%E7%8E%87%E6%88%96%E4%BF%A1%E6%81%AF%E7%86%B5%E7%9A%84%E9%80%9A%E9%81%93%E6%B3%A8%E6%84%8F%E5%8A%9B%E6%9C%BA-Glenn/v2-25bca420244d9148b2c4c3dfac1b7a44_r.jpg"><br>表1. IFE 的定量比较。+C、 +E 表示基于曲率或信息熵的 IFE。DLV3+ 是 DeepLabV3+。* 表示 DSC 通过 t 检验，p＜0.05。<br><img src="/2023/06/07/Medical_Image_Segmentaion/IFE%E5%9F%BA%E4%BA%8E%E6%9B%B2%E7%8E%87%E6%88%96%E4%BF%A1%E6%81%AF%E7%86%B5%E7%9A%84%E9%80%9A%E9%81%93%E6%B3%A8%E6%84%8F%E5%8A%9B%E6%9C%BA-Glenn/v2-51718417bf44bdcaea864944c3eb9ce8_r.jpg"><br>图7. 模态（a）和解剖结构（b）中 UNet（蓝色）和 UNet+E （粉色）的 DSC。Hist、Colo 和 Derm 是组织病理学、结肠镜检查和皮肤镜检查。<br><img src="/2023/06/07/Medical_Image_Segmentaion/IFE%E5%9F%BA%E4%BA%8E%E6%9B%B2%E7%8E%87%E6%88%96%E4%BF%A1%E6%81%AF%E7%86%B5%E7%9A%84%E9%80%9A%E9%81%93%E6%B3%A8%E6%84%8F%E5%8A%9B%E6%9C%BA-Glenn/v2-4b5c78e06def5675386d8b085ed612da_r.jpg"><br>图8. 配备 IFE 的不同模型的定性比较。红色和绿色分别表示预测和金标准。<br>在将 IFE 应用于不同网络时，选择合适的选择比例 r 至关重要。</p>
+<p>不同网络的编码器提取特征的能力并不相同，更有利于分割结果的信道特征的比例也不同。</p>
+<p>为了分析 r 的影响，作者使用 UNet 进行了实验。如表 2 所示， r 过大或过小都会导致模型性能下降。</p>
+<p><img src="/2023/06/07/Medical_Image_Segmentaion/IFE%E5%9F%BA%E4%BA%8E%E6%9B%B2%E7%8E%87%E6%88%96%E4%BF%A1%E6%81%AF%E7%86%B5%E7%9A%84%E9%80%9A%E9%81%93%E6%B3%A8%E6%84%8F%E5%8A%9B%E6%9C%BA-Glenn/v2-f533122282757523a00c372e9fc4fb56_r.jpg"><br>表2. 在 UNet 上关于选择比例 r 的消融研究。</p>
+<hr>
+<p>感觉验证实验不够 solid，缺少和其余通道注意力机制的对比实验，不过应该是有补充材料的，后续关注下。</p>
+
+      
+    </div>
+    <div class="article-footer">
+      <blockquote class="mt-2x">
+  <ul class="post-copyright list-unstyled">
+    
+    <li class="post-copyright-link hidden-xs">
+      <strong>本文链接：</strong>
+      <a href="https://chenluda.github.io/2023/06/07/Medical_Image_Segmentaion/IFE%E5%9F%BA%E4%BA%8E%E6%9B%B2%E7%8E%87%E6%88%96%E4%BF%A1%E6%81%AF%E7%86%B5%E7%9A%84%E9%80%9A%E9%81%93%E6%B3%A8%E6%84%8F%E5%8A%9B%E6%9C%BA-Glenn/" title="MedSeg | IFE：基于曲率或信息熵的通道注意力机制" target="_blank" rel="external">https://chenluda.github.io/2023/06/07/Medical_Image_Segmentaion/IFE基于曲率或信息熵的通道注意力机-Glenn/</a>
+    </li>
+    
+    <li class="post-copyright-license">
+      <strong>版权声明： </strong> 本博客所有文章除特别声明外，均采用 <a href="http://creativecommons.org/licenses/by/4.0/deed.zh" target="_blank" rel="external">CC BY 4.0 CN协议</a> 许可协议。转载请注明出处！
+    </li>
+  </ul>
+</blockquote>
+
+
+<div class="panel panel-default panel-badger">
+  <div class="panel-body">
+    <figure class="media">
+      <div class="media-left">
+        <a href="https://github.com/chenluda" target="_blank" class="img-burn thumb-sm visible-lg">
+          <img src="/images/avatar.png" class="img-rounded w-full" alt="">
+        </a>
+      </div>
+      <div class="media-body">
+        <h3 class="media-heading"><a href="https://github.com/chenluda" target="_blank"><span class="text-dark">Glenn</span><small class="ml-1x">Stay hungry, stay foolish.</small></a></h3>
+        <div>咖啡，健身，热爱生活。</div>
+      </div>
+    </figure>
+  </div>
+</div>
+
+
+    </div>
+  </article>
+  
+    
+  <section id="comments">
+  	
+      <div id="vcomments"></div>
+    
+  </section>
+
+
+  
+</div>
+
+  <nav class="bar bar-footer clearfix" data-stick-bottom>
+  <div class="bar-inner">
+  
+  <ul class="pager pull-left">
+    
+    <li class="prev">
+      <a href="/2023/06/07/Medical_Image_Segmentaion/Seg-%E8%85%B9%E9%83%A8%E5%A4%9A%E5%99%A8%E5%AE%98%E5%92%8C%E8%82%BF%E7%98%A4%E5%88%86%E5%89%B2%E7%9A%84%E5%A2%9E%E9%87%8F%E5%AD%A6-Glenn/" title="MedSeg | 腹部多器官和肿瘤分割的增量学习"><i class="icon icon-angle-left" aria-hidden="true"></i><span>&nbsp;&nbsp;上一篇</span></a>
+    </li>
+    
+    
+    <li class="next">
+      <a href="/2023/06/07/Medical_Image_Segmentaion/Loss%E7%94%A8%E4%BA%8E%E5%8C%BB%E5%AD%A6%E5%9B%BE%E5%83%8F%E5%88%86%E5%89%B2%E7%9A%84%E9%B2%81%E6%A3%92%E6%8D%9F%E5%A4%B1%E5%87%BD-Glenn/" title="MedSeg | T-Loss：用于医学图像分割的鲁棒损失函数"><span>下一篇&nbsp;&nbsp;</span><i class="icon icon-angle-right" aria-hidden="true"></i></a>
+    </li>
+    
+    
+    <li class="toggle-toc">
+      <a class="toggle-btn " data-toggle="collapse" href="#collapseToc" aria-expanded="false" title="文章目录" role="button">    <span>[&nbsp;</span><span>文章目录</span>
+        <i class="text-collapsed icon icon-anchor"></i>
+        <i class="text-in icon icon-close"></i>
+        <span>]</span>
+      </a>
+    </li>
+    
+  </ul>
+  
+  
+  
+  <div class="bar-right">
+    
+    <div class="share-component" data-sites="weibo,qq,wechat,facebook,twitter" data-mobile-sites="weibo,qq,qzone"></div>
+    
+  </div>
+  </div>
+</nav>
+  
+
+
+</main>
+
+  <footer class="footer" itemscope itemtype="http://schema.org/WPFooter">
+	
+	
+    <ul class="social-links">
+    	
+        <li><a href="https://github.com/chenluda" target="_blank" title="Github" data-toggle=tooltip data-placement=top><i class="icon icon-github"></i></a></li>
+        
+        <li><a href="https://www.zhihu.com/people/Glenn" target="_blank" title="Zhihu" data-toggle=tooltip data-placement=top><i class="icon icon-zhihu"></i></a></li>
+        
+    </ul>
+
+    <div class="copyright">
+    	
+        &copy; 2023 Glenn
+        
+        <div class="publishby">
+        	Theme by <a href="https://github.com/cofess" target="_blank"> cofess </a>base on <a href="https://github.com/cofess/hexo-theme-pure" target="_blank">pure</a>.
+        </div>
+    </div>
+</footer>
+  <script src="//cdn.jsdelivr.net/npm/jquery@1.12.4/dist/jquery.min.js"></script>
+<script>
+window.jQuery || document.write('<script src="js/jquery.min.js"><\/script>')
+</script>
+
+<script src="/js/plugin.min.js"></script>
+
+
+<script src="/js/application.js"></script>
+
+
+    <script>
+(function (window) {
+    var INSIGHT_CONFIG = {
+        TRANSLATION: {
+            POSTS: '文章',
+            PAGES: '页面',
+            CATEGORIES: '分类',
+            TAGS: '标签',
+            UNTITLED: '(未命名)',
+        },
+        ROOT_URL: '/',
+        CONTENT_URL: '/content.json',
+    };
+    window.INSIGHT_CONFIG = INSIGHT_CONFIG;
+})(window);
+</script>
+
+<script src="/js/insight.js"></script>
+
+
+
+
+
+
+   
+
+
+
+
+   
+    
+  <script src="//cdn1.lncld.net/static/js/3.0.4/av-min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/valine"></script>
+  <script type="text/javascript">
+  var GUEST = ['nick', 'mail', 'link'];
+  var meta = 'nick,mail,link';
+  meta = meta.split(',').filter(function(item) {
+    return GUEST.indexOf(item) > -1;
+  });
+  new Valine({
+    el: '#vcomments',
+    verify: false,
+    notify: false,
+    appId: 'rSq08S6gdVroDI1A4r7XWnix-MdYXbMMI',
+    appKey: '5UM6jz8DwNaaEQTN5ojTHB1N',
+    placeholder: '请输入...',
+    avatar: 'mm',
+    meta: meta,
+    pageSize: '10' || 10,
+    visitor: true
+  });
+  </script>
+
+     
+
+
+
+
+
+
+
+</body>
+</html>

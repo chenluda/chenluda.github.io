@@ -1,0 +1,617 @@
+<!DOCTYPE html>
+<html lang=zh>
+<head>
+  <meta charset="utf-8">
+  
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=no, minimal-ui">
+  <meta name="renderer" content="webkit">
+  <meta http-equiv="Cache-Control" content="no-transform" />
+  <meta http-equiv="Cache-Control" content="no-siteapp" />
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black">
+  <meta name="format-detection" content="telephone=no,email=no,adress=no">
+  <!-- Color theme for statusbar -->
+  <meta name="theme-color" content="#000000" />
+  <!-- 强制页面在当前窗口以独立页面显示,防止别人在框架里调用页面 -->
+  <meta http-equiv="window-target" content="_top" />
+  
+  
+  <title>MedSeg | 腹部多器官和肿瘤分割的增量学习 | Glenn&#39;s blog</title>
+  <meta name="description" content="题目：Continual Learning for Abdominal Multi-Organ and Tumor Segmentation作者单位：约翰霍普金斯大学论文网址：https:&#x2F;&#x2F;arxiv.org&#x2F;abs&#x2F;2306.00988 论文代码：https:&#x2F;&#x2F;github.com&#x2F;MrGiovanni&#x2F;ContinualLearning 首次发布时间：2023 年 6 月 1 日  1">
+<meta property="og:type" content="article">
+<meta property="og:title" content="MedSeg | 腹部多器官和肿瘤分割的增量学习">
+<meta property="og:url" content="https://chenluda.github.io/2023/06/07/Medical_Image_Segmentaion/Seg-%E8%85%B9%E9%83%A8%E5%A4%9A%E5%99%A8%E5%AE%98%E5%92%8C%E8%82%BF%E7%98%A4%E5%88%86%E5%89%B2%E7%9A%84%E5%A2%9E%E9%87%8F%E5%AD%A6-Glenn/index.html">
+<meta property="og:site_name" content="Glenn">
+<meta property="og:description" content="题目：Continual Learning for Abdominal Multi-Organ and Tumor Segmentation作者单位：约翰霍普金斯大学论文网址：https:&#x2F;&#x2F;arxiv.org&#x2F;abs&#x2F;2306.00988 论文代码：https:&#x2F;&#x2F;github.com&#x2F;MrGiovanni&#x2F;ContinualLearning 首次发布时间：2023 年 6 月 1 日  1">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://chenluda.github.io/2023/06/07/Medical_Image_Segmentaion/Seg-%E8%85%B9%E9%83%A8%E5%A4%9A%E5%99%A8%E5%AE%98%E5%92%8C%E8%82%BF%E7%98%A4%E5%88%86%E5%89%B2%E7%9A%84%E5%A2%9E%E9%87%8F%E5%AD%A6-Glenn/v2-56299e8bbf299c83a716e63a65f87d3d_r.jpg">
+<meta property="og:image" content="https://chenluda.github.io/2023/06/07/Medical_Image_Segmentaion/Seg-%E8%85%B9%E9%83%A8%E5%A4%9A%E5%99%A8%E5%AE%98%E5%92%8C%E8%82%BF%E7%98%A4%E5%88%86%E5%89%B2%E7%9A%84%E5%A2%9E%E9%87%8F%E5%AD%A6-Glenn/v2-800e640182bb8ee94ba6f35500ecb9d5_r.jpg">
+<meta property="og:image" content="https://chenluda.github.io/2023/06/07/Medical_Image_Segmentaion/Seg-%E8%85%B9%E9%83%A8%E5%A4%9A%E5%99%A8%E5%AE%98%E5%92%8C%E8%82%BF%E7%98%A4%E5%88%86%E5%89%B2%E7%9A%84%E5%A2%9E%E9%87%8F%E5%AD%A6-Glenn/v2-41d02cba36ad78f5fdfedf49db19e941_r.jpg">
+<meta property="og:image" content="https://chenluda.github.io/2023/06/07/Medical_Image_Segmentaion/Seg-%E8%85%B9%E9%83%A8%E5%A4%9A%E5%99%A8%E5%AE%98%E5%92%8C%E8%82%BF%E7%98%A4%E5%88%86%E5%89%B2%E7%9A%84%E5%A2%9E%E9%87%8F%E5%AD%A6-Glenn/v2-08641a3a06f1d61a7fd08914be8fec94_r.jpg">
+<meta property="og:image" content="https://chenluda.github.io/2023/06/07/Medical_Image_Segmentaion/Seg-%E8%85%B9%E9%83%A8%E5%A4%9A%E5%99%A8%E5%AE%98%E5%92%8C%E8%82%BF%E7%98%A4%E5%88%86%E5%89%B2%E7%9A%84%E5%A2%9E%E9%87%8F%E5%AD%A6-Glenn/v2-2bf39531aaade39f4c4ce067e24a1ab8_r.jpg">
+<meta property="og:image" content="https://chenluda.github.io/2023/06/07/Medical_Image_Segmentaion/Seg-%E8%85%B9%E9%83%A8%E5%A4%9A%E5%99%A8%E5%AE%98%E5%92%8C%E8%82%BF%E7%98%A4%E5%88%86%E5%89%B2%E7%9A%84%E5%A2%9E%E9%87%8F%E5%AD%A6-Glenn/v2-2dbc4b8672b4abb8ff57836548bf926f_r.jpg">
+<meta property="og:image" content="https://chenluda.github.io/2023/06/07/Medical_Image_Segmentaion/Seg-%E8%85%B9%E9%83%A8%E5%A4%9A%E5%99%A8%E5%AE%98%E5%92%8C%E8%82%BF%E7%98%A4%E5%88%86%E5%89%B2%E7%9A%84%E5%A2%9E%E9%87%8F%E5%AD%A6-Glenn/v2-b6bdb84848ea7dd7a6a099d21a110c84_r.jpg">
+<meta property="og:image" content="https://chenluda.github.io/2023/06/07/Medical_Image_Segmentaion/Seg-%E8%85%B9%E9%83%A8%E5%A4%9A%E5%99%A8%E5%AE%98%E5%92%8C%E8%82%BF%E7%98%A4%E5%88%86%E5%89%B2%E7%9A%84%E5%A2%9E%E9%87%8F%E5%AD%A6-Glenn/v2-1d6ccfe4555a63bbc22eb916189384ff_r.jpg">
+<meta property="og:image" content="https://chenluda.github.io/2023/06/07/Medical_Image_Segmentaion/Seg-%E8%85%B9%E9%83%A8%E5%A4%9A%E5%99%A8%E5%AE%98%E5%92%8C%E8%82%BF%E7%98%A4%E5%88%86%E5%89%B2%E7%9A%84%E5%A2%9E%E9%87%8F%E5%AD%A6-Glenn/v2-6ced7c8e75eef4b9732d0897ad5bf138_r.jpg">
+<meta property="og:image" content="https://chenluda.github.io/2023/06/07/Medical_Image_Segmentaion/Seg-%E8%85%B9%E9%83%A8%E5%A4%9A%E5%99%A8%E5%AE%98%E5%92%8C%E8%82%BF%E7%98%A4%E5%88%86%E5%89%B2%E7%9A%84%E5%A2%9E%E9%87%8F%E5%AD%A6-Glenn/v2-82f918fcc211431772b089654c5df03a_r.jpg">
+<meta property="article:published_time" content="2023-06-07T10:58:37.000Z">
+<meta property="article:modified_time" content="2023-06-07T11:24:21.450Z">
+<meta property="article:author" content="Glenn">
+<meta property="article:tag" content="Medical Image Segmentation">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://chenluda.github.io/2023/06/07/Medical_Image_Segmentaion/Seg-%E8%85%B9%E9%83%A8%E5%A4%9A%E5%99%A8%E5%AE%98%E5%92%8C%E8%82%BF%E7%98%A4%E5%88%86%E5%89%B2%E7%9A%84%E5%A2%9E%E9%87%8F%E5%AD%A6-Glenn/v2-56299e8bbf299c83a716e63a65f87d3d_r.jpg">
+  <!-- Canonical links -->
+  <link rel="canonical" href="https://chenluda.github.io/2023/06/07/Medical_Image_Segmentaion/Seg-%E8%85%B9%E9%83%A8%E5%A4%9A%E5%99%A8%E5%AE%98%E5%92%8C%E8%82%BF%E7%98%A4%E5%88%86%E5%89%B2%E7%9A%84%E5%A2%9E%E9%87%8F%E5%AD%A6-Glenn/index.html">
+  
+    <link rel="alternate" href="/atom.xml" title="Glenn" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="/images/avatar.png" type="image/x-icon">
+  
+  
+<link rel="stylesheet" href="/css/style.css">
+
+  
+  
+  
+  
+<!-- hexo injector head_end start -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/katex.min.css">
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/hexo-math@4.0.0/dist/style.css">
+<!-- hexo injector head_end end --><meta name="generator" content="Hexo 6.3.0"></head>
+
+
+<body class="main-center theme-black" itemscope itemtype="http://schema.org/WebPage">
+  <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+  <div class="slimContent">
+    <div class="navbar-header">
+      
+      
+      <div class="profile-block text-center">
+        <a id="avatar" href="https://github.com/chenluda" target="_blank">
+          <img class="img-circle img-rotate" src="/images/avatar.png" width="200" height="200">
+        </a>
+        <h2 id="name" class="hidden-xs hidden-sm">Glenn</h2>
+        <h3 id="title" class="hidden-xs hidden-sm hidden-md">Stay hungry, stay foolish.</h3>
+        <small id="location" class="text-muted hidden-xs hidden-sm"><i class="icon icon-map-marker"></i> Yunnan, China</small>
+      </div>
+      
+      <div class="search" id="search-form-wrap">
+
+    <form class="search-form sidebar-form">
+        <div class="input-group">
+            <input type="text" class="search-form-input form-control" placeholder="搜索" />
+            <span class="input-group-btn">
+                <button type="submit" class="search-form-submit btn btn-flat" onclick="return false;"><i class="icon icon-search"></i></button>
+            </span>
+        </div>
+    </form>
+    <div class="ins-search">
+  <div class="ins-search-mask"></div>
+  <div class="ins-search-container">
+    <div class="ins-input-wrapper">
+      <input type="text" class="ins-search-input" placeholder="想要查找什么..." x-webkit-speech />
+      <button type="button" class="close ins-close ins-selectable" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span></button>
+    </div>
+    <div class="ins-section-wrapper">
+      <div class="ins-section-container"></div>
+    </div>
+  </div>
+</div>
+
+
+</div>
+      <button class="navbar-toggle collapsed" type="button" data-toggle="collapse" data-target="#main-navbar" aria-controls="main-navbar" aria-expanded="false">
+        <span class="sr-only">Toggle navigation</span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+    </div>
+    <nav id="main-navbar" class="collapse navbar-collapse" itemscope itemtype="http://schema.org/SiteNavigationElement" role="navigation">
+      <ul class="nav navbar-nav main-nav menu-highlight">
+        
+        
+        <li class="menu-item menu-item-home">
+          <a href="/.">
+            
+            <i class="icon icon-home-fill"></i>
+            
+            <span class="menu-title">首页</span>
+          </a>
+        </li>
+        
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives">
+            
+            <i class="icon icon-archives-fill"></i>
+            
+            <span class="menu-title">归档</span>
+          </a>
+        </li>
+        
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories">
+            
+            <i class="icon icon-folder"></i>
+            
+            <span class="menu-title">分类</span>
+          </a>
+        </li>
+        
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about">
+            
+            <i class="icon icon-cup-fill"></i>
+            
+            <span class="menu-title">关于</span>
+          </a>
+        </li>
+        
+      </ul>
+      
+	
+    <ul class="social-links">
+    	
+        <li><a href="https://github.com/chenluda" target="_blank" title="Github" data-toggle=tooltip data-placement=top><i class="icon icon-github"></i></a></li>
+        
+        <li><a href="https://www.zhihu.com/people/Glenn" target="_blank" title="Zhihu" data-toggle=tooltip data-placement=top><i class="icon icon-zhihu"></i></a></li>
+        
+    </ul>
+
+    </nav>
+  </div>
+</header>
+
+  
+    <aside class="sidebar" itemscope itemtype="http://schema.org/WPSideBar">
+  <div class="slimContent">
+    
+      <div class="widget">
+    <h3 class="widget-title">公告</h3>
+    <div class="widget-body">
+        <div id="board">
+            <div class="content">
+                <p>① <strong>google，chatgpt</strong> 账号注册</p> <p>② <strong>chatgpt</strong> 账号升级 <strong>plus</strong></p> <p><strong>联系 wx：GlennChen2021</strong></p> <img src="/images/chatgpt.jpg" width="200" height="200">
+            </div>
+        </div>
+    </div>
+</div>
+
+    
+      
+  <div class="widget">
+    <h3 class="widget-title">分类</h3>
+    <div class="widget-body">
+      <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/%E4%B9%A6%E7%B1%8D/">书籍</a><span class="category-list-count">4</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/%E4%BB%A3%E7%A0%81/">代码</a><span class="category-list-count">4</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/%E6%8E%A8%E8%8D%90/">推荐</a><span class="category-list-count">3</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/%E8%AE%BA%E6%96%87/">论文</a><span class="category-list-count">19</span></li></ul>
+    </div>
+  </div>
+
+
+    
+      
+  <div class="widget">
+    <h3 class="widget-title">标签云</h3>
+    <div class="widget-body tagcloud">
+      <a href="/tags/Competition/" style="font-size: 13px;">Competition</a> <a href="/tags/Masked-Image-Modeling/" style="font-size: 14px;">Masked Image Modeling</a> <a href="/tags/Medical-Image-Segmentation/" style="font-size: 13.25px;">Medical Image Segmentation</a> <a href="/tags/Research/" style="font-size: 13.75px;">Research</a> <a href="/tags/Steve-Jobs/" style="font-size: 13.5px;">Steve Jobs</a>
+    </div>
+  </div>
+
+    
+      
+  <div class="widget">
+    <h3 class="widget-title">归档</h3>
+    <div class="widget-body">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2023/06/">六月 2023</a><span class="archive-list-count">7</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2023/05/">五月 2023</a><span class="archive-list-count">23</span></li></ul>
+    </div>
+  </div>
+
+
+    
+      
+  <div class="widget">
+    <h3 class="widget-title">最新文章</h3>
+    <div class="widget-body">
+      <ul class="recent-post-list list-unstyled no-thumbnail">
+        
+          <li>
+            
+            <div class="item-inner">
+              <p class="item-category">
+                <a class="category-link" href="/categories/%E6%8E%A8%E8%8D%90/">推荐</a>
+              </p>
+              <p class="item-title">
+                <a href="/2023/06/07/%E9%80%9F%E8%A7%88/us%E4%BB%8E%E5%85%A5%E9%97%A8%E5%88%B0%E5%BA%94%E7%94%A8%E4%BB%8E%E8%87%AA%E7%84%B6%E5%88%B0%E7%A7%91%E5%AD%A6%E7%95%85%E8%A1%8C%E7%A7%91%E7%A0%94%E5%AE%87-Glenn/" class="title">Catalyst Plus：从入门到应用，从自然到科学，畅行科研宇宙</a>
+              </p>
+              <p class="item-date">
+                <time datetime="2023-06-07T11:29:23.000Z" itemprop="datePublished">2023-06-07</time>
+              </p>
+            </div>
+          </li>
+          
+          <li>
+            
+            <div class="item-inner">
+              <p class="item-category">
+                <a class="category-link" href="/categories/%E8%AE%BA%E6%96%87/">论文</a>
+              </p>
+              <p class="item-title">
+                <a href="/2023/06/07/Medical_Image_Segmentaion/Seg-%E8%85%B9%E9%83%A8%E5%A4%9A%E5%99%A8%E5%AE%98%E5%92%8C%E8%82%BF%E7%98%A4%E5%88%86%E5%89%B2%E7%9A%84%E5%A2%9E%E9%87%8F%E5%AD%A6-Glenn/" class="title">MedSeg | 腹部多器官和肿瘤分割的增量学习</a>
+              </p>
+              <p class="item-date">
+                <time datetime="2023-06-07T10:58:37.000Z" itemprop="datePublished">2023-06-07</time>
+              </p>
+            </div>
+          </li>
+          
+          <li>
+            
+            <div class="item-inner">
+              <p class="item-category">
+                <a class="category-link" href="/categories/%E8%AE%BA%E6%96%87/">论文</a>
+              </p>
+              <p class="item-title">
+                <a href="/2023/06/07/Medical_Image_Segmentaion/IFE%E5%9F%BA%E4%BA%8E%E6%9B%B2%E7%8E%87%E6%88%96%E4%BF%A1%E6%81%AF%E7%86%B5%E7%9A%84%E9%80%9A%E9%81%93%E6%B3%A8%E6%84%8F%E5%8A%9B%E6%9C%BA-Glenn/" class="title">MedSeg | IFE：基于曲率或信息熵的通道注意力机制</a>
+              </p>
+              <p class="item-date">
+                <time datetime="2023-06-07T10:58:29.000Z" itemprop="datePublished">2023-06-07</time>
+              </p>
+            </div>
+          </li>
+          
+          <li>
+            
+            <div class="item-inner">
+              <p class="item-category">
+                <a class="category-link" href="/categories/%E8%AE%BA%E6%96%87/">论文</a>
+              </p>
+              <p class="item-title">
+                <a href="/2023/06/07/Medical_Image_Segmentaion/Loss%E7%94%A8%E4%BA%8E%E5%8C%BB%E5%AD%A6%E5%9B%BE%E5%83%8F%E5%88%86%E5%89%B2%E7%9A%84%E9%B2%81%E6%A3%92%E6%8D%9F%E5%A4%B1%E5%87%BD-Glenn/" class="title">MedSeg | T-Loss：用于医学图像分割的鲁棒损失函数</a>
+              </p>
+              <p class="item-date">
+                <time datetime="2023-06-07T10:58:29.000Z" itemprop="datePublished">2023-06-07</time>
+              </p>
+            </div>
+          </li>
+          
+          <li>
+            
+            <div class="item-inner">
+              <p class="item-category">
+                <a class="category-link" href="/categories/%E8%AE%BA%E6%96%87/">论文</a>
+              </p>
+              <p class="item-title">
+                <a href="/2023/06/07/Masked_Image_Model/%E8%AE%BA%E6%96%87%E9%98%85%E8%AF%BB%E6%9D%8E%E9%A3%9E%E9%A3%9E-MIM-SiamMAE-Glenn/" class="title">MIM | SiamMAE：用于从视频中学习视觉对应关系的 MAE 简单扩展</a>
+              </p>
+              <p class="item-date">
+                <time datetime="2023-06-07T10:51:29.000Z" itemprop="datePublished">2023-06-07</time>
+              </p>
+            </div>
+          </li>
+          
+      </ul>
+    </div>
+  </div>
+  
+
+    
+  </div>
+</aside>
+
+  
+  
+  <aside class="sidebar sidebar-toc collapse   in  " id="collapseToc" itemscope itemtype="http://schema.org/WPSideBar">
+  <div class="slimContent">
+    <nav id="toc" class="article-toc">
+      <h3 class="toc-title">文章目录</h3>
+      <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#%E4%B8%BB%E8%A6%81%E5%86%85%E5%AE%B9"><span class="toc-number">1.</span> <span class="toc-text">主要内容</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E6%96%B9%E6%B3%95"><span class="toc-number">2.</span> <span class="toc-text">方法</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%A4%9A%E5%99%A8%E5%AE%98%E5%88%86%E5%89%B2%E7%9A%84%E4%BC%AA%E6%A0%87%E7%AD%BE"><span class="toc-number">2.1.</span> <span class="toc-text">多器官分割的伪标签</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%A4%9A%E5%99%A8%E5%AE%98%E5%88%86%E5%89%B2%E6%A8%A1%E5%9E%8B"><span class="toc-number">2.2.</span> <span class="toc-text">多器官分割模型</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E7%BB%93%E6%9E%9C%E4%B8%8E%E8%AE%A8%E8%AE%BA"><span class="toc-number">3.</span> <span class="toc-text">结果与讨论</span></a></li></ol>
+    </nav>
+  </div>
+</aside>
+
+<main class="main" role="main">
+  <div class="content">
+  <article id="post-Medical_Image_Segmentaion/Seg-腹部多器官和肿瘤分割的增量学-Glenn" class="article article-type-post" itemscope itemtype="http://schema.org/BlogPosting">
+    
+    <div class="article-header">
+      
+        
+  
+    <h1 class="article-title" itemprop="name">
+      MedSeg | 腹部多器官和肿瘤分割的增量学习
+    </h1>
+  
+
+      
+      <div class="article-meta">
+        <span class="article-date">
+    <i class="icon icon-calendar-check"></i>
+	<a href="/2023/06/07/Medical_Image_Segmentaion/Seg-%E8%85%B9%E9%83%A8%E5%A4%9A%E5%99%A8%E5%AE%98%E5%92%8C%E8%82%BF%E7%98%A4%E5%88%86%E5%89%B2%E7%9A%84%E5%A2%9E%E9%87%8F%E5%AD%A6-Glenn/" class="article-date">
+	  <time datetime="2023-06-07T10:58:37.000Z" itemprop="datePublished">2023-06-07</time>
+	</a>
+</span>
+        
+  <span class="article-category">
+    <i class="icon icon-folder"></i>
+    <a class="article-category-link" href="/categories/%E8%AE%BA%E6%96%87/">论文</a>
+  </span>
+
+        
+  <span class="article-tag">
+    <i class="icon icon-tags"></i>
+	<a class="article-tag-link-link" href="/tags/Medical-Image-Segmentation/" rel="tag">Medical Image Segmentation</a>
+  </span>
+
+
+        
+
+	<span class="article-read hidden-xs">
+    	<i class="icon icon-eye-fill" aria-hidden="true"></i>
+    	<span id="/2023/06/07/Medical_Image_Segmentaion/Seg-%E8%85%B9%E9%83%A8%E5%A4%9A%E5%99%A8%E5%AE%98%E5%92%8C%E8%82%BF%E7%98%A4%E5%88%86%E5%89%B2%E7%9A%84%E5%A2%9E%E9%87%8F%E5%AD%A6-Glenn/" class="leancloud_visitors"  data-flag-title="MedSeg | 腹部多器官和肿瘤分割的增量学习">
+			<span class="leancloud-visitors-count">0</span>
+		</span>
+    </span>
+
+        <span class="post-comment"><i class="icon icon-comment"></i> <a href="/2023/06/07/Medical_Image_Segmentaion/Seg-%E8%85%B9%E9%83%A8%E5%A4%9A%E5%99%A8%E5%AE%98%E5%92%8C%E8%82%BF%E7%98%A4%E5%88%86%E5%89%B2%E7%9A%84%E5%A2%9E%E9%87%8F%E5%AD%A6-Glenn/#comments" class="article-comment-link">评论</a></span>
+        
+      </div>
+    </div>
+    <div class="article-entry marked-body" itemprop="articleBody">
+      
+        <p><img src="/2023/06/07/Medical_Image_Segmentaion/Seg-%E8%85%B9%E9%83%A8%E5%A4%9A%E5%99%A8%E5%AE%98%E5%92%8C%E8%82%BF%E7%98%A4%E5%88%86%E5%89%B2%E7%9A%84%E5%A2%9E%E9%87%8F%E5%AD%A6-Glenn/v2-56299e8bbf299c83a716e63a65f87d3d_r.jpg"></p>
+<blockquote>
+<p><em><strong>题目：</strong>Continual Learning for Abdominal Multi-Organ and Tumor Segmentation<br><strong>作者单位：</strong>约翰霍普金斯大学<br><strong>论文网址：</strong></em><a href="https://link.zhihu.com/?target=https://arxiv.org/abs/2306.00988">https://arxiv.org/abs/2306.00988</a> <em><strong>论文代码：</strong></em><a href="https://link.zhihu.com/?target=https://github.com/MrGiovanni/ContinualLearning">https://github.com/MrGiovanni/ContinualLearning</a> <em><strong>首次发布时间：</strong>2023 年 6 月 1 日</em></p>
+</blockquote>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">@misc&#123;zhang2023continual,</span><br><span class="line">      title=&#123;Continual Learning for Abdominal Multi-Organ and Tumor Segmentation&#125;, </span><br><span class="line">      author=&#123;Yixiao Zhang and Xinyi Li and Huimiao Chen and Alan Yuille and Yaoyao Liu and Zongwei Zhou&#125;,</span><br><span class="line">      year=&#123;2023&#125;,</span><br><span class="line">      eprint=&#123;2306.00988&#125;,</span><br><span class="line">      archivePrefix=&#123;arXiv&#125;,</span><br><span class="line">      primaryClass=&#123;eess.IV&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+<hr>
+<h1 id="主要内容"><a href="#主要内容" class="headerlink" title="主要内容"></a>主要内容</h1><p>深度学习模型存在“灾难性遗忘”问题，新数据的学习可能会覆盖之前获取的知识。</p>
+<p>医学领域的多器官和肿瘤分割任务需要模型动态地扩展到新的类别，然而现有增量学习方法大多需要存取旧数据，而这在实践中受到隐私法规的限制，难以实施，例如：</p>
+<ul>
+<li>Ozdemir 等人将蒸馏损失应用到医学图像分割。Liu 等人引入了一个内存模块来存储不同器官类别的典型表现。<strong>这些方法依赖于少数具有代表性的样本，而这可能在实践中无法获取</strong>；</li>
+<li>一项最近的研究主要关注网络扩展，通过冻结编码器和解码器并在学习新类时添加额外的解码器来解决遗忘问题。<strong>尽管这些方法在减轻遗忘问题上取得了成功，但它们为网络参数带来了巨大的内存成本。</strong></li>
+</ul>
+<p>因此，作者确定了在设计多器官和肿瘤分割框架时必须解决的两个主要开放问题：</p>
+<ul>
+<li><strong>Q1：能否在不需要具有代表性的样本的情况下缓解遗忘问题？</strong></li>
+<li><strong>Q2：能否设计一个新的网络架构，允许在不同的增量学习步骤之间共享更多的网络参数？</strong></li>
+</ul>
+<p>这篇研究提出了一个新的增量多器官和肿瘤分割方法，这种方法不需要保存旧数据，且减小了内存和计算的负担。概括来说，总共分为三个部分：</p>
+<ul>
+<li>受增量学习中的知识蒸馏方法的启发，在新到达的数据上为旧类生成软伪注释。这使模型能够在不保存旧数据的情况下回忆旧知识。通过这种简单的策略，能够为旧类保持合理的性能；</li>
+<li>在共享的编码器和解码器之上为每个类提出了图像感知的分割头。这些头允许使用单一的 backbone 和轻松扩展到新类，同时带来较小的计算成本。</li>
+<li>将对比语言-图像预训练（CLIP）应用到此问题中，利用文本嵌入的高级视觉语义信息，增强训练效果。</li>
+</ul>
+<p>通过使用三个数据集进行验证，该方法在保持对旧类别知识的理解和学习新类别的能力上，都表现出优越的性能，且内存效率高。</p>
+<hr>
+<h1 id="方法"><a href="#方法" class="headerlink" title="方法"></a>方法</h1><p>首先定义<strong>增量器官分割问题</strong>：给定一序列部分标注的数据集 \left{D_1, D_2, . . . , D_n\right} ，每个数据集有其器官类别 \left{C_1, C_2, . . . , C_n\right} ，然后一次使用一个数据集来顺序地学习一个单一的多器官分割模型。当在第 i 个数据集 D_t 上训练时，先前的数据集 \left{D_1, D_2, . . . , D_{n-1}\right} 不可用。模型需要预测所有已看见数据集 \left{D_1, D_2, . . . , D_t\right} 的累积器官标签：</p>
+<p>\begin{array}{l}\hat{Y}_{j}&#x3D;\arg!\operatorname*{max}_{c\in C_t}P(Y_{j}&#x3D;c|X)\ C_{t}&#x3D;\cup_{\tau\leq t} C_{\tau}\end{array} </p>
+<p>其中， j 是体素索引， X 是来自 D_t 的图像， P 是模型学习的概率函数，而 \hat Y 是输出的分割掩膜。</p>
+<h2 id="多器官分割的伪标签"><a href="#多器官分割的伪标签" class="headerlink" title="多器官分割的伪标签"></a>多器官分割的伪标签</h2><p>一个在某些器官类别上进行预训练的分割模型在微调新类别时会完全忘记旧的类别。使用伪标签可以大大缓解这个问题，并保留现有的知识。</p>
+<p>具体来说，利用先前学习步骤 t − 1 的输出预测 \hat Y_{t−1} ，这个预测值包括了在那一步学习的所有旧类别 C_{t−1} ，作为当前步骤旧类别的伪标签。对于新类别，仍然使用真实的标签。形式上，当前学习步骤 t 中类别 c 的标签 \tilde L^c_t 可以表达为：</p>
+<p>\tilde{L}_{t}^{c}&#x3D;\left\begin{array}{l l}L_{t}^{c}&amp;\mathrm{if<del>}c\in C_{t}-C_{t-1}\ \hat{Y}_{t-1}^{c}&amp;\mathrm{if</del>}c\in C_{t-1}\end{array}\right. </p>
+<p>其中， L^c_t 代表了从数据集 D_t 获取的在步骤 t 中类别 c 的真实标签。通过利用这种方法，可以保持原有知识，并在学习新类别时防止模型忘记之前学习的信息。接下来提出的模型只使用旧类别的伪标签进行训练，而不需要任何其他的知识蒸馏或正则化。</p>
+<h2 id="多器官分割模型"><a href="#多器官分割模型" class="headerlink" title="多器官分割模型"></a>多器官分割模型</h2><p>图 1 展示了本文所提模型架构的整体框架。它由一个主干网络，一组图像感知的器官特定输出头，和文本驱动的头部参数生成组成。</p>
+<p><img src="/2023/06/07/Medical_Image_Segmentaion/Seg-%E8%85%B9%E9%83%A8%E5%A4%9A%E5%99%A8%E5%AE%98%E5%92%8C%E8%82%BF%E7%98%A4%E5%88%86%E5%89%B2%E7%9A%84%E5%A2%9E%E9%87%8F%E5%AD%A6-Glenn/v2-800e640182bb8ee94ba6f35500ecb9d5_r.jpg"><br>图1. 所提模型架构的整体框架。</p>
+<ul>
+<li><strong>主干网络：</strong>对于增量学习来说，理想的模型应能学习到足够通用的表示，从而轻松适应新的类别。使用 Swin UNETR 作为主干网络，因为它在自监督预训练和转移到各种医学图像分割任务上表现出强大的性能。 Swin UNETR 的编码器是 Swin Transformer，解码器是几层反卷积层。使用类似 U-Net 的跳跃连接来将低级别编码器特征和解码器特征融合。</li>
+<li><strong>图像感知器官特定头：</strong>原始的 Swin UNETR 网络的输出层是一个 Softmax 层，预测每个类别的概率。作者提出将输出层替换为多个图像感知的器官特定头。首先，在最后的编码器特征上使用全局平均池化（GAP）层，得到当前图像 X 的全局特征 f 。然后，对于每一个器官类别 k ，学习一个多层感知器（MLP）模块，将全局图像特征映射到一组参数 θ_k ：</li>
+</ul>
+<p>θ_k &#x3D; MLP_k(GAP(E(X))) </p>
+<p>其中 E(X) 表示图像 X 的编码器特征。器官类别 k 的输出头是一系列使用参数 θ_k 作为卷积核参数的卷积层。这些卷积层应用于解码器特征，输出器官类别 k 的分割预测：</p>
+<p>P(Y_{j}^{k}&#x3D;1|X,\theta_{k})&#x3D;\sigma(\mathrm{Conv}(D(E(X));\theta_{k})) </p>
+<p>其中， E 是编码器， D 是解码器， σ 是 Sigmoid 非线性层， P(Y_{j}^{k}&#x3D;1) 表示像素 j 属于器官类别 k 的预测概率。每个类别的预测通过二元交叉熵损失进行优化。这种设计允许对新引入的和先前学习的类别进行独立的概率预测，从而在增量学习过程中最小化新类别对旧类别的影响。此外，这种设计允许对一个像素属于多个类别（例如，一个器官上的肿瘤）的情况进行多标签预测。</p>
+<ul>
+<li><strong>文本驱动的头部参数生成：</strong>进一步为分割头提供了关于每个器官类别的语义信息，使用 CLIP 生成目标器官名字的文本嵌入。具体来说，通过预训练的 CLIP 文本编码器和医学提示（例如，”[CLS] 的计算机断层扫描”，其中 [CLS] 是器官类别名）生成器官名字嵌入。然后，使用文本嵌入 ω 和全局图像特征 f 一起生成器官分割头的参数：</li>
+</ul>
+<p>θ_k &#x3D; MLP_k([GAP(E(X)), ω_k]) </p>
+<p>其中 ω_k 是器官类别 k 的文本嵌入。CLIP 嵌入携带高级语义，并有能力连接相关概念。因此，它指导 MLP 模块为每个器官类别生成更好的卷积参数。更重要的是，固定长度的 CLIP 嵌入能够将预训练模型适应到开放词汇的分割，并扩展到新的类别。</p>
+<hr>
+<h1 id="结果与讨论"><a href="#结果与讨论" class="headerlink" title="结果与讨论"></a>结果与讨论</h1><p><strong>数据集：</strong>在两种数据设置下实证评估了所提出的模型。</p>
+<p>训练和增量学习都在JHH 数据集上进行。它有多个已注释的类别，可以分为三组：腹部器官（<strong>其中七个类别在步骤 1 中学习：脾、右肾、左肾、胆囊、肝、下腔静脉、胰腺</strong>）、胃肠道（<strong>其中三个类别在步骤 2 中学习：胃、结肠、小肠</strong>）、其他器官（<strong>其中四个类别在步骤 3 中学习：主动脉、门静脉和脾静脉、腹腔干、上腹腺动脉</strong>）。</p>
+<p>先在 BTCV 数据集上进行训练，然后在 LiTS 数据集上进行增量学习。BTCV 数据集包含 47 个腹部 CT 图像，描绘了 13 个器官。LiTS 数据集包含 130 个增强的腹部 CT 扫描，用于肝脏和肝脏肿瘤分割。<strong>在步骤 1 的学习中使用了 BTCV 中的 13 个类别</strong>（脾、右肾、左肾、胆囊、食道、肝、胃、主动脉、下腔静脉、门静脉和脾静脉、胰腺、右肾上腺、左肾上腺），<strong>在步骤 2 的学习中使用了 LiTS 中的肝肿瘤。</strong></p>
+<p><strong>结果：</strong>使用 JHH 数据集和公共数据集的增量分割结果分别在表 1 和表 2 中显示。</p>
+<p><img src="/2023/06/07/Medical_Image_Segmentaion/Seg-%E8%85%B9%E9%83%A8%E5%A4%9A%E5%99%A8%E5%AE%98%E5%92%8C%E8%82%BF%E7%98%A4%E5%88%86%E5%89%B2%E7%9A%84%E5%A2%9E%E9%87%8F%E5%AD%A6-Glenn/v2-41d02cba36ad78f5fdfedf49db19e941_r.jpg"><br>表1. JHH 数据集上的基准增量学习方法<br><img src="/2023/06/07/Medical_Image_Segmentaion/Seg-%E8%85%B9%E9%83%A8%E5%A4%9A%E5%99%A8%E5%AE%98%E5%92%8C%E8%82%BF%E7%98%A4%E5%88%86%E5%89%B2%E7%9A%84%E5%A2%9E%E9%87%8F%E5%AD%A6-Glenn/v2-08641a3a06f1d61a7fd08914be8fec94_r.jpg"><br>表2. 公共数据集上的基准增量学习方法<br><img src="/2023/06/07/Medical_Image_Segmentaion/Seg-%E8%85%B9%E9%83%A8%E5%A4%9A%E5%99%A8%E5%AE%98%E5%92%8C%E8%82%BF%E7%98%A4%E5%88%86%E5%89%B2%E7%9A%84%E5%A2%9E%E9%87%8F%E5%AD%A6-Glenn/v2-2bf39531aaade39f4c4ce067e24a1ab8_r.jpg"><br>表3. JHH_organ 数据集中七个类别的基准增量学习方法。在三个增量学习步骤中展示了每个类的 Dice 分数。<br><img src="/2023/06/07/Medical_Image_Segmentaion/Seg-%E8%85%B9%E9%83%A8%E5%A4%9A%E5%99%A8%E5%AE%98%E5%92%8C%E8%82%BF%E7%98%A4%E5%88%86%E5%89%B2%E7%9A%84%E5%A2%9E%E9%87%8F%E5%AD%A6-Glenn/v2-2dbc4b8672b4abb8ff57836548bf926f_r.jpg"><br>表4. JHH_gastr 数据集中三个类的基准增量学习方法。在两个增量学习步骤中展示了每个类的 Dice 分数。<br><img src="/2023/06/07/Medical_Image_Segmentaion/Seg-%E8%85%B9%E9%83%A8%E5%A4%9A%E5%99%A8%E5%AE%98%E5%92%8C%E8%82%BF%E7%98%A4%E5%88%86%E5%89%B2%E7%9A%84%E5%A2%9E%E9%87%8F%E5%AD%A6-Glenn/v2-b6bdb84848ea7dd7a6a099d21a110c84_r.jpg"><br>表5. JHH_cardiac 数据集中四个类的基准增量学习方法。在最终的增量学习步骤中展示了每个类的 Dice 分数。<br><img src="/2023/06/07/Medical_Image_Segmentaion/Seg-%E8%85%B9%E9%83%A8%E5%A4%9A%E5%99%A8%E5%AE%98%E5%92%8C%E8%82%BF%E7%98%A4%E5%88%86%E5%89%B2%E7%9A%84%E5%A2%9E%E9%87%8F%E5%AD%A6-Glenn/v2-1d6ccfe4555a63bbc22eb916189384ff_r.jpg"><br>表6. 从 BTCV 到 LiTS 数据集的基准增量学习方法。在两个增量学习步骤中展示了每个类的 Dice 分数。</p>
+<ul>
+<li>通过简单地使用伪标签技术（LwF），能够在记忆旧类别上达到相当好的性能（在 JHH 数据集的步骤 2 中，腹部器官的 Dice 为 0.777，步骤 3 中为 0.767；在 BTCV 器官的步骤 2 中，Dice 为 0.770）。</li>
+<li>所提出的方法在旧类别中表现出最少的遗忘，并且在适应新数据和新类别上有更好的能力。</li>
+</ul>
+<p>为了评估所提出的模型设计，还对 JHH 数据集进行了消融研究，结果显示在表 7 中。</p>
+<p><img src="/2023/06/07/Medical_Image_Segmentaion/Seg-%E8%85%B9%E9%83%A8%E5%A4%9A%E5%99%A8%E5%AE%98%E5%92%8C%E8%82%BF%E7%98%A4%E5%88%86%E5%89%B2%E7%9A%84%E5%A2%9E%E9%87%8F%E5%AD%A6-Glenn/v2-6ced7c8e75eef4b9732d0897ad5bf138_r.jpg"><br>表7. JHH 数据集的消融研究。<br>具体来说，消融了器官特异性分割头以及 CLIP 文本嵌入带来的性能提升。</p>
+<ul>
+<li>表 3 的第一行显示了使用伪标签（LwF）学习的基线 Swin UNETR 模型的性能。</li>
+<li>第二行引入了器官特异性分割头，但对每个器官使用的是 one-hot 嵌入，而不是 CLIP 文本嵌入。</li>
+<li>第三行给出了完整方法的性能。</li>
+</ul>
+<p>结果显示，通过将模型调整为使用器官特异性头部作为分割输出，能够实现大幅度的改进（例如，对胃肠道的步骤 2 改进了 0.144，步骤 3 改进了 0.179）。通过应用 CLIP 文本嵌入，能够进一步提高性能（例如，通过在胃肠道的步骤 2 和步骤 3 中增加 0.019 和 0.027）。</p>
+<p>最后，图 2 展示了所提出方法的定性分割结果，以及在 JHH 数据集上最好的基线方法 ILT。每列一个案例，每个步骤两个案例。可视化结果表明，所提出的方法成功地分割出正确的器官，而最好的基线方法在整个增量学习过程中都性能不佳。</p>
+<p><img src="/2023/06/07/Medical_Image_Segmentaion/Seg-%E8%85%B9%E9%83%A8%E5%A4%9A%E5%99%A8%E5%AE%98%E5%92%8C%E8%82%BF%E7%98%A4%E5%88%86%E5%89%B2%E7%9A%84%E5%A2%9E%E9%87%8F%E5%AD%A6-Glenn/v2-82f918fcc211431772b089654c5df03a_r.jpg"><br>图2. 在 JHH 数据集上持续学习步骤 2 和 3 中本文提出模型和基线模型 ILT 的可视化比较。</p>
+
+      
+    </div>
+    <div class="article-footer">
+      <blockquote class="mt-2x">
+  <ul class="post-copyright list-unstyled">
+    
+    <li class="post-copyright-link hidden-xs">
+      <strong>本文链接：</strong>
+      <a href="https://chenluda.github.io/2023/06/07/Medical_Image_Segmentaion/Seg-%E8%85%B9%E9%83%A8%E5%A4%9A%E5%99%A8%E5%AE%98%E5%92%8C%E8%82%BF%E7%98%A4%E5%88%86%E5%89%B2%E7%9A%84%E5%A2%9E%E9%87%8F%E5%AD%A6-Glenn/" title="MedSeg | 腹部多器官和肿瘤分割的增量学习" target="_blank" rel="external">https://chenluda.github.io/2023/06/07/Medical_Image_Segmentaion/Seg-腹部多器官和肿瘤分割的增量学-Glenn/</a>
+    </li>
+    
+    <li class="post-copyright-license">
+      <strong>版权声明： </strong> 本博客所有文章除特别声明外，均采用 <a href="http://creativecommons.org/licenses/by/4.0/deed.zh" target="_blank" rel="external">CC BY 4.0 CN协议</a> 许可协议。转载请注明出处！
+    </li>
+  </ul>
+</blockquote>
+
+
+<div class="panel panel-default panel-badger">
+  <div class="panel-body">
+    <figure class="media">
+      <div class="media-left">
+        <a href="https://github.com/chenluda" target="_blank" class="img-burn thumb-sm visible-lg">
+          <img src="/images/avatar.png" class="img-rounded w-full" alt="">
+        </a>
+      </div>
+      <div class="media-body">
+        <h3 class="media-heading"><a href="https://github.com/chenluda" target="_blank"><span class="text-dark">Glenn</span><small class="ml-1x">Stay hungry, stay foolish.</small></a></h3>
+        <div>咖啡，健身，热爱生活。</div>
+      </div>
+    </figure>
+  </div>
+</div>
+
+
+    </div>
+  </article>
+  
+    
+  <section id="comments">
+  	
+      <div id="vcomments"></div>
+    
+  </section>
+
+
+  
+</div>
+
+  <nav class="bar bar-footer clearfix" data-stick-bottom>
+  <div class="bar-inner">
+  
+  <ul class="pager pull-left">
+    
+    <li class="prev">
+      <a href="/2023/06/07/%E9%80%9F%E8%A7%88/us%E4%BB%8E%E5%85%A5%E9%97%A8%E5%88%B0%E5%BA%94%E7%94%A8%E4%BB%8E%E8%87%AA%E7%84%B6%E5%88%B0%E7%A7%91%E5%AD%A6%E7%95%85%E8%A1%8C%E7%A7%91%E7%A0%94%E5%AE%87-Glenn/" title="Catalyst Plus：从入门到应用，从自然到科学，畅行科研宇宙"><i class="icon icon-angle-left" aria-hidden="true"></i><span>&nbsp;&nbsp;上一篇</span></a>
+    </li>
+    
+    
+    <li class="next">
+      <a href="/2023/06/07/Medical_Image_Segmentaion/IFE%E5%9F%BA%E4%BA%8E%E6%9B%B2%E7%8E%87%E6%88%96%E4%BF%A1%E6%81%AF%E7%86%B5%E7%9A%84%E9%80%9A%E9%81%93%E6%B3%A8%E6%84%8F%E5%8A%9B%E6%9C%BA-Glenn/" title="MedSeg | IFE：基于曲率或信息熵的通道注意力机制"><span>下一篇&nbsp;&nbsp;</span><i class="icon icon-angle-right" aria-hidden="true"></i></a>
+    </li>
+    
+    
+    <li class="toggle-toc">
+      <a class="toggle-btn " data-toggle="collapse" href="#collapseToc" aria-expanded="false" title="文章目录" role="button">    <span>[&nbsp;</span><span>文章目录</span>
+        <i class="text-collapsed icon icon-anchor"></i>
+        <i class="text-in icon icon-close"></i>
+        <span>]</span>
+      </a>
+    </li>
+    
+  </ul>
+  
+  
+  
+  <div class="bar-right">
+    
+    <div class="share-component" data-sites="weibo,qq,wechat,facebook,twitter" data-mobile-sites="weibo,qq,qzone"></div>
+    
+  </div>
+  </div>
+</nav>
+  
+
+
+</main>
+
+  <footer class="footer" itemscope itemtype="http://schema.org/WPFooter">
+	
+	
+    <ul class="social-links">
+    	
+        <li><a href="https://github.com/chenluda" target="_blank" title="Github" data-toggle=tooltip data-placement=top><i class="icon icon-github"></i></a></li>
+        
+        <li><a href="https://www.zhihu.com/people/Glenn" target="_blank" title="Zhihu" data-toggle=tooltip data-placement=top><i class="icon icon-zhihu"></i></a></li>
+        
+    </ul>
+
+    <div class="copyright">
+    	
+        &copy; 2023 Glenn
+        
+        <div class="publishby">
+        	Theme by <a href="https://github.com/cofess" target="_blank"> cofess </a>base on <a href="https://github.com/cofess/hexo-theme-pure" target="_blank">pure</a>.
+        </div>
+    </div>
+</footer>
+  <script src="//cdn.jsdelivr.net/npm/jquery@1.12.4/dist/jquery.min.js"></script>
+<script>
+window.jQuery || document.write('<script src="js/jquery.min.js"><\/script>')
+</script>
+
+<script src="/js/plugin.min.js"></script>
+
+
+<script src="/js/application.js"></script>
+
+
+    <script>
+(function (window) {
+    var INSIGHT_CONFIG = {
+        TRANSLATION: {
+            POSTS: '文章',
+            PAGES: '页面',
+            CATEGORIES: '分类',
+            TAGS: '标签',
+            UNTITLED: '(未命名)',
+        },
+        ROOT_URL: '/',
+        CONTENT_URL: '/content.json',
+    };
+    window.INSIGHT_CONFIG = INSIGHT_CONFIG;
+})(window);
+</script>
+
+<script src="/js/insight.js"></script>
+
+
+
+
+
+
+   
+
+
+
+
+   
+    
+  <script src="//cdn1.lncld.net/static/js/3.0.4/av-min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/valine"></script>
+  <script type="text/javascript">
+  var GUEST = ['nick', 'mail', 'link'];
+  var meta = 'nick,mail,link';
+  meta = meta.split(',').filter(function(item) {
+    return GUEST.indexOf(item) > -1;
+  });
+  new Valine({
+    el: '#vcomments',
+    verify: false,
+    notify: false,
+    appId: 'rSq08S6gdVroDI1A4r7XWnix-MdYXbMMI',
+    appKey: '5UM6jz8DwNaaEQTN5ojTHB1N',
+    placeholder: '请输入...',
+    avatar: 'mm',
+    meta: meta,
+    pageSize: '10' || 10,
+    visitor: true
+  });
+  </script>
+
+     
+
+
+
+
+
+
+
+</body>
+</html>

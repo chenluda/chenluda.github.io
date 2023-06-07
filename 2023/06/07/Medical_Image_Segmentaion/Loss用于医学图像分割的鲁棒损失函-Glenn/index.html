@@ -1,0 +1,633 @@
+<!DOCTYPE html>
+<html lang=zh>
+<head>
+  <meta charset="utf-8">
+  
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=no, minimal-ui">
+  <meta name="renderer" content="webkit">
+  <meta http-equiv="Cache-Control" content="no-transform" />
+  <meta http-equiv="Cache-Control" content="no-siteapp" />
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black">
+  <meta name="format-detection" content="telephone=no,email=no,adress=no">
+  <!-- Color theme for statusbar -->
+  <meta name="theme-color" content="#000000" />
+  <!-- 强制页面在当前窗口以独立页面显示,防止别人在框架里调用页面 -->
+  <meta http-equiv="window-target" content="_top" />
+  
+  
+  <title>MedSeg | T-Loss：用于医学图像分割的鲁棒损失函数 | Glenn&#39;s blog</title>
+  <meta name="description" content="题目：Robust T-Loss for Medical Image Segmentation作者单位：巴塞尔大学、lucerne school of computer science and information technology论文网址：https:&#x2F;&#x2F;arxiv.org&#x2F;abs&#x2F;2306.00753论文代码：https:&#x2F;&#x2F;robust-tloss.github.io首次发布时间：">
+<meta property="og:type" content="article">
+<meta property="og:title" content="MedSeg | T-Loss：用于医学图像分割的鲁棒损失函数">
+<meta property="og:url" content="https://chenluda.github.io/2023/06/07/Medical_Image_Segmentaion/Loss%E7%94%A8%E4%BA%8E%E5%8C%BB%E5%AD%A6%E5%9B%BE%E5%83%8F%E5%88%86%E5%89%B2%E7%9A%84%E9%B2%81%E6%A3%92%E6%8D%9F%E5%A4%B1%E5%87%BD-Glenn/index.html">
+<meta property="og:site_name" content="Glenn">
+<meta property="og:description" content="题目：Robust T-Loss for Medical Image Segmentation作者单位：巴塞尔大学、lucerne school of computer science and information technology论文网址：https:&#x2F;&#x2F;arxiv.org&#x2F;abs&#x2F;2306.00753论文代码：https:&#x2F;&#x2F;robust-tloss.github.io首次发布时间：">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://chenluda.github.io/2023/06/07/Medical_Image_Segmentaion/Loss%E7%94%A8%E4%BA%8E%E5%8C%BB%E5%AD%A6%E5%9B%BE%E5%83%8F%E5%88%86%E5%89%B2%E7%9A%84%E9%B2%81%E6%A3%92%E6%8D%9F%E5%A4%B1%E5%87%BD-Glenn/v2-3454cbfc9c6ff26a77976104e3d82a27_r.jpg">
+<meta property="og:image" content="https://chenluda.github.io/2023/06/07/Medical_Image_Segmentaion/Loss%E7%94%A8%E4%BA%8E%E5%8C%BB%E5%AD%A6%E5%9B%BE%E5%83%8F%E5%88%86%E5%89%B2%E7%9A%84%E9%B2%81%E6%A3%92%E6%8D%9F%E5%A4%B1%E5%87%BD-Glenn/v2-e98c70655cbfd871905a056045abca5a_r.jpg">
+<meta property="og:image" content="https://chenluda.github.io/2023/06/07/Medical_Image_Segmentaion/Loss%E7%94%A8%E4%BA%8E%E5%8C%BB%E5%AD%A6%E5%9B%BE%E5%83%8F%E5%88%86%E5%89%B2%E7%9A%84%E9%B2%81%E6%A3%92%E6%8D%9F%E5%A4%B1%E5%87%BD-Glenn/v2-256fff5dd43131ee17813f52fca5a26a_r.jpg">
+<meta property="og:image" content="https://chenluda.github.io/2023/06/07/Medical_Image_Segmentaion/Loss%E7%94%A8%E4%BA%8E%E5%8C%BB%E5%AD%A6%E5%9B%BE%E5%83%8F%E5%88%86%E5%89%B2%E7%9A%84%E9%B2%81%E6%A3%92%E6%8D%9F%E5%A4%B1%E5%87%BD-Glenn/v2-4943802b49610a22ec1b43bd172b4c38_r.jpg">
+<meta property="og:image" content="https://chenluda.github.io/2023/06/07/Medical_Image_Segmentaion/Loss%E7%94%A8%E4%BA%8E%E5%8C%BB%E5%AD%A6%E5%9B%BE%E5%83%8F%E5%88%86%E5%89%B2%E7%9A%84%E9%B2%81%E6%A3%92%E6%8D%9F%E5%A4%B1%E5%87%BD-Glenn/v2-c6fb4b688b77269f2ab18c1e6c124c26_r.jpg">
+<meta property="article:published_time" content="2023-06-07T10:58:29.000Z">
+<meta property="article:modified_time" content="2023-06-07T11:23:21.601Z">
+<meta property="article:author" content="Glenn">
+<meta property="article:tag" content="Medical Image Segmentation">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://chenluda.github.io/2023/06/07/Medical_Image_Segmentaion/Loss%E7%94%A8%E4%BA%8E%E5%8C%BB%E5%AD%A6%E5%9B%BE%E5%83%8F%E5%88%86%E5%89%B2%E7%9A%84%E9%B2%81%E6%A3%92%E6%8D%9F%E5%A4%B1%E5%87%BD-Glenn/v2-3454cbfc9c6ff26a77976104e3d82a27_r.jpg">
+  <!-- Canonical links -->
+  <link rel="canonical" href="https://chenluda.github.io/2023/06/07/Medical_Image_Segmentaion/Loss%E7%94%A8%E4%BA%8E%E5%8C%BB%E5%AD%A6%E5%9B%BE%E5%83%8F%E5%88%86%E5%89%B2%E7%9A%84%E9%B2%81%E6%A3%92%E6%8D%9F%E5%A4%B1%E5%87%BD-Glenn/index.html">
+  
+    <link rel="alternate" href="/atom.xml" title="Glenn" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="/images/avatar.png" type="image/x-icon">
+  
+  
+<link rel="stylesheet" href="/css/style.css">
+
+  
+  
+  
+  
+<!-- hexo injector head_end start -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/katex.min.css">
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/hexo-math@4.0.0/dist/style.css">
+<!-- hexo injector head_end end --><meta name="generator" content="Hexo 6.3.0"></head>
+
+
+<body class="main-center theme-black" itemscope itemtype="http://schema.org/WebPage">
+  <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+  <div class="slimContent">
+    <div class="navbar-header">
+      
+      
+      <div class="profile-block text-center">
+        <a id="avatar" href="https://github.com/chenluda" target="_blank">
+          <img class="img-circle img-rotate" src="/images/avatar.png" width="200" height="200">
+        </a>
+        <h2 id="name" class="hidden-xs hidden-sm">Glenn</h2>
+        <h3 id="title" class="hidden-xs hidden-sm hidden-md">Stay hungry, stay foolish.</h3>
+        <small id="location" class="text-muted hidden-xs hidden-sm"><i class="icon icon-map-marker"></i> Yunnan, China</small>
+      </div>
+      
+      <div class="search" id="search-form-wrap">
+
+    <form class="search-form sidebar-form">
+        <div class="input-group">
+            <input type="text" class="search-form-input form-control" placeholder="搜索" />
+            <span class="input-group-btn">
+                <button type="submit" class="search-form-submit btn btn-flat" onclick="return false;"><i class="icon icon-search"></i></button>
+            </span>
+        </div>
+    </form>
+    <div class="ins-search">
+  <div class="ins-search-mask"></div>
+  <div class="ins-search-container">
+    <div class="ins-input-wrapper">
+      <input type="text" class="ins-search-input" placeholder="想要查找什么..." x-webkit-speech />
+      <button type="button" class="close ins-close ins-selectable" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span></button>
+    </div>
+    <div class="ins-section-wrapper">
+      <div class="ins-section-container"></div>
+    </div>
+  </div>
+</div>
+
+
+</div>
+      <button class="navbar-toggle collapsed" type="button" data-toggle="collapse" data-target="#main-navbar" aria-controls="main-navbar" aria-expanded="false">
+        <span class="sr-only">Toggle navigation</span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+    </div>
+    <nav id="main-navbar" class="collapse navbar-collapse" itemscope itemtype="http://schema.org/SiteNavigationElement" role="navigation">
+      <ul class="nav navbar-nav main-nav menu-highlight">
+        
+        
+        <li class="menu-item menu-item-home">
+          <a href="/.">
+            
+            <i class="icon icon-home-fill"></i>
+            
+            <span class="menu-title">首页</span>
+          </a>
+        </li>
+        
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives">
+            
+            <i class="icon icon-archives-fill"></i>
+            
+            <span class="menu-title">归档</span>
+          </a>
+        </li>
+        
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories">
+            
+            <i class="icon icon-folder"></i>
+            
+            <span class="menu-title">分类</span>
+          </a>
+        </li>
+        
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about">
+            
+            <i class="icon icon-cup-fill"></i>
+            
+            <span class="menu-title">关于</span>
+          </a>
+        </li>
+        
+      </ul>
+      
+	
+    <ul class="social-links">
+    	
+        <li><a href="https://github.com/chenluda" target="_blank" title="Github" data-toggle=tooltip data-placement=top><i class="icon icon-github"></i></a></li>
+        
+        <li><a href="https://www.zhihu.com/people/Glenn" target="_blank" title="Zhihu" data-toggle=tooltip data-placement=top><i class="icon icon-zhihu"></i></a></li>
+        
+    </ul>
+
+    </nav>
+  </div>
+</header>
+
+  
+    <aside class="sidebar" itemscope itemtype="http://schema.org/WPSideBar">
+  <div class="slimContent">
+    
+      <div class="widget">
+    <h3 class="widget-title">公告</h3>
+    <div class="widget-body">
+        <div id="board">
+            <div class="content">
+                <p>① <strong>google，chatgpt</strong> 账号注册</p> <p>② <strong>chatgpt</strong> 账号升级 <strong>plus</strong></p> <p><strong>联系 wx：GlennChen2021</strong></p> <img src="/images/chatgpt.jpg" width="200" height="200">
+            </div>
+        </div>
+    </div>
+</div>
+
+    
+      
+  <div class="widget">
+    <h3 class="widget-title">分类</h3>
+    <div class="widget-body">
+      <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/%E4%B9%A6%E7%B1%8D/">书籍</a><span class="category-list-count">4</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/%E4%BB%A3%E7%A0%81/">代码</a><span class="category-list-count">4</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/%E6%8E%A8%E8%8D%90/">推荐</a><span class="category-list-count">3</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/%E8%AE%BA%E6%96%87/">论文</a><span class="category-list-count">19</span></li></ul>
+    </div>
+  </div>
+
+
+    
+      
+  <div class="widget">
+    <h3 class="widget-title">标签云</h3>
+    <div class="widget-body tagcloud">
+      <a href="/tags/Competition/" style="font-size: 13px;">Competition</a> <a href="/tags/Masked-Image-Modeling/" style="font-size: 14px;">Masked Image Modeling</a> <a href="/tags/Medical-Image-Segmentation/" style="font-size: 13.25px;">Medical Image Segmentation</a> <a href="/tags/Research/" style="font-size: 13.75px;">Research</a> <a href="/tags/Steve-Jobs/" style="font-size: 13.5px;">Steve Jobs</a>
+    </div>
+  </div>
+
+    
+      
+  <div class="widget">
+    <h3 class="widget-title">归档</h3>
+    <div class="widget-body">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2023/06/">六月 2023</a><span class="archive-list-count">7</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2023/05/">五月 2023</a><span class="archive-list-count">23</span></li></ul>
+    </div>
+  </div>
+
+
+    
+      
+  <div class="widget">
+    <h3 class="widget-title">最新文章</h3>
+    <div class="widget-body">
+      <ul class="recent-post-list list-unstyled no-thumbnail">
+        
+          <li>
+            
+            <div class="item-inner">
+              <p class="item-category">
+                <a class="category-link" href="/categories/%E6%8E%A8%E8%8D%90/">推荐</a>
+              </p>
+              <p class="item-title">
+                <a href="/2023/06/07/%E9%80%9F%E8%A7%88/us%E4%BB%8E%E5%85%A5%E9%97%A8%E5%88%B0%E5%BA%94%E7%94%A8%E4%BB%8E%E8%87%AA%E7%84%B6%E5%88%B0%E7%A7%91%E5%AD%A6%E7%95%85%E8%A1%8C%E7%A7%91%E7%A0%94%E5%AE%87-Glenn/" class="title">Catalyst Plus：从入门到应用，从自然到科学，畅行科研宇宙</a>
+              </p>
+              <p class="item-date">
+                <time datetime="2023-06-07T11:29:23.000Z" itemprop="datePublished">2023-06-07</time>
+              </p>
+            </div>
+          </li>
+          
+          <li>
+            
+            <div class="item-inner">
+              <p class="item-category">
+                <a class="category-link" href="/categories/%E8%AE%BA%E6%96%87/">论文</a>
+              </p>
+              <p class="item-title">
+                <a href="/2023/06/07/Medical_Image_Segmentaion/Seg-%E8%85%B9%E9%83%A8%E5%A4%9A%E5%99%A8%E5%AE%98%E5%92%8C%E8%82%BF%E7%98%A4%E5%88%86%E5%89%B2%E7%9A%84%E5%A2%9E%E9%87%8F%E5%AD%A6-Glenn/" class="title">MedSeg | 腹部多器官和肿瘤分割的增量学习</a>
+              </p>
+              <p class="item-date">
+                <time datetime="2023-06-07T10:58:37.000Z" itemprop="datePublished">2023-06-07</time>
+              </p>
+            </div>
+          </li>
+          
+          <li>
+            
+            <div class="item-inner">
+              <p class="item-category">
+                <a class="category-link" href="/categories/%E8%AE%BA%E6%96%87/">论文</a>
+              </p>
+              <p class="item-title">
+                <a href="/2023/06/07/Medical_Image_Segmentaion/IFE%E5%9F%BA%E4%BA%8E%E6%9B%B2%E7%8E%87%E6%88%96%E4%BF%A1%E6%81%AF%E7%86%B5%E7%9A%84%E9%80%9A%E9%81%93%E6%B3%A8%E6%84%8F%E5%8A%9B%E6%9C%BA-Glenn/" class="title">MedSeg | IFE：基于曲率或信息熵的通道注意力机制</a>
+              </p>
+              <p class="item-date">
+                <time datetime="2023-06-07T10:58:29.000Z" itemprop="datePublished">2023-06-07</time>
+              </p>
+            </div>
+          </li>
+          
+          <li>
+            
+            <div class="item-inner">
+              <p class="item-category">
+                <a class="category-link" href="/categories/%E8%AE%BA%E6%96%87/">论文</a>
+              </p>
+              <p class="item-title">
+                <a href="/2023/06/07/Medical_Image_Segmentaion/Loss%E7%94%A8%E4%BA%8E%E5%8C%BB%E5%AD%A6%E5%9B%BE%E5%83%8F%E5%88%86%E5%89%B2%E7%9A%84%E9%B2%81%E6%A3%92%E6%8D%9F%E5%A4%B1%E5%87%BD-Glenn/" class="title">MedSeg | T-Loss：用于医学图像分割的鲁棒损失函数</a>
+              </p>
+              <p class="item-date">
+                <time datetime="2023-06-07T10:58:29.000Z" itemprop="datePublished">2023-06-07</time>
+              </p>
+            </div>
+          </li>
+          
+          <li>
+            
+            <div class="item-inner">
+              <p class="item-category">
+                <a class="category-link" href="/categories/%E8%AE%BA%E6%96%87/">论文</a>
+              </p>
+              <p class="item-title">
+                <a href="/2023/06/07/Masked_Image_Model/%E8%AE%BA%E6%96%87%E9%98%85%E8%AF%BB%E6%9D%8E%E9%A3%9E%E9%A3%9E-MIM-SiamMAE-Glenn/" class="title">MIM | SiamMAE：用于从视频中学习视觉对应关系的 MAE 简单扩展</a>
+              </p>
+              <p class="item-date">
+                <time datetime="2023-06-07T10:51:29.000Z" itemprop="datePublished">2023-06-07</time>
+              </p>
+            </div>
+          </li>
+          
+      </ul>
+    </div>
+  </div>
+  
+
+    
+  </div>
+</aside>
+
+  
+  
+  <aside class="sidebar sidebar-toc collapse   in  " id="collapseToc" itemscope itemtype="http://schema.org/WPSideBar">
+  <div class="slimContent">
+    <nav id="toc" class="article-toc">
+      <h3 class="toc-title">文章目录</h3>
+      <ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#2-1-%E9%97%AE%E9%A2%98%E5%AE%9A%E4%B9%89"><span class="toc-number">1.</span> <span class="toc-text">2.1 问题定义</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-2-%E4%B8%BA%E4%BB%80%E4%B9%88%E9%80%89%E7%94%A8-Student-t-%E5%88%86%E5%B8%83"><span class="toc-number">2.</span> <span class="toc-text">2.2 为什么选用 Student-t 分布</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-3-T-Loss-%E6%9E%84%E5%BB%BA"><span class="toc-number">3.</span> <span class="toc-text">2.3 T-Loss 构建</span></a></li></ol>
+    </nav>
+  </div>
+</aside>
+
+<main class="main" role="main">
+  <div class="content">
+  <article id="post-Medical_Image_Segmentaion/Loss用于医学图像分割的鲁棒损失函-Glenn" class="article article-type-post" itemscope itemtype="http://schema.org/BlogPosting">
+    
+    <div class="article-header">
+      
+        
+  
+    <h1 class="article-title" itemprop="name">
+      MedSeg | T-Loss：用于医学图像分割的鲁棒损失函数
+    </h1>
+  
+
+      
+      <div class="article-meta">
+        <span class="article-date">
+    <i class="icon icon-calendar-check"></i>
+	<a href="/2023/06/07/Medical_Image_Segmentaion/Loss%E7%94%A8%E4%BA%8E%E5%8C%BB%E5%AD%A6%E5%9B%BE%E5%83%8F%E5%88%86%E5%89%B2%E7%9A%84%E9%B2%81%E6%A3%92%E6%8D%9F%E5%A4%B1%E5%87%BD-Glenn/" class="article-date">
+	  <time datetime="2023-06-07T10:58:29.000Z" itemprop="datePublished">2023-06-07</time>
+	</a>
+</span>
+        
+  <span class="article-category">
+    <i class="icon icon-folder"></i>
+    <a class="article-category-link" href="/categories/%E8%AE%BA%E6%96%87/">论文</a>
+  </span>
+
+        
+  <span class="article-tag">
+    <i class="icon icon-tags"></i>
+	<a class="article-tag-link-link" href="/tags/Medical-Image-Segmentation/" rel="tag">Medical Image Segmentation</a>
+  </span>
+
+
+        
+
+	<span class="article-read hidden-xs">
+    	<i class="icon icon-eye-fill" aria-hidden="true"></i>
+    	<span id="/2023/06/07/Medical_Image_Segmentaion/Loss%E7%94%A8%E4%BA%8E%E5%8C%BB%E5%AD%A6%E5%9B%BE%E5%83%8F%E5%88%86%E5%89%B2%E7%9A%84%E9%B2%81%E6%A3%92%E6%8D%9F%E5%A4%B1%E5%87%BD-Glenn/" class="leancloud_visitors"  data-flag-title="MedSeg | T-Loss：用于医学图像分割的鲁棒损失函数">
+			<span class="leancloud-visitors-count">0</span>
+		</span>
+    </span>
+
+        <span class="post-comment"><i class="icon icon-comment"></i> <a href="/2023/06/07/Medical_Image_Segmentaion/Loss%E7%94%A8%E4%BA%8E%E5%8C%BB%E5%AD%A6%E5%9B%BE%E5%83%8F%E5%88%86%E5%89%B2%E7%9A%84%E9%B2%81%E6%A3%92%E6%8D%9F%E5%A4%B1%E5%87%BD-Glenn/#comments" class="article-comment-link">评论</a></span>
+        
+      </div>
+    </div>
+    <div class="article-entry marked-body" itemprop="articleBody">
+      
+        <p><img src="/2023/06/07/Medical_Image_Segmentaion/Loss%E7%94%A8%E4%BA%8E%E5%8C%BB%E5%AD%A6%E5%9B%BE%E5%83%8F%E5%88%86%E5%89%B2%E7%9A%84%E9%B2%81%E6%A3%92%E6%8D%9F%E5%A4%B1%E5%87%BD-Glenn/v2-3454cbfc9c6ff26a77976104e3d82a27_r.jpg"></p>
+<blockquote>
+<p><em><strong>题目：</strong>Robust T-Loss for Medical Image Segmentation</em><br><em><strong>作者单位：</strong>巴塞尔大学、lucerne school of computer science and information technology</em><br><em><strong>论文网址：</strong></em><a href="https://link.zhihu.com/?target=https://arxiv.org/abs/2306.00753">https://arxiv.org/abs/2306.00753</a><br><em><strong>论文代码：</strong></em><a href="https://link.zhihu.com/?target=https://robust-tloss.github.io/">https://robust-tloss.github.io</a><br><em><strong>首次发布时间：</strong>2023 年 6 月 1 日</em></p>
+</blockquote>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">@misc&#123;gonzalezjimenez2023robust,</span><br><span class="line">      title=&#123;Robust T-Loss for Medical Image Segmentation&#125;, </span><br><span class="line">      author=&#123;Alvaro Gonzalez-Jimenez and Simone Lionetti and Philippe Gottfrois and Fabian Gröger and Marc Pouly and Alexander Navarini&#125;,</span><br><span class="line">      year=&#123;2023&#125;,</span><br><span class="line">      eprint=&#123;2306.00753&#125;,</span><br><span class="line">      archivePrefix=&#123;arXiv&#125;,</span><br><span class="line">      primaryClass=&#123;cs.CV&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+<hr>
+<ol>
+<li>主要内容</li>
+</ol>
+<hr>
+<p><strong>背景介绍：</strong></p>
+<ul>
+<li>CNNs 和 ViTs 已成为语义分割的标准方法。</li>
+<li>使用这些模型进行监督训练需要大量标注数据，但在医学领域获取标注数据昂贵且耗时。</li>
+<li>医学图像标注可能受到人为偏差和标注者一致性差的影响，同时自动挖掘和众包方法获得的标签由于噪声水平较高，其质量也存在挑战。</li>
+</ul>
+<p><strong>现有研究：</strong></p>
+<ul>
+<li>先前的研究主要集中在标签修正、基于噪声转移矩阵的损失函数修正和鲁棒损失函数等方法。</li>
+<li>医学领域的语义分割中关于噪声标签的研究相对较少，主要集中在抗噪声网络架构的开发、领域特定先验知识的结合、在记忆前更新噪声掩模的最新策略等策略。</li>
+</ul>
+<p><strong>现有研究的缺陷：</strong></p>
+<ul>
+<li>先前的其他方法通常存在一些限制，例如更多的超参数、对网络架构的修改或复杂的训练过程。</li>
+<li>相比之下，鲁棒损失函数提供了一个更简单的解决方案，因为只需要对单个建模组件进行简单的改变就可以将其整合进来。然而，先前的鲁棒损失函数在记忆化噪声标签方面存在问题。</li>
+</ul>
+<p><strong>方法提出：</strong></p>
+<ul>
+<li>提出一种新的鲁棒损失函数 T-Loss，灵感来自于 Student-t 分布的负对数似然。</li>
+<li>T-Loss 具有简单的参数形式，能够在反向传播过程中自适应地学习标签噪声的最优容忍度水平。</li>
+</ul>
+<hr>
+<ol start="2">
+<li>方法</li>
+</ol>
+<hr>
+<h3 id="2-1-问题定义"><a href="#2-1-问题定义" class="headerlink" title="2.1 问题定义"></a>2.1 问题定义</h3><p>假设 x_i∈\mathbb R^{c×w×h} 为输入图像， y_i∈\left{0,1\right}^{w×h} 是带有噪声的标注二值分割掩码，其中 c 表示通道数， w 表示图像宽度， h 表示图像高度。</p>
+<p>给定一组图像 \left{x_1，…，x_N\right} 和相应的掩码 \left{y_1，…，y_N\right} ，目标是训练具有参数 w 的模型 f_w ，使得 f_w(x) 近似于任何给定图像 x 的精确二值分割掩码。</p>
+<h3 id="2-2-为什么选用-Student-t-分布"><a href="#2-2-为什么选用-Student-t-分布" class="headerlink" title="2.2 为什么选用 Student-t 分布"></a>2.2 为什么选用 Student-t 分布</h3><p><strong>Student-t 分布在处理错误项时具有比通常的高斯形式更大的噪声容忍度。</strong></p>
+<ul>
+<li>D 维变量 y 的 Student-t 分布由概率密度函数（PDF）定义：</li>
+</ul>
+<p>p(y|\mu,\Sigma;\nu)&#x3D;\frac{\Gamma\left(\frac{\nu+D}{2}\right)}{\Gamma\left(\frac{\nu}{2}\right)}\frac|\mathbf{\Sigma}|^{-1&#x2F;2}(\pi\nu)^{D&#x2F;2}\left[1+\frac{(\mathbf{y}-\boldsymbol{\mu})^{T}\mathbf{\Sigma}^{-1}(\mathbf{y}-\boldsymbol{\mu})}\boldsymbol{\tau}\right]^-\frac{\nu+D}{2}</p>
+<ul>
+<li>而 D 维变量 y 的 高斯分布由概率密度函数（PDF）定义：</li>
+</ul>
+<p>p(y | \mu, \Sigma) &#x3D; \frac{1}(2\pi)^{D&#x2F;2} |\mathbf{\Sigma}|^{1&#x2F;2} \exp\left(-\frac{1}{2} (y - \mu)^T \mathbf{\Sigma}^{-1} (y - \mu)\right)  </p>
+<p>其中 μ 和 \Sigma 分别是相关的多元正态分布的均值和协方差矩阵， Γ 是自由度， |·| 表示行列式。</p>
+<p>从此公式可以看出 Student-t 分布的尾部 \left[1+\frac(\mathbf{y}-\boldsymbol{\mu})^{T}{\mathbf{\Sigma}^{-1}(\mathbf{y}-\boldsymbol{\mu})}\boldsymbol{\tau}\right]^-\frac{\nu+D}{2} 遵循幂律，比通常的二次指数形式更重。这意味着， y 离 μ 越远（即，越是异常值），这一项的值越大，从而降低了 y 的概率。但是，由于取了 -\frac{(ν + D)}{2} 次幂，所以当 y 离 μ 非常远时，这个降低的速度比高斯分布要慢，从而使得 Student-t 分布在处理大的异常值时，比高斯分布有更好的表现，<strong>对异常值更具有鲁棒性</strong>。</p>
+<h3 id="2-3-T-Loss-构建"><a href="#2-3-T-Loss-构建" class="headerlink" title="2.3 T-Loss 构建"></a>2.3 T-Loss 构建</h3><p>由于通常的均方误差（MSE）损失函数是通过最小化正态分布的负对数似然得出的，应用相同的转换，可以得到以下形式的损失函数：\begin{array}{c}-\log p({y}|\mu,\Sigma;\nu)&#x3D;-\log\Gamma\left(\frac{\nu+D}{2}\right)+\log\Gamma\left(\frac{\nu}{2}\right)+\frac{1}{2}\log|{\Sigma}|+\frac{D}{2}\log(\pi\nu)+\frac{\nu+D}{2}\log\left[1+\frac{({y}-\mu)^{T},{\Sigma}^{-1}({y}-\mu)}{\nu}\right]\end{array} </p>
+<p>对于每一张图像，损失函数的函数形式可以通过令 y &#x3D; y_i 和近似值 μ &#x3D; f_w(x_i) 得到，并进行汇总，表示为：</p>
+<p>\mathcal{L}_\mathrm{T}&#x3D;\frac{1}{N}\sum_{i&#x3D;1}^{N}-\log p(y_{i}|f_\mathrm{w}(x_{i}),\Sigma;\nu) </p>
+<p>方程中的协方差矩阵 Σ 具有 D(D+1)&#x2F;2 个自由参数，需要从数据中进行估计。对于图像来说，这个参数数量可以很容易地达到 10^4 或更大，这使得通常的计算变得非常复杂，并且可能会降低模型的泛化能力。因此，为了简化计算和提高模型的泛化能力，将 Σ 设定为单位矩阵 I_D ，尽管知道图像中的像素注释并不是独立的。对于一张图像，损失函数的项可以简化为：</p>
+<p>\begin{array}{c}{-\log p({\bf y}|\mu,{\bf I}_{D};\nu)&#x3D;-\log\Gamma\left(\frac{\nu+D}{2}\right)+\log\Gamma\left(\frac{\nu}{2}\right)+\frac{D}{2}\log\left(\pi\nu\right)}{+\frac{\nu+D}{2}\log\left[1+\frac({\bf y}-\mu)^{2}{\nu}\right]}\end{array} </p>
+<p>假设 δ &#x3D; |y_i − f_w(x_i)| ，并固定 ν 的值。</p>
+<ul>
+<li>当 δ 接近 0 时，损失函数与 MSE 相关，对小误差敏感；</li>
+<li>当 δ 较大时，损失函数与对数函数相关，对大误差的惩罚较小。</li>
+</ul>
+<p>因此损失函数对异常值的敏感性可以由参数 ν 调节。</p>
+<p>作者使用梯度下降算法同时优化参数 ν 和 w 。对 ν 进行了重新参数化，即 ν &#x3D; e^\tilde ν + \epsilon ，其中 \epsilon 是为了保证数值稳定性而引入的保护项。通过联合优化参数 ν 和 w ，可以调整损失函数对预测误差的容忍度。参数 ν 的调整可以改变损失函数对偏差的惩罚程度，进而影响模型的训练和性能。重新参数化 ν 的目的是为了提高优化过程的数值稳定性，确保损失函数的计算可靠。</p>
+<hr>
+<ol start="3">
+<li>结果与讨论</li>
+</ol>
+<hr>
+<p>在没有具有真实噪声和干净分割掩码的公共基准的情况下，作者在 ISIC 2017 和 Shenzhen 两个数据集中人为地注入额外的掩码噪声，以测试模型对低注释质量的鲁棒性。</p>
+<p>这模拟了注释者因疲劳或其他因素导致错误的真实风险。以概率 α∈\left{0.3，0.5，0.7\right} 随机采样一部分训练数据，并应用由 β∈\left{0.5，0.7\right}^3 控制的形态学变换噪声。形态学变换包括侵蚀、膨胀和仿射变换，它们分别缩小、扩大和移位注释区域。</p>
+<p>表 1 和图 1 展示了在 ISIC 2017 数据集上的实验结果，从中可以得出结论：</p>
+<ul>
+<li>传统损失函数在无噪声或低噪声水平下表现良好。</li>
+<li>随着噪声水平的增加，传统鲁棒损失函数的性能显著下降。</li>
+<li>T-Loss 损失函数在高噪声情况下仍保持较好的性能。</li>
+<li>在 ISIC 数据集上，T-Loss 在最极端的噪声场景下获得了较高的 Dice 分数（0.788 ± 0.007）。</li>
+</ul>
+<p><img src="/2023/06/07/Medical_Image_Segmentaion/Loss%E7%94%A8%E4%BA%8E%E5%8C%BB%E5%AD%A6%E5%9B%BE%E5%83%8F%E5%88%86%E5%89%B2%E7%9A%84%E9%B2%81%E6%A3%92%E6%8D%9F%E5%A4%B1%E5%87%BD-Glenn/v2-e98c70655cbfd871905a056045abca5a_r.jpg"><br>表1. 具有不同噪声比率的 ISIC 2017 数据集上的 Dice 分数。这些数值是在最后 10 个 epoch 内的平均分数上，基于 3 个不同的随机种子计算得到的平均值和标准差。<br><img src="/2023/06/07/Medical_Image_Segmentaion/Loss%E7%94%A8%E4%BA%8E%E5%8C%BB%E5%AD%A6%E5%9B%BE%E5%83%8F%E5%88%86%E5%89%B2%E7%9A%84%E9%B2%81%E6%A3%92%E6%8D%9F%E5%A4%B1%E5%87%BD-Glenn/v2-256fff5dd43131ee17813f52fca5a26a_r.jpg"><br>图1. 在 ISIC 2017 数据集上，在训练过程中，对比训练集预测结果与真实标注的 Dice 分数，针对每种类型的噪声掩模（α &#x3D; 0.7，β &#x3D; 0.7）。模型在大约前 20K 次迭代后记忆了噪声标签，从而对除 T-Loss 之外的所有损失函数的 Dice 分数产生了负面影响。<br>表 2 展示了在 Shenzhen 数据集实验结果，从中可以得出结论：</p>
+<ul>
+<li>在肺部分割任务中，所有鲁棒损失函数在低噪声水平下表现良好。</li>
+<li>随着噪声水平的增加，所有鲁棒损失函数的 Dice 分数下降。</li>
+<li>T-Loss 始终取得最高的 Dice 分数，即使在最具挑战性的场景中也是如此。</li>
+</ul>
+<p><img src="/2023/06/07/Medical_Image_Segmentaion/Loss%E7%94%A8%E4%BA%8E%E5%8C%BB%E5%AD%A6%E5%9B%BE%E5%83%8F%E5%88%86%E5%89%B2%E7%9A%84%E9%B2%81%E6%A3%92%E6%8D%9F%E5%A4%B1%E5%87%BD-Glenn/v2-4943802b49610a22ec1b43bd172b4c38_r.jpg"><br>表2. 在 Shenzhen 数据集上，使用不同的噪声比例进行的 Dice 分数实验。这些数值是在最后 10 个 epoch 内的平均分数上，基于 3 个不同的随机种子计算得到的平均值和标准差。<br>图 2 展示了参数 \tilde ν 初始值在 ISIC 2017 数据集上对结果的影响，从中可以得出结论：</p>
+<ul>
+<li>参数 \tilde ν 在训练过程中动态调整注释噪声的容忍度。</li>
+<li>参数 \tilde ν 的初始值对收敛速度有一定影响，但对最终的Dice分数没有显著影响。</li>
+<li>在训练过程中， \tilde ν 逐渐收敛到一个稳定的解。</li>
+</ul>
+<p><img src="/2023/06/07/Medical_Image_Segmentaion/Loss%E7%94%A8%E4%BA%8E%E5%8C%BB%E5%AD%A6%E5%9B%BE%E5%83%8F%E5%88%86%E5%89%B2%E7%9A%84%E9%B2%81%E6%A3%92%E6%8D%9F%E5%A4%B1%E5%87%BD-Glenn/v2-c6fb4b688b77269f2ab18c1e6c124c26_r.jpg"><br>图2. 在皮肤病变分割任务中，参数 ν 的行为。左图：在不同标签噪声水平下 ν 的收敛性。中图：对于 α &#x3D; 0.7，β &#x3D; 0.7， ν 初始值的敏感性。右图：Dice 分数对 ν 初始值的敏感性。</p>
+
+      
+    </div>
+    <div class="article-footer">
+      <blockquote class="mt-2x">
+  <ul class="post-copyright list-unstyled">
+    
+    <li class="post-copyright-link hidden-xs">
+      <strong>本文链接：</strong>
+      <a href="https://chenluda.github.io/2023/06/07/Medical_Image_Segmentaion/Loss%E7%94%A8%E4%BA%8E%E5%8C%BB%E5%AD%A6%E5%9B%BE%E5%83%8F%E5%88%86%E5%89%B2%E7%9A%84%E9%B2%81%E6%A3%92%E6%8D%9F%E5%A4%B1%E5%87%BD-Glenn/" title="MedSeg | T-Loss：用于医学图像分割的鲁棒损失函数" target="_blank" rel="external">https://chenluda.github.io/2023/06/07/Medical_Image_Segmentaion/Loss用于医学图像分割的鲁棒损失函-Glenn/</a>
+    </li>
+    
+    <li class="post-copyright-license">
+      <strong>版权声明： </strong> 本博客所有文章除特别声明外，均采用 <a href="http://creativecommons.org/licenses/by/4.0/deed.zh" target="_blank" rel="external">CC BY 4.0 CN协议</a> 许可协议。转载请注明出处！
+    </li>
+  </ul>
+</blockquote>
+
+
+<div class="panel panel-default panel-badger">
+  <div class="panel-body">
+    <figure class="media">
+      <div class="media-left">
+        <a href="https://github.com/chenluda" target="_blank" class="img-burn thumb-sm visible-lg">
+          <img src="/images/avatar.png" class="img-rounded w-full" alt="">
+        </a>
+      </div>
+      <div class="media-body">
+        <h3 class="media-heading"><a href="https://github.com/chenluda" target="_blank"><span class="text-dark">Glenn</span><small class="ml-1x">Stay hungry, stay foolish.</small></a></h3>
+        <div>咖啡，健身，热爱生活。</div>
+      </div>
+    </figure>
+  </div>
+</div>
+
+
+    </div>
+  </article>
+  
+    
+  <section id="comments">
+  	
+      <div id="vcomments"></div>
+    
+  </section>
+
+
+  
+</div>
+
+  <nav class="bar bar-footer clearfix" data-stick-bottom>
+  <div class="bar-inner">
+  
+  <ul class="pager pull-left">
+    
+    <li class="prev">
+      <a href="/2023/06/07/Medical_Image_Segmentaion/IFE%E5%9F%BA%E4%BA%8E%E6%9B%B2%E7%8E%87%E6%88%96%E4%BF%A1%E6%81%AF%E7%86%B5%E7%9A%84%E9%80%9A%E9%81%93%E6%B3%A8%E6%84%8F%E5%8A%9B%E6%9C%BA-Glenn/" title="MedSeg | IFE：基于曲率或信息熵的通道注意力机制"><i class="icon icon-angle-left" aria-hidden="true"></i><span>&nbsp;&nbsp;上一篇</span></a>
+    </li>
+    
+    
+    <li class="next">
+      <a href="/2023/06/07/Masked_Image_Model/%E8%AE%BA%E6%96%87%E9%98%85%E8%AF%BB%E6%9D%8E%E9%A3%9E%E9%A3%9E-MIM-SiamMAE-Glenn/" title="MIM | SiamMAE：用于从视频中学习视觉对应关系的 MAE 简单扩展"><span>下一篇&nbsp;&nbsp;</span><i class="icon icon-angle-right" aria-hidden="true"></i></a>
+    </li>
+    
+    
+    <li class="toggle-toc">
+      <a class="toggle-btn " data-toggle="collapse" href="#collapseToc" aria-expanded="false" title="文章目录" role="button">    <span>[&nbsp;</span><span>文章目录</span>
+        <i class="text-collapsed icon icon-anchor"></i>
+        <i class="text-in icon icon-close"></i>
+        <span>]</span>
+      </a>
+    </li>
+    
+  </ul>
+  
+  
+  
+  <div class="bar-right">
+    
+    <div class="share-component" data-sites="weibo,qq,wechat,facebook,twitter" data-mobile-sites="weibo,qq,qzone"></div>
+    
+  </div>
+  </div>
+</nav>
+  
+
+
+</main>
+
+  <footer class="footer" itemscope itemtype="http://schema.org/WPFooter">
+	
+	
+    <ul class="social-links">
+    	
+        <li><a href="https://github.com/chenluda" target="_blank" title="Github" data-toggle=tooltip data-placement=top><i class="icon icon-github"></i></a></li>
+        
+        <li><a href="https://www.zhihu.com/people/Glenn" target="_blank" title="Zhihu" data-toggle=tooltip data-placement=top><i class="icon icon-zhihu"></i></a></li>
+        
+    </ul>
+
+    <div class="copyright">
+    	
+        &copy; 2023 Glenn
+        
+        <div class="publishby">
+        	Theme by <a href="https://github.com/cofess" target="_blank"> cofess </a>base on <a href="https://github.com/cofess/hexo-theme-pure" target="_blank">pure</a>.
+        </div>
+    </div>
+</footer>
+  <script src="//cdn.jsdelivr.net/npm/jquery@1.12.4/dist/jquery.min.js"></script>
+<script>
+window.jQuery || document.write('<script src="js/jquery.min.js"><\/script>')
+</script>
+
+<script src="/js/plugin.min.js"></script>
+
+
+<script src="/js/application.js"></script>
+
+
+    <script>
+(function (window) {
+    var INSIGHT_CONFIG = {
+        TRANSLATION: {
+            POSTS: '文章',
+            PAGES: '页面',
+            CATEGORIES: '分类',
+            TAGS: '标签',
+            UNTITLED: '(未命名)',
+        },
+        ROOT_URL: '/',
+        CONTENT_URL: '/content.json',
+    };
+    window.INSIGHT_CONFIG = INSIGHT_CONFIG;
+})(window);
+</script>
+
+<script src="/js/insight.js"></script>
+
+
+
+
+
+
+   
+
+
+
+
+   
+    
+  <script src="//cdn1.lncld.net/static/js/3.0.4/av-min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/valine"></script>
+  <script type="text/javascript">
+  var GUEST = ['nick', 'mail', 'link'];
+  var meta = 'nick,mail,link';
+  meta = meta.split(',').filter(function(item) {
+    return GUEST.indexOf(item) > -1;
+  });
+  new Valine({
+    el: '#vcomments',
+    verify: false,
+    notify: false,
+    appId: 'rSq08S6gdVroDI1A4r7XWnix-MdYXbMMI',
+    appKey: '5UM6jz8DwNaaEQTN5ojTHB1N',
+    placeholder: '请输入...',
+    avatar: 'mm',
+    meta: meta,
+    pageSize: '10' || 10,
+    visitor: true
+  });
+  </script>
+
+     
+
+
+
+
+
+
+
+</body>
+</html>

@@ -1,0 +1,610 @@
+<!DOCTYPE html>
+<html lang=zh>
+<head>
+  <meta charset="utf-8">
+  
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=no, minimal-ui">
+  <meta name="renderer" content="webkit">
+  <meta http-equiv="Cache-Control" content="no-transform" />
+  <meta http-equiv="Cache-Control" content="no-siteapp" />
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black">
+  <meta name="format-detection" content="telephone=no,email=no,adress=no">
+  <!-- Color theme for statusbar -->
+  <meta name="theme-color" content="#000000" />
+  <!-- 强制页面在当前窗口以独立页面显示,防止别人在框架里调用页面 -->
+  <meta http-equiv="window-target" content="_top" />
+  
+  
+  <title>MIM | MR-MAE：完美利用 MIM 的高级与低级特征 | Glenn&#39;s blog</title>
+  <meta name="description" content="题目：Mimic before Reconstruct: Enhancing Masked Autoencoders with Feature Mimicking作者单位：上海人工智能实验室、香港中文大学论文网址：https:&#x2F;&#x2F;arxiv.org&#x2F;abs&#x2F;2303.05475论文代码：https:&#x2F;&#x2F;github.com&#x2F;Alpha-VL&#x2F;ConvMAE首次发布时间：2023 年 3 月 9">
+<meta property="og:type" content="article">
+<meta property="og:title" content="MIM | MR-MAE：完美利用 MIM 的高级与低级特征">
+<meta property="og:url" content="https://chenluda.github.io/2023/06/07/Masked_Image_Model/%E8%AE%BA%E6%96%87%E9%98%85%E8%AF%BB-MIM-MR-MAE%E5%AE%8C%E7%BE%8E%E5%88%A9%E7%94%A8-Glenn/index.html">
+<meta property="og:site_name" content="Glenn">
+<meta property="og:description" content="题目：Mimic before Reconstruct: Enhancing Masked Autoencoders with Feature Mimicking作者单位：上海人工智能实验室、香港中文大学论文网址：https:&#x2F;&#x2F;arxiv.org&#x2F;abs&#x2F;2303.05475论文代码：https:&#x2F;&#x2F;github.com&#x2F;Alpha-VL&#x2F;ConvMAE首次发布时间：2023 年 3 月 9">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://chenluda.github.io/2023/06/07/Masked_Image_Model/%E8%AE%BA%E6%96%87%E9%98%85%E8%AF%BB-MIM-MR-MAE%E5%AE%8C%E7%BE%8E%E5%88%A9%E7%94%A8-Glenn/v2-a81856769a302aed0ac9949ebbbf4585_r.jpg">
+<meta property="og:image" content="https://chenluda.github.io/2023/06/07/Masked_Image_Model/%E8%AE%BA%E6%96%87%E9%98%85%E8%AF%BB-MIM-MR-MAE%E5%AE%8C%E7%BE%8E%E5%88%A9%E7%94%A8-Glenn/v2-9bc2da1fc23ffab57fc67ccd1bfd37e7_r.jpg">
+<meta property="og:image" content="https://chenluda.github.io/2023/06/07/Masked_Image_Model/%E8%AE%BA%E6%96%87%E9%98%85%E8%AF%BB-MIM-MR-MAE%E5%AE%8C%E7%BE%8E%E5%88%A9%E7%94%A8-Glenn/v2-c10095e0bbf9420a90c43d995d5a3353_r.jpg">
+<meta property="og:image" content="https://chenluda.github.io/2023/06/07/Masked_Image_Model/%E8%AE%BA%E6%96%87%E9%98%85%E8%AF%BB-MIM-MR-MAE%E5%AE%8C%E7%BE%8E%E5%88%A9%E7%94%A8-Glenn/v2-439839e7724b3048356e0bd76d2f84d0_r.jpg">
+<meta property="og:image" content="https://chenluda.github.io/2023/06/07/Masked_Image_Model/%E8%AE%BA%E6%96%87%E9%98%85%E8%AF%BB-MIM-MR-MAE%E5%AE%8C%E7%BE%8E%E5%88%A9%E7%94%A8-Glenn/v2-347ae14908cf9ddeabde2748d58243de_r.jpg">
+<meta property="og:image" content="https://chenluda.github.io/2023/06/07/Masked_Image_Model/%E8%AE%BA%E6%96%87%E9%98%85%E8%AF%BB-MIM-MR-MAE%E5%AE%8C%E7%BE%8E%E5%88%A9%E7%94%A8-Glenn/v2-e7288fecfe3947b7cb66c20b5b387a9c_r.jpg">
+<meta property="og:image" content="https://chenluda.github.io/2023/06/07/Masked_Image_Model/%E8%AE%BA%E6%96%87%E9%98%85%E8%AF%BB-MIM-MR-MAE%E5%AE%8C%E7%BE%8E%E5%88%A9%E7%94%A8-Glenn/v2-57c3adec54f35515d2cf1d43f35df10f_b.jpg">
+<meta property="og:image" content="https://chenluda.github.io/2023/06/07/Masked_Image_Model/%E8%AE%BA%E6%96%87%E9%98%85%E8%AF%BB-MIM-MR-MAE%E5%AE%8C%E7%BE%8E%E5%88%A9%E7%94%A8-Glenn/v2-f47705318a5ff08cb7f60728b9f6d4ed_r.jpg">
+<meta property="og:image" content="https://chenluda.github.io/2023/06/07/Masked_Image_Model/%E8%AE%BA%E6%96%87%E9%98%85%E8%AF%BB-MIM-MR-MAE%E5%AE%8C%E7%BE%8E%E5%88%A9%E7%94%A8-Glenn/v2-fd0a54a2a0122db7e81797af31009beb_r.jpg">
+<meta property="og:image" content="https://chenluda.github.io/2023/06/07/Masked_Image_Model/%E8%AE%BA%E6%96%87%E9%98%85%E8%AF%BB-MIM-MR-MAE%E5%AE%8C%E7%BE%8E%E5%88%A9%E7%94%A8-Glenn/v2-6d06add339e64b95590919f042e88be7_r.jpg">
+<meta property="article:published_time" content="2023-06-07T10:49:38.000Z">
+<meta property="article:modified_time" content="2023-06-07T10:51:13.997Z">
+<meta property="article:author" content="Glenn">
+<meta property="article:tag" content="Masked Image Modeling">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://chenluda.github.io/2023/06/07/Masked_Image_Model/%E8%AE%BA%E6%96%87%E9%98%85%E8%AF%BB-MIM-MR-MAE%E5%AE%8C%E7%BE%8E%E5%88%A9%E7%94%A8-Glenn/v2-a81856769a302aed0ac9949ebbbf4585_r.jpg">
+  <!-- Canonical links -->
+  <link rel="canonical" href="https://chenluda.github.io/2023/06/07/Masked_Image_Model/%E8%AE%BA%E6%96%87%E9%98%85%E8%AF%BB-MIM-MR-MAE%E5%AE%8C%E7%BE%8E%E5%88%A9%E7%94%A8-Glenn/index.html">
+  
+    <link rel="alternate" href="/atom.xml" title="Glenn" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="/images/avatar.png" type="image/x-icon">
+  
+  
+<link rel="stylesheet" href="/css/style.css">
+
+  
+  
+  
+  
+<!-- hexo injector head_end start -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/katex.min.css">
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/hexo-math@4.0.0/dist/style.css">
+<!-- hexo injector head_end end --><meta name="generator" content="Hexo 6.3.0"></head>
+
+
+<body class="main-center theme-black" itemscope itemtype="http://schema.org/WebPage">
+  <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+  <div class="slimContent">
+    <div class="navbar-header">
+      
+      
+      <div class="profile-block text-center">
+        <a id="avatar" href="https://github.com/chenluda" target="_blank">
+          <img class="img-circle img-rotate" src="/images/avatar.png" width="200" height="200">
+        </a>
+        <h2 id="name" class="hidden-xs hidden-sm">Glenn</h2>
+        <h3 id="title" class="hidden-xs hidden-sm hidden-md">Stay hungry, stay foolish.</h3>
+        <small id="location" class="text-muted hidden-xs hidden-sm"><i class="icon icon-map-marker"></i> Yunnan, China</small>
+      </div>
+      
+      <div class="search" id="search-form-wrap">
+
+    <form class="search-form sidebar-form">
+        <div class="input-group">
+            <input type="text" class="search-form-input form-control" placeholder="搜索" />
+            <span class="input-group-btn">
+                <button type="submit" class="search-form-submit btn btn-flat" onclick="return false;"><i class="icon icon-search"></i></button>
+            </span>
+        </div>
+    </form>
+    <div class="ins-search">
+  <div class="ins-search-mask"></div>
+  <div class="ins-search-container">
+    <div class="ins-input-wrapper">
+      <input type="text" class="ins-search-input" placeholder="想要查找什么..." x-webkit-speech />
+      <button type="button" class="close ins-close ins-selectable" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span></button>
+    </div>
+    <div class="ins-section-wrapper">
+      <div class="ins-section-container"></div>
+    </div>
+  </div>
+</div>
+
+
+</div>
+      <button class="navbar-toggle collapsed" type="button" data-toggle="collapse" data-target="#main-navbar" aria-controls="main-navbar" aria-expanded="false">
+        <span class="sr-only">Toggle navigation</span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+    </div>
+    <nav id="main-navbar" class="collapse navbar-collapse" itemscope itemtype="http://schema.org/SiteNavigationElement" role="navigation">
+      <ul class="nav navbar-nav main-nav menu-highlight">
+        
+        
+        <li class="menu-item menu-item-home">
+          <a href="/.">
+            
+            <i class="icon icon-home-fill"></i>
+            
+            <span class="menu-title">首页</span>
+          </a>
+        </li>
+        
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives">
+            
+            <i class="icon icon-archives-fill"></i>
+            
+            <span class="menu-title">归档</span>
+          </a>
+        </li>
+        
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories">
+            
+            <i class="icon icon-folder"></i>
+            
+            <span class="menu-title">分类</span>
+          </a>
+        </li>
+        
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about">
+            
+            <i class="icon icon-cup-fill"></i>
+            
+            <span class="menu-title">关于</span>
+          </a>
+        </li>
+        
+      </ul>
+      
+	
+    <ul class="social-links">
+    	
+        <li><a href="https://github.com/chenluda" target="_blank" title="Github" data-toggle=tooltip data-placement=top><i class="icon icon-github"></i></a></li>
+        
+        <li><a href="https://www.zhihu.com/people/Glenn" target="_blank" title="Zhihu" data-toggle=tooltip data-placement=top><i class="icon icon-zhihu"></i></a></li>
+        
+    </ul>
+
+    </nav>
+  </div>
+</header>
+
+  
+    <aside class="sidebar" itemscope itemtype="http://schema.org/WPSideBar">
+  <div class="slimContent">
+    
+      <div class="widget">
+    <h3 class="widget-title">公告</h3>
+    <div class="widget-body">
+        <div id="board">
+            <div class="content">
+                <p>① <strong>google，chatgpt</strong> 账号注册</p> <p>② <strong>chatgpt</strong> 账号升级 <strong>plus</strong></p> <p><strong>联系 wx：GlennChen2021</strong></p> <img src="/images/chatgpt.jpg" width="200" height="200">
+            </div>
+        </div>
+    </div>
+</div>
+
+    
+      
+  <div class="widget">
+    <h3 class="widget-title">分类</h3>
+    <div class="widget-body">
+      <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/%E4%B9%A6%E7%B1%8D/">书籍</a><span class="category-list-count">4</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/%E4%BB%A3%E7%A0%81/">代码</a><span class="category-list-count">4</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/%E6%8E%A8%E8%8D%90/">推荐</a><span class="category-list-count">3</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/%E8%AE%BA%E6%96%87/">论文</a><span class="category-list-count">19</span></li></ul>
+    </div>
+  </div>
+
+
+    
+      
+  <div class="widget">
+    <h3 class="widget-title">标签云</h3>
+    <div class="widget-body tagcloud">
+      <a href="/tags/Competition/" style="font-size: 13px;">Competition</a> <a href="/tags/Masked-Image-Modeling/" style="font-size: 14px;">Masked Image Modeling</a> <a href="/tags/Medical-Image-Segmentation/" style="font-size: 13.25px;">Medical Image Segmentation</a> <a href="/tags/Research/" style="font-size: 13.75px;">Research</a> <a href="/tags/Steve-Jobs/" style="font-size: 13.5px;">Steve Jobs</a>
+    </div>
+  </div>
+
+    
+      
+  <div class="widget">
+    <h3 class="widget-title">归档</h3>
+    <div class="widget-body">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2023/06/">六月 2023</a><span class="archive-list-count">7</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2023/05/">五月 2023</a><span class="archive-list-count">23</span></li></ul>
+    </div>
+  </div>
+
+
+    
+      
+  <div class="widget">
+    <h3 class="widget-title">最新文章</h3>
+    <div class="widget-body">
+      <ul class="recent-post-list list-unstyled no-thumbnail">
+        
+          <li>
+            
+            <div class="item-inner">
+              <p class="item-category">
+                <a class="category-link" href="/categories/%E6%8E%A8%E8%8D%90/">推荐</a>
+              </p>
+              <p class="item-title">
+                <a href="/2023/06/07/%E9%80%9F%E8%A7%88/us%E4%BB%8E%E5%85%A5%E9%97%A8%E5%88%B0%E5%BA%94%E7%94%A8%E4%BB%8E%E8%87%AA%E7%84%B6%E5%88%B0%E7%A7%91%E5%AD%A6%E7%95%85%E8%A1%8C%E7%A7%91%E7%A0%94%E5%AE%87-Glenn/" class="title">Catalyst Plus：从入门到应用，从自然到科学，畅行科研宇宙</a>
+              </p>
+              <p class="item-date">
+                <time datetime="2023-06-07T11:29:23.000Z" itemprop="datePublished">2023-06-07</time>
+              </p>
+            </div>
+          </li>
+          
+          <li>
+            
+            <div class="item-inner">
+              <p class="item-category">
+                <a class="category-link" href="/categories/%E8%AE%BA%E6%96%87/">论文</a>
+              </p>
+              <p class="item-title">
+                <a href="/2023/06/07/Medical_Image_Segmentaion/Seg-%E8%85%B9%E9%83%A8%E5%A4%9A%E5%99%A8%E5%AE%98%E5%92%8C%E8%82%BF%E7%98%A4%E5%88%86%E5%89%B2%E7%9A%84%E5%A2%9E%E9%87%8F%E5%AD%A6-Glenn/" class="title">MedSeg | 腹部多器官和肿瘤分割的增量学习</a>
+              </p>
+              <p class="item-date">
+                <time datetime="2023-06-07T10:58:37.000Z" itemprop="datePublished">2023-06-07</time>
+              </p>
+            </div>
+          </li>
+          
+          <li>
+            
+            <div class="item-inner">
+              <p class="item-category">
+                <a class="category-link" href="/categories/%E8%AE%BA%E6%96%87/">论文</a>
+              </p>
+              <p class="item-title">
+                <a href="/2023/06/07/Medical_Image_Segmentaion/IFE%E5%9F%BA%E4%BA%8E%E6%9B%B2%E7%8E%87%E6%88%96%E4%BF%A1%E6%81%AF%E7%86%B5%E7%9A%84%E9%80%9A%E9%81%93%E6%B3%A8%E6%84%8F%E5%8A%9B%E6%9C%BA-Glenn/" class="title">MedSeg | IFE：基于曲率或信息熵的通道注意力机制</a>
+              </p>
+              <p class="item-date">
+                <time datetime="2023-06-07T10:58:29.000Z" itemprop="datePublished">2023-06-07</time>
+              </p>
+            </div>
+          </li>
+          
+          <li>
+            
+            <div class="item-inner">
+              <p class="item-category">
+                <a class="category-link" href="/categories/%E8%AE%BA%E6%96%87/">论文</a>
+              </p>
+              <p class="item-title">
+                <a href="/2023/06/07/Medical_Image_Segmentaion/Loss%E7%94%A8%E4%BA%8E%E5%8C%BB%E5%AD%A6%E5%9B%BE%E5%83%8F%E5%88%86%E5%89%B2%E7%9A%84%E9%B2%81%E6%A3%92%E6%8D%9F%E5%A4%B1%E5%87%BD-Glenn/" class="title">MedSeg | T-Loss：用于医学图像分割的鲁棒损失函数</a>
+              </p>
+              <p class="item-date">
+                <time datetime="2023-06-07T10:58:29.000Z" itemprop="datePublished">2023-06-07</time>
+              </p>
+            </div>
+          </li>
+          
+          <li>
+            
+            <div class="item-inner">
+              <p class="item-category">
+                <a class="category-link" href="/categories/%E8%AE%BA%E6%96%87/">论文</a>
+              </p>
+              <p class="item-title">
+                <a href="/2023/06/07/Masked_Image_Model/%E8%AE%BA%E6%96%87%E9%98%85%E8%AF%BB%E6%9D%8E%E9%A3%9E%E9%A3%9E-MIM-SiamMAE-Glenn/" class="title">MIM | SiamMAE：用于从视频中学习视觉对应关系的 MAE 简单扩展</a>
+              </p>
+              <p class="item-date">
+                <time datetime="2023-06-07T10:51:29.000Z" itemprop="datePublished">2023-06-07</time>
+              </p>
+            </div>
+          </li>
+          
+      </ul>
+    </div>
+  </div>
+  
+
+    
+  </div>
+</aside>
+
+  
+  
+  <aside class="sidebar sidebar-toc collapse   in  " id="collapseToc" itemscope itemtype="http://schema.org/WPSideBar">
+  <div class="slimContent">
+    <nav id="toc" class="article-toc">
+      <h3 class="toc-title">文章目录</h3>
+      <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#%E4%B8%BB%E8%A6%81%E5%86%85%E5%AE%B9"><span class="toc-number">1.</span> <span class="toc-text">主要内容</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E6%96%B9%E6%B3%95"><span class="toc-number">2.</span> <span class="toc-text">方法</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E7%BB%93%E6%9E%9C"><span class="toc-number">3.</span> <span class="toc-text">结果</span></a></li></ol>
+    </nav>
+  </div>
+</aside>
+
+<main class="main" role="main">
+  <div class="content">
+  <article id="post-Masked_Image_Model/论文阅读-MIM-MR-MAE完美利用-Glenn" class="article article-type-post" itemscope itemtype="http://schema.org/BlogPosting">
+    
+    <div class="article-header">
+      
+        
+  
+    <h1 class="article-title" itemprop="name">
+      MIM | MR-MAE：完美利用 MIM 的高级与低级特征
+    </h1>
+  
+
+      
+      <div class="article-meta">
+        <span class="article-date">
+    <i class="icon icon-calendar-check"></i>
+	<a href="/2023/06/07/Masked_Image_Model/%E8%AE%BA%E6%96%87%E9%98%85%E8%AF%BB-MIM-MR-MAE%E5%AE%8C%E7%BE%8E%E5%88%A9%E7%94%A8-Glenn/" class="article-date">
+	  <time datetime="2023-06-07T10:49:38.000Z" itemprop="datePublished">2023-06-07</time>
+	</a>
+</span>
+        
+  <span class="article-category">
+    <i class="icon icon-folder"></i>
+    <a class="article-category-link" href="/categories/%E8%AE%BA%E6%96%87/">论文</a>
+  </span>
+
+        
+  <span class="article-tag">
+    <i class="icon icon-tags"></i>
+	<a class="article-tag-link-link" href="/tags/Masked-Image-Modeling/" rel="tag">Masked Image Modeling</a>
+  </span>
+
+
+        
+
+	<span class="article-read hidden-xs">
+    	<i class="icon icon-eye-fill" aria-hidden="true"></i>
+    	<span id="/2023/06/07/Masked_Image_Model/%E8%AE%BA%E6%96%87%E9%98%85%E8%AF%BB-MIM-MR-MAE%E5%AE%8C%E7%BE%8E%E5%88%A9%E7%94%A8-Glenn/" class="leancloud_visitors"  data-flag-title="MIM | MR-MAE：完美利用 MIM 的高级与低级特征">
+			<span class="leancloud-visitors-count">0</span>
+		</span>
+    </span>
+
+        <span class="post-comment"><i class="icon icon-comment"></i> <a href="/2023/06/07/Masked_Image_Model/%E8%AE%BA%E6%96%87%E9%98%85%E8%AF%BB-MIM-MR-MAE%E5%AE%8C%E7%BE%8E%E5%88%A9%E7%94%A8-Glenn/#comments" class="article-comment-link">评论</a></span>
+        
+      </div>
+    </div>
+    <div class="article-entry marked-body" itemprop="articleBody">
+      
+        <p><img src="/2023/06/07/Masked_Image_Model/%E8%AE%BA%E6%96%87%E9%98%85%E8%AF%BB-MIM-MR-MAE%E5%AE%8C%E7%BE%8E%E5%88%A9%E7%94%A8-Glenn/v2-a81856769a302aed0ac9949ebbbf4585_r.jpg"></p>
+<blockquote>
+<p><em><strong>题目：</strong>Mimic before Reconstruct: Enhancing Masked Autoencoders with Feature Mimicking</em><br><em><strong>作者单位：</strong>上海人工智能实验室、香港中文大学</em><br><em><strong>论文网址：</strong><a href="https://link.zhihu.com/?target=https://arxiv.org/abs/2303.05475">https://arxiv.org/abs/2303.05475</a></em><br><em><strong>论文代码：</strong><a href="https://link.zhihu.com/?target=https://github.com/Alpha-VL/ConvMAE">https://github.com/Alpha-VL/ConvMAE</a></em><br><em><strong>首次发布时间：</strong>2023 年 3 月 9 日</em></p>
+</blockquote>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">@article&#123;gao2023mimic,</span><br><span class="line">  title=&#123;Mimic before Reconstruct: Enhancing Masked Autoencoders with Feature Mimicking&#125;,</span><br><span class="line">  author=&#123;Gao, Peng and Zhang, Renrui and Fang, Rongyao and Lin, Ziyi and Li, Hongyang and Li, Hongsheng and Yu, Qiao&#125;,</span><br><span class="line">  journal=&#123;arXiv preprint arXiv:2303.05475&#125;,</span><br><span class="line">  year=&#123;2023&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+<hr>
+<h1 id="主要内容"><a href="#主要内容" class="headerlink" title="主要内容"></a>主要内容</h1><p>在 MIM 中，常见的观点是 MAE 重建解码器后的底层 RGB 信号，忽视了对编码器高层次语义的监督。为了改善这个问题，大多数现有的解决方案会使用 DINO、CLIP 等高级编码特征来代替像素重建目标。</p>
+<p>然而，作者提出了一种名为 MR-MAE 的方法，也就是 ‘Mimic before Reconstruct for Masked Autoencoders’，通过使用预训练的现成特征编码器正则化中间表示来增强 MAE，其目标是<strong>在预训练阶段无干扰地同时学习高级和底层表示。</strong></p>
+<p>如图 1(b) 所示，将低级和高级监督直接应用于解码器输出会导致语义冲突，因此 MR-MAE 将低级和高级监督分别应用于不同的图像 tokens 和网络层。通过在 ImageNet-1K 上进行微调的 top-1 准确率可以从 83.0% 提高到 85.5%。</p>
+<p><img src="/2023/06/07/Masked_Image_Model/%E8%AE%BA%E6%96%87%E9%98%85%E8%AF%BB-MIM-MR-MAE%E5%AE%8C%E7%BE%8E%E5%88%A9%E7%94%A8-Glenn/v2-9bc2da1fc23ffab57fc67ccd1bfd37e7_r.jpg"><br>图1. 使用 MR-MAE 进行预训练。(a) 原始 MAE 仅重建低级 RGB 像素。(b) 将低级和高级监督直接应用于解码器输出会导致语义冲突。(c) MR-MAE 将低级和高级监督分别应用于不同的图像 tokens 和网络层。通过在 ImageNet-1K 上进行微调的 top-1 准确率可以从 83.0% 提高到 85.5%。</p>
+<hr>
+<h1 id="方法"><a href="#方法" class="headerlink" title="方法"></a>方法</h1><p>MR-MAE 的整体流程如图 2 所示。MR-MAE 将 25% 的可见 tokens 输入到 Transformer 编码器中，以得到中间表示 E_v 。这与仅依赖于解码器进行低级重构的方法有所不同，MR-MAE 从编码器中提取的丰富的高级语义特征，如 DINO 或 CLIP 来引导中间表征 E_v ，如图 2 (2) 所示。</p>
+<p>在此过程中，图像首先输入到预训练的编码器中，以提取 DINO 或 CLIP 特征，记为 F^D_v，F^C_v\in\mathbb R^{l_v×C} 。然后，在编码器上增加一个特性模拟头（mimic head），即一个线性投影层，使得可见表示 E_v 去 mimic F^D_v 或 F^C_v 。最后，MR-MAE 的 L2 模拟损失（mimic loss）定义为：\mathcal L_{\mathcal M}&#x3D;\frac{1}{l_v}||L(E_v)-F_v||^2_2 ，其中 L 表示 mimic head。</p>
+<p>另一方面，在 MR-MAE 中，为了整合低级和高级信息，采用了一个轻量级的解码器来重构 75% 的被掩蔽的 RGB 像素，如图 2(3) 所示。</p>
+<p>在 MR-MAE 中，特征模拟损失 \mathcal L_{\mathcal M} 和掩码 tokens 的重建损失 \mathcal L_{\mathcal R} ，各自针对输入图像的高级语义和低级纹理进行编码。这两种损失函数能够相互补充，协同促进更具辨别性的表征学习。</p>
+<p>另外，为了避免低级和高级目标之间的学习冲突，MR-MAE 通过对不同的 tokens 组（25% 可见对 75% 掩蔽）和不同的网络层（编码器和解码器的输出）应用监督。</p>
+<p>通过新引入的高级特征模拟损失，MR-MAE 能够显著提升 MAE 的下游性能，并缩短其预训练的 epoch。</p>
+<p><img src="/2023/06/07/Masked_Image_Model/%E8%AE%BA%E6%96%87%E9%98%85%E8%AF%BB-MIM-MR-MAE%E5%AE%8C%E7%BE%8E%E5%88%A9%E7%94%A8-Glenn/v2-c10095e0bbf9420a90c43d995d5a3353_r.jpg"><br>图2. MR-MAE 的架构。在 MAE 预训练期间，分别为不同的图像 tokens 和网络层设置高级和低级学习目标：编码器 25% 可见 tokens 的 mimic loss，以及解码器的 75% 掩码 tokens 的重建损失。<br>MR-MAE 中还有些 tricks：</p>
+<ul>
+<li><strong>Focused Mimicking：</strong>MAE 采用随机掩蔽策略来选择可见 tokens，这种方式本质上是对低级信号重构的一种自然选择，不依赖额外的引导。而在预训练模型中，[CLS] token 可以通过其注意力图清晰地标识出重要区域。因此，作者在教师网络的注意力图中挑选出最显著的 tokens，用于模拟可见特征。通过这种方法，MR-MAE 可以更有效地捕获教师网络中编码的高级语义信息，而不是非显著的低级语义。</li>
+<li><strong>Multi-layer Fusion：</strong>在原始的 MAE 中，只有编码器最后一层的输出 tokens 被送入解码器，用于被掩蔽像素的重建。然而，编码器的不同层可能在不同的抽象级别上描述图像。因此，作者采取策略性地结合来自编码器多个中间层的可见 tokens，然后使用这些组合的 tokens 进行高级特征的模拟和低级像素的重建。通过这种方式，特征模拟的监督可以直接应用到编码器的多个层面，从而优化视觉表征。</li>
+<li><strong>Masked Convolution Stages：</strong>作者在 transformer 块前添加了额外的掩蔽卷积层，以便有效地捕捉高分辨率的细节，并应用了多尺度的逐块掩蔽，以防止像素重建过程中的信息泄露。这种多尺度编码能够学习到层次化的表示，并在下游任务中实现显著的改进。</li>
+</ul>
+<hr>
+<h1 id="结果"><a href="#结果" class="headerlink" title="结果"></a>结果</h1><p>通过表 1 可以看出：</p>
+<ul>
+<li>MR-MAE 在重构低级像素和使用各向同性（isotropic）结构上超过了 BeiT, MAE, CAE 等 MIM 方法的性能（85.8% 对 83.0&#x2F;83.6&#x2F;83.6&#x2F;84.0%）；</li>
+<li>采用多尺度特征的 SimMIM，MCMAE 和 MixMIM 虽然提高了微调精度，但由于它们仍然重构低级信号，MR-MAE 在预训练周期更少的情况下仍然能够超过它们的微调精度（85.8% vs 84.0&#x2F;85.0&#x2F;85.1%）；</li>
+<li>有一些研究尝试用高级语义目标直接替代低级信号的重构，如 MaskFeat，data2vec，MVP 和 MILAN 等。尽管这些模型展现出了一些有前景的结果，但 MR-MAE 在多尺度架构中联合学习低级和高级目标，仍然获得了更好的性能（85.8% vs 85.4&#x2F;85.5%）；</li>
+<li>不同于 CMAE 的对比损失和重构损失的联合优化，MR-MAE 使用了一个含有丰富语义知识的预训练教师模型，提高了 Top-1 准确性，并缩短了预训练周期；</li>
+<li>DMAE 模型尽管采用了与 MR-MAE 类似的方法，但由于其教师模型仍然以低级像素为目标进行预训练，因此其微调精度不如 MR-MAE（84.0% vs 85.8%）。</li>
+</ul>
+<p><img src="/2023/06/07/Masked_Image_Model/%E8%AE%BA%E6%96%87%E9%98%85%E8%AF%BB-MIM-MR-MAE%E5%AE%8C%E7%BE%8E%E5%88%A9%E7%94%A8-Glenn/v2-439839e7724b3048356e0bd76d2f84d0_r.jpg"><br>表1. 对 ImageNet-1K 进行微调。&#39;Ratio&#39; 表示输入编码器的图像 tokens 的可见比率； &#39;P-Epochs&#39; 和 &#39;FT&#39; 表示预训练 epoch 和通过微调获得的 Top-1 精度。<br>从表 2 可以看出：</p>
+<ul>
+<li>将 MR-MAE 用作 Mask-RCNN 的预训练 backbone，经过在 COCO train2017 上进行 25 个 epoch 的微调，获得了 53.4% 的 AP^{box} 和 46.9% 的 AP^{mask}。</li>
+<li>比于使用了 1600 个 epoch 预训练的 MAE 编码器的基准 ViTDet，MR-MAE 可以提高 AP^{box} 和 AP^{mask} +2.2% 和 +1.4%。</li>
+<li>与 CMAE 和 MCMAE 等多尺度主干网络相比，MR-MAE 在预训练周期大大缩短（400 对 1600）的情况下，实现了可比的 AP^{box} 和 AP^{mask}。</li>
+</ul>
+<p><img src="/2023/06/07/Masked_Image_Model/%E8%AE%BA%E6%96%87%E9%98%85%E8%AF%BB-MIM-MR-MAE%E5%AE%8C%E7%BE%8E%E5%88%A9%E7%94%A8-Glenn/v2-347ae14908cf9ddeabde2748d58243de_r.jpg"><br>表2. 基于 Mask RCNN 框架对 COCO 进行微调<br>表 3 展示了 MR-MAE 的“’mimic before reconstruct”和 bag-of-tricks 的消融研究，可以得出：</p>
+<ul>
+<li>基线 MAE 模型使用低级重构损失，在 200 个预训练周期的 ImageNet1K 上达到了 83.0% 的微调精度。通过联合模仿损失学习，分类精度提高了+1.7%。同时优化低级和高级目标可以比仅模仿高级语义获得更好的性能，特别是对于物体检测的 AP^{box} 提升了 0.7%。</li>
+<li>在 \mathcal L_{\mathcal R} 和 \mathcal L_{\mathcal M} 的微调精度为 84.7% 的基础上，Focused mimicking 提升了精度+0.2%，得益于教师网络的注意力图引导的显著 tokens 的关注。Multi-layer Fusion 进一步提高了精度 +0.1%。引入 Masked Convolution Stages 可以将 ImageNet-1K 的微调精度提高 +0.5%，并且提高了 AP^{box} 和 AP^{mask} +1.4% 和 +1.0%，这表明了多尺度架构的重要性。</li>
+<li>低级和高级目标包含不同的视觉语义，它们的联合监督可能会产生冲突。低级和高级目标的联合重构使 ImageNet-1K 的微调精度下降1.7%，AP^{box} 下降 1.3%，AP^{mask} 下降 0.6%。Mimic-before-Reconstruct 框架通过在不同的 tokens 组和不同的网络层上应用模仿和重构损失，解决了低级和高级目标之间的冲突。</li>
+</ul>
+<p><img src="/2023/06/07/Masked_Image_Model/%E8%AE%BA%E6%96%87%E9%98%85%E8%AF%BB-MIM-MR-MAE%E5%AE%8C%E7%BE%8E%E5%88%A9%E7%94%A8-Glenn/v2-e7288fecfe3947b7cb66c20b5b387a9c_r.jpg"><br>表3. MR-MAE 的“&#39;mimic before reconstruct”和 bag-of-tricks 的消融研究。<br>表 4 展示了在 ImageNet-1K 上使用高级预训练目标的微调精度的消融研究，可以得出：</p>
+<ul>
+<li>由 CLIP 生成的特征比 DINO 的微调精度高 1%，这表明图像-语言对比学习提供的高级语义比图像-图像对比学习更强；</li>
+<li>多个高级信号的联合模仿比独立模仿效果差，我们认为这是由于预测不同高级目标的梯度冲突引起的。所以作者分别对 MR-MAE 进行预训练和微调，然后集成两个模型，以避免由重构不同高级目标的冲突引入的性能下降；</li>
+<li>CLIP&#x2F;DINO（分离）可以比 CLIP&#x2F;DINO（联合）高 1.7%，这验证了与不同目标学习的互补表示。</li>
+</ul>
+<p><img src="/2023/06/07/Masked_Image_Model/%E8%AE%BA%E6%96%87%E9%98%85%E8%AF%BB-MIM-MR-MAE%E5%AE%8C%E7%BE%8E%E5%88%A9%E7%94%A8-Glenn/v2-57c3adec54f35515d2cf1d43f35df10f_b.jpg"><br>表4. 在 ImageNet-1K 上使用高级预训练目标的微调精度的消融研究。<br>表 5 展示了预训练 epoch 对 ImageNet-1K 和 COCO 影响的消融研究，可以得出：</p>
+<ul>
+<li>200 个周期的预训练可以达到 85.5% 的 ImageNet1K 微调精度和 COCO 的 52.7% 的 AP^{box}。</li>
+<li>MR-MAE 在预训练 400 个周期后，ImageNet-1K 的微调精度提高了 0.3%，AP^{box} 提高了 0.7%。</li>
+<li>当预训练周期延长到 800 个周期时，性能趋于饱和，这说明引入高级目标可以使 MIM 方法更快地收敛。</li>
+<li>在 Mimic-beforere-construct 框架下，原本需要 1600 个预训练周期的计划可以缩短到 400 个周期。</li>
+</ul>
+<p><img src="/2023/06/07/Masked_Image_Model/%E8%AE%BA%E6%96%87%E9%98%85%E8%AF%BB-MIM-MR-MAE%E5%AE%8C%E7%BE%8E%E5%88%A9%E7%94%A8-Glenn/v2-f47705318a5ff08cb7f60728b9f6d4ed_r.jpg"><br>表5. 预训练 epoch 对 ImageNet-1K 和 COCO 影响的消融研究。<br>表 6 测试了 MR-MAE 的可扩展性，可以得出：与单尺度的 baseline MAE 和更强大的多尺度 baseline MCMAE相比，MR-MAE 在所有模型大小上的性能都有显著提升，且预训练周期大大缩短。</p>
+<p><img src="/2023/06/07/Masked_Image_Model/%E8%AE%BA%E6%96%87%E9%98%85%E8%AF%BB-MIM-MR-MAE%E5%AE%8C%E7%BE%8E%E5%88%A9%E7%94%A8-Glenn/v2-fd0a54a2a0122db7e81797af31009beb_r.jpg"><br>表6. 不同模型尺度的 ImageNet-1K 微调精度。<br>同时，作者通过可视化了不同模型的注意力图来解释为何高级目标能提升模型表现。如图 3 所示，MAE 的注意力偏向于纹理模式，因其旨在重构低级像素，这意味着 MAE 在与语义理解无关的低级纹理上浪费了能力。而 DINO 的 [CLS] token 的注意力过于强调突出物体的部分信息。相比之下，MR-MAE 的注意力能够捕获完整的物体信息。</p>
+<p><img src="/2023/06/07/Masked_Image_Model/%E8%AE%BA%E6%96%87%E9%98%85%E8%AF%BB-MIM-MR-MAE%E5%AE%8C%E7%BE%8E%E5%88%A9%E7%94%A8-Glenn/v2-6d06add339e64b95590919f042e88be7_r.jpg"><br>图3. DINO、MAE 和 MR-MAE 最后一个自注意层的注意力权重可视化。与以前的方法相比，MR-MAE 可以更好地捕获显着特征表示。</p>
+
+      
+    </div>
+    <div class="article-footer">
+      <blockquote class="mt-2x">
+  <ul class="post-copyright list-unstyled">
+    
+    <li class="post-copyright-link hidden-xs">
+      <strong>本文链接：</strong>
+      <a href="https://chenluda.github.io/2023/06/07/Masked_Image_Model/%E8%AE%BA%E6%96%87%E9%98%85%E8%AF%BB-MIM-MR-MAE%E5%AE%8C%E7%BE%8E%E5%88%A9%E7%94%A8-Glenn/" title="MIM | MR-MAE：完美利用 MIM 的高级与低级特征" target="_blank" rel="external">https://chenluda.github.io/2023/06/07/Masked_Image_Model/论文阅读-MIM-MR-MAE完美利用-Glenn/</a>
+    </li>
+    
+    <li class="post-copyright-license">
+      <strong>版权声明： </strong> 本博客所有文章除特别声明外，均采用 <a href="http://creativecommons.org/licenses/by/4.0/deed.zh" target="_blank" rel="external">CC BY 4.0 CN协议</a> 许可协议。转载请注明出处！
+    </li>
+  </ul>
+</blockquote>
+
+
+<div class="panel panel-default panel-badger">
+  <div class="panel-body">
+    <figure class="media">
+      <div class="media-left">
+        <a href="https://github.com/chenluda" target="_blank" class="img-burn thumb-sm visible-lg">
+          <img src="/images/avatar.png" class="img-rounded w-full" alt="">
+        </a>
+      </div>
+      <div class="media-body">
+        <h3 class="media-heading"><a href="https://github.com/chenluda" target="_blank"><span class="text-dark">Glenn</span><small class="ml-1x">Stay hungry, stay foolish.</small></a></h3>
+        <div>咖啡，健身，热爱生活。</div>
+      </div>
+    </figure>
+  </div>
+</div>
+
+
+    </div>
+  </article>
+  
+    
+  <section id="comments">
+  	
+      <div id="vcomments"></div>
+    
+  </section>
+
+
+  
+</div>
+
+  <nav class="bar bar-footer clearfix" data-stick-bottom>
+  <div class="bar-inner">
+  
+  <ul class="pager pull-left">
+    
+    <li class="prev">
+      <a href="/2023/06/07/Masked_Image_Model/%E8%AE%BA%E6%96%87%E9%98%85%E8%AF%BB%E6%9D%8E%E9%A3%9E%E9%A3%9E-MIM-SiamMAE-Glenn/" title="MIM | SiamMAE：用于从视频中学习视觉对应关系的 MAE 简单扩展"><i class="icon icon-angle-left" aria-hidden="true"></i><span>&nbsp;&nbsp;上一篇</span></a>
+    </li>
+    
+    
+    <li class="next">
+      <a href="/2023/06/07/Masked_Image_Model/%E8%AE%BA%E6%96%87%E9%98%85%E8%AF%BB-MIM-%E7%90%86%E8%AE%BAMIM-%E7%9A%84%E6%95%B0%E6%8D%AE%E5%8F%AF-Glenn/" title="MIM | 理论：MIM 的数据可扩展性研究"><span>下一篇&nbsp;&nbsp;</span><i class="icon icon-angle-right" aria-hidden="true"></i></a>
+    </li>
+    
+    
+    <li class="toggle-toc">
+      <a class="toggle-btn " data-toggle="collapse" href="#collapseToc" aria-expanded="false" title="文章目录" role="button">    <span>[&nbsp;</span><span>文章目录</span>
+        <i class="text-collapsed icon icon-anchor"></i>
+        <i class="text-in icon icon-close"></i>
+        <span>]</span>
+      </a>
+    </li>
+    
+  </ul>
+  
+  
+  
+  <div class="bar-right">
+    
+    <div class="share-component" data-sites="weibo,qq,wechat,facebook,twitter" data-mobile-sites="weibo,qq,qzone"></div>
+    
+  </div>
+  </div>
+</nav>
+  
+
+
+</main>
+
+  <footer class="footer" itemscope itemtype="http://schema.org/WPFooter">
+	
+	
+    <ul class="social-links">
+    	
+        <li><a href="https://github.com/chenluda" target="_blank" title="Github" data-toggle=tooltip data-placement=top><i class="icon icon-github"></i></a></li>
+        
+        <li><a href="https://www.zhihu.com/people/Glenn" target="_blank" title="Zhihu" data-toggle=tooltip data-placement=top><i class="icon icon-zhihu"></i></a></li>
+        
+    </ul>
+
+    <div class="copyright">
+    	
+        &copy; 2023 Glenn
+        
+        <div class="publishby">
+        	Theme by <a href="https://github.com/cofess" target="_blank"> cofess </a>base on <a href="https://github.com/cofess/hexo-theme-pure" target="_blank">pure</a>.
+        </div>
+    </div>
+</footer>
+  <script src="//cdn.jsdelivr.net/npm/jquery@1.12.4/dist/jquery.min.js"></script>
+<script>
+window.jQuery || document.write('<script src="js/jquery.min.js"><\/script>')
+</script>
+
+<script src="/js/plugin.min.js"></script>
+
+
+<script src="/js/application.js"></script>
+
+
+    <script>
+(function (window) {
+    var INSIGHT_CONFIG = {
+        TRANSLATION: {
+            POSTS: '文章',
+            PAGES: '页面',
+            CATEGORIES: '分类',
+            TAGS: '标签',
+            UNTITLED: '(未命名)',
+        },
+        ROOT_URL: '/',
+        CONTENT_URL: '/content.json',
+    };
+    window.INSIGHT_CONFIG = INSIGHT_CONFIG;
+})(window);
+</script>
+
+<script src="/js/insight.js"></script>
+
+
+
+
+
+
+   
+
+
+
+
+   
+    
+  <script src="//cdn1.lncld.net/static/js/3.0.4/av-min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/valine"></script>
+  <script type="text/javascript">
+  var GUEST = ['nick', 'mail', 'link'];
+  var meta = 'nick,mail,link';
+  meta = meta.split(',').filter(function(item) {
+    return GUEST.indexOf(item) > -1;
+  });
+  new Valine({
+    el: '#vcomments',
+    verify: false,
+    notify: false,
+    appId: 'rSq08S6gdVroDI1A4r7XWnix-MdYXbMMI',
+    appKey: '5UM6jz8DwNaaEQTN5ojTHB1N',
+    placeholder: '请输入...',
+    avatar: 'mm',
+    meta: meta,
+    pageSize: '10' || 10,
+    visitor: true
+  });
+  </script>
+
+     
+
+
+
+
+
+
+
+</body>
+</html>
